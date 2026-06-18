@@ -46,8 +46,8 @@ export async function POST(req: NextRequest) {
     const cookies = setAuthCookie(token);
     response.headers.set("Set-Cookie", cookies["Set-Cookie"]);
     return response;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Register error:", error);
-    return NextResponse.json({ error: "注册失败，请稍后重试" }, { status: 500 });
+    return NextResponse.json({ error: "注册失败", detail: error?.message || String(error) }, { status: 500 });
   }
 }
