@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Server, Plus, Pencil, Trash2, X, ChevronDown } from "lucide-react";
+import { apiGet, apiPost, apiDelete, isLoginRequired, getLocalStorage } from "@/lib/api";
 
 export interface SavedServer {
   id: string;
@@ -22,20 +23,6 @@ interface ServerManagerProps {
 
 const STORAGE_KEY = "quick_servers";
 
-function loadServers(): SavedServer[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveServers(servers: SavedServer[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(servers));
-}
-
 export function ServerManager({
   onSelect,
   selectedId,
@@ -46,37 +33,86 @@ export function ServerManager({
   const [showModal, setShowModal] = useState(false);
   const [editingServer, setEditingServer] = useState<SavedServer | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   useEffect(() => {
-    setServers(loadServers());
+    setIsLoggedIn(!isLoginRequired());
+    loadServers();
   }, []);
+
+  const loadServers = async () => {
+    if (isLoginRequired()) {
+      setIsLoggedIn(false);
+      setServers(getLocalStorage<SavedServer[]>(STORAGE_KEY, []));
+      return;
+    }
+    try {
+      const data = await apiGet<SavedServer[]>("/api/servers");
+      setServers(data);
+      // Sync to localStorage as backup
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch {
+      setServers(getLocalStorage<SavedServer[]>(STORAGE_KEY, []));
+    }
+  };
 
   const refresh = useCallback(() => {
-    setServers(loadServers());
+    loadServers();
   }, []);
 
-  const addServer = (data: Omit<SavedServer, "id">) => {
+  const addServer = async (data: Omit<SavedServer, "id">) => {
+    if (isLoggedIn) {
+      try {
+        const newServer = await apiPost<SavedServer>("/api/servers", data);
+        setServers((prev) => [...prev, newServer]);
+        return;
+      } catch {
+        // Fall back to localStorage
+      }
+    }
     const newServer: SavedServer = {
       ...data,
       id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
     };
-    const updated = [...servers, newServer];
-    saveServers(updated);
-    setServers(updated);
+    setServers((prev) => {
+      const updated = [...prev, newServer];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
   };
 
-  const updateServer = (data: SavedServer) => {
-    const updated = servers.map((s) => (s.id === data.id ? data : s));
-    saveServers(updated);
-    setServers(updated);
+  const updateServer = async (data: SavedServer) => {
+    if (isLoggedIn) {
+      try {
+        await apiPost<SavedServer>("/api/servers", data);
+        setServers((prev) => prev.map((s) => (s.id === data.id ? data : s)));
+        return;
+      } catch {
+        // Fall back to localStorage
+      }
+    }
+    setServers((prev) => {
+      const updated = prev.map((s) => (s.id === data.id ? data : s));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
   };
 
-  const deleteServer = (id: string) => {
-    const updated = servers.filter((s) => s.id !== id);
-    saveServers(updated);
-    setServers(updated);
+  const deleteServer = async (id: string) => {
+    if (isLoggedIn) {
+      try {
+        await apiDelete("/api/servers", id);
+      } catch {
+        // Continue with local delete
+      }
+    }
+    setServers((prev) => {
+      const updated = prev.filter((s) => s.id !== id);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
     if (selectedId === id && onSelect) {
-      onSelect(updated[0] || null!);
+      onSelect(servers.find((s) => s.id !== id) || null!);
     }
   };
 
@@ -94,7 +130,6 @@ export function ServerManager({
 
   return (
     <div className="space-y-3">
-      {/* Selector */}
       {showSelect && (
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
@@ -192,7 +227,6 @@ export function ServerManager({
         </div>
       )}
 
-      {/* Server List (non-select mode) */}
       {!showSelect && (
         <div className="space-y-2">
           {servers.length === 0 ? (
@@ -253,7 +287,6 @@ export function ServerManager({
         </div>
       )}
 
-      {/* Add/Edit Modal */}
       {showModal && (
         <ServerFormModal
           server={editingServer}
@@ -313,7 +346,6 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
       <div
         className="glass-heavy rounded-2xl w-full max-w-md shadow-[0_16px_48px_rgba(0,0,0,0.5)] animate-scale-in max-h-[90vh] flex flex-col"
       >
-        {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.06] shrink-0">
           <h3 className="text-[17px] font-semibold tracking-tight">
             {server ? "编辑服务器" : "添加服务器"}
@@ -326,7 +358,6 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
           </button>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4 overflow-y-auto flex-1">
           <div>
             <label className="text-[12px] text-muted-foreground/60 uppercase tracking-wider mb-1.5 block">
@@ -386,7 +417,6 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
             />
           </div>
 
-          {/* Auth Type */}
           <div>
             <label className="text-[12px] text-muted-foreground/60 uppercase tracking-wider mb-1.5 block">
               认证方式
@@ -434,7 +464,6 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
             )}
           </div>
 
-          {/* Actions */}
           <div className="flex gap-2 pt-2">
             <button
               type="button"

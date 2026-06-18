@@ -6,6 +6,7 @@ import { ThemeSettings } from '@/components/settings/theme-settings';
 import { MonitorSettings } from '@/components/settings/monitor-settings';
 import { TerminalSettings } from '@/components/settings/terminal-settings';
 import { Save } from 'lucide-react';
+import { apiGet, apiPut, isLoginRequired, getLocalStorage } from '@/lib/api';
 
 interface Settings {
   theme: 'dark' | 'light' | 'system';
@@ -21,6 +22,8 @@ const defaultSettings: Settings = {
   terminalFontFamily: 'Menlo, Monaco, "Courier New", monospace',
 };
 
+const SETTINGS_KEY = 'toolkitx_settings';
+
 export default function SettingsPage() {
   const [settings, setSettings] = useState<Settings>(defaultSettings);
   const [saved, setSaved] = useState(false);
@@ -29,15 +32,34 @@ export default function SettingsPage() {
     loadSettings();
   }, []);
 
-  const loadSettings = () => {
-    const stored = localStorage.getItem('toolkitx_settings');
-    if (stored) {
-      setSettings({ ...defaultSettings, ...JSON.parse(stored) });
+  const loadSettings = async () => {
+    if (isLoginRequired()) {
+      setSettings({ ...defaultSettings, ...getLocalStorage(SETTINGS_KEY, {} as Settings) });
+      return;
+    }
+    try {
+      const data = await apiGet<Settings>('/api/settings');
+      setSettings(data);
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(data));
+    } catch {
+      setSettings({ ...defaultSettings, ...getLocalStorage(SETTINGS_KEY, {} as Settings) });
     }
   };
 
-  const saveSettings = () => {
-    localStorage.setItem('toolkitx_settings', JSON.stringify(settings));
+  const saveSettings = async () => {
+    if (isLoginRequired()) {
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+      return;
+    }
+    try {
+      const data = await apiPut<Settings>('/api/settings', settings);
+      setSettings(data);
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(data));
+    } catch {
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    }
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };

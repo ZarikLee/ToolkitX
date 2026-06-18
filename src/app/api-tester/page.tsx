@@ -3,10 +3,9 @@
 import { useState, useRef } from "react";
 import { RequestBuilder, RequestBuilderRef } from "@/components/api-tester/request-builder";
 import { ResponseViewer } from "@/components/api-tester/response-viewer";
-import { RequestHistory, saveToHistory } from "@/components/api-tester/request-history";
 import { SubPageLayout } from "@/components/layout/sub-page-layout";
-import { TabButton } from "@/components/ui/tab-button";
 import { Clock, Trash2, ArrowUpRight, FileCode } from "lucide-react";
+import { apiPost, apiDelete, apiGet, isLoginRequired } from "@/lib/api";
 
 const helpContent = [
   {
@@ -53,6 +52,8 @@ interface HistoryEntry {
   timestamp: number;
 }
 
+const HISTORY_KEY = "api_test_history";
+
 export default function ApiTesterPage() {
   const [response, setResponse] = useState<any>(null);
   const [error, setError] = useState<string | undefined>();
@@ -60,7 +61,7 @@ export default function ApiTesterPage() {
   const [history, setHistory] = useState<HistoryEntry[]>(() => {
     if (typeof window === "undefined") return [];
     try {
-      const stored = localStorage.getItem("api_test_history");
+      const stored = localStorage.getItem(HISTORY_KEY);
       return stored ? JSON.parse(stored) : [];
     } catch {
       return [];
@@ -68,6 +69,15 @@ export default function ApiTesterPage() {
   });
   const [selectedHistory, setSelectedHistory] = useState<HistoryEntry | null>(null);
   const builderRef = useRef<RequestBuilderRef>(null);
+
+  const loadHistory = async () => {
+    if (isLoginRequired()) return;
+    try {
+      const data = await apiGet<HistoryEntry[]>("/api/api-history");
+      setHistory(data);
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(data));
+    } catch {}
+  };
 
   const handleSend = async (config: {
     name: string;
@@ -105,9 +115,25 @@ export default function ApiTesterPage() {
           time: data.time,
           timestamp: Date.now(),
         };
+
+        // Save to database if logged in
+        if (!isLoginRequired()) {
+          try {
+            await apiPost("/api/api-history", {
+              name: entry.name,
+              method: entry.method,
+              url: entry.url,
+              headers: entry.headers,
+              body: entry.body,
+              status: entry.status,
+              time: entry.time,
+            });
+          } catch {}
+        }
+
         const newHistory = [entry, ...history].slice(0, 50);
         setHistory(newHistory);
-        localStorage.setItem("api_test_history", JSON.stringify(newHistory));
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(newHistory));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Network error");
@@ -120,15 +146,25 @@ export default function ApiTesterPage() {
     setSelectedHistory(entry);
   };
 
-  const clearHistory = () => {
-    localStorage.removeItem("api_test_history");
+  const clearHistory = async () => {
+    if (!isLoginRequired()) {
+      try {
+        await apiDelete("/api/api-history");
+      } catch {}
+    }
+    localStorage.removeItem(HISTORY_KEY);
     setHistory([]);
   };
 
-  const removeHistory = (id: string) => {
+  const removeHistory = async (id: string) => {
+    if (!isLoginRequired()) {
+      try {
+        await apiDelete("/api/api-history", id);
+      } catch {}
+    }
     const updated = history.filter((h) => h.id !== id);
     setHistory(updated);
-    localStorage.setItem("api_test_history", JSON.stringify(updated));
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
   };
 
   const getMethodColor = (method: string) => {
@@ -147,16 +183,6 @@ export default function ApiTesterPage() {
     if (status >= 300 && status < 400) return "text-[#ff9f0a]";
     if (status >= 400) return "text-[#ff453a]";
     return "text-muted-foreground";
-  };
-
-  const formatTime = (timestamp: number) => {
-    const d = new Date(timestamp);
-    const now = new Date();
-    const diff = now.getTime() - d.getTime();
-    if (diff < 60000) return "刚刚";
-    if (diff < 3600000) return `${Math.floor(diff / 60000)}分钟前`;
-    if (diff < 86400000) return `${Math.floor(diff / 3600000)}小时前`;
-    return d.toLocaleDateString("zh-CN");
   };
 
   return (
@@ -226,7 +252,6 @@ export default function ApiTesterPage() {
 
         {/* Main Content */}
         <div className="flex-1 space-y-4 min-w-0">
-          {/* Request Builder */}
           <div className="p-5 rounded-2xl border border-white/[0.06] bg-white/[0.02]">
             <RequestBuilder
               ref={builderRef}
@@ -240,7 +265,6 @@ export default function ApiTesterPage() {
             />
           </div>
 
-          {/* Response */}
           <div className="p-5 rounded-2xl border border-white/[0.06] bg-white/[0.02]">
             <h3 className="text-[12px] font-medium text-muted-foreground/60 uppercase tracking-wider mb-4">
               响应

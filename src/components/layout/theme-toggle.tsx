@@ -3,22 +3,62 @@
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 
+const THEME_KEY = "theme";
+
 export function ThemeToggle() {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
 
   useEffect(() => {
+    // Try to load from settings API first
+    loadTheme();
+  }, []);
+
+  const loadTheme = async () => {
+    try {
+      const res = await fetch("/api/settings");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.theme === "light" || data.theme === "dark") {
+          setTheme(data.theme);
+          localStorage.setItem(THEME_KEY, data.theme);
+          applyTheme(data.theme);
+          return;
+        }
+      }
+    } catch {}
+    // Fallback to localStorage
+    const stored = localStorage.getItem(THEME_KEY);
+    if (stored === "light" || stored === "dark") {
+      setTheme(stored);
+      applyTheme(stored);
+    }
+  };
+
+  const applyTheme = (t: "light" | "dark") => {
     const root = document.documentElement;
-    if (theme === "dark") {
+    if (t === "dark") {
       root.classList.add("dark");
       root.classList.remove("light");
     } else {
       root.classList.remove("dark");
       root.classList.add("light");
     }
-  }, [theme]);
+  };
 
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  const toggleTheme = async () => {
+    const next = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    localStorage.setItem(THEME_KEY, next);
+    applyTheme(next);
+
+    // Sync to settings API if logged in
+    try {
+      await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ theme: next }),
+      });
+    } catch {}
   };
 
   return (

@@ -17,6 +17,8 @@ interface SessionSnapshotProps {
   onRestore: (commands: string[]) => void;
 }
 
+const STORAGE_KEY = "session_snapshots";
+
 export function SessionSnapshot({ serverId, serverName, onRestore }: SessionSnapshotProps) {
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
   const [currentCommands, setCurrentCommands] = useState<string[]>([]);
@@ -24,22 +26,34 @@ export function SessionSnapshot({ serverId, serverName, onRestore }: SessionSnap
   const [snapshotName, setSnapshotName] = useState("");
 
   useEffect(() => {
-    const saved = localStorage.getItem("session_snapshots");
-    if (saved) {
-      setSnapshots(JSON.parse(saved));
-    }
+    loadSnapshots();
   }, []);
 
-  const saveSnapshots = (newSnapshots: Snapshot[]) => {
+  const loadSnapshots = async () => {
+    try {
+      const res = await fetch("/api/snapshots");
+      if (res.ok) {
+        const data = await res.json();
+        setSnapshots(data);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        return;
+      }
+    } catch {}
+    // Fallback to localStorage
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) setSnapshots(JSON.parse(saved));
+  };
+
+  const saveSnapshots = async (newSnapshots: Snapshot[]) => {
     setSnapshots(newSnapshots);
-    localStorage.setItem("session_snapshots", JSON.stringify(newSnapshots));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newSnapshots));
   };
 
   const addCommand = (command: string) => {
     setCurrentCommands([...currentCommands, command]);
   };
 
-  const saveSnapshot = () => {
+  const saveSnapshot = async () => {
     if (!snapshotName) return;
 
     const newSnapshot: Snapshot = {
@@ -51,6 +65,23 @@ export function SessionSnapshot({ serverId, serverName, onRestore }: SessionSnap
       timestamp: Date.now(),
     };
 
+    try {
+      const res = await fetch("/api/snapshots", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: snapshotName,
+          serverId,
+          serverName,
+          commands: currentCommands,
+        }),
+      });
+      if (res.ok) {
+        const saved = await res.json();
+        newSnapshot.id = saved.id;
+      }
+    } catch {}
+
     saveSnapshots([newSnapshot, ...snapshots]);
     setSnapshotName("");
     setShowSaveModal(false);
@@ -61,7 +92,10 @@ export function SessionSnapshot({ serverId, serverName, onRestore }: SessionSnap
     onRestore(snapshot.commands);
   };
 
-  const deleteSnapshot = (id: string) => {
+  const deleteSnapshot = async (id: string) => {
+    try {
+      await fetch(`/api/snapshots?id=${id}`, { method: "DELETE" });
+    } catch {}
     saveSnapshots(snapshots.filter((s) => s.id !== id));
   };
 

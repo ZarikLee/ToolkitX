@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-interface CommandHistory {
+interface CommandHistoryItem {
   id: string;
   command: string;
   output: string;
@@ -14,30 +14,56 @@ interface CommandHistoryProps {
   onExecute: (command: string) => void;
 }
 
+const STORAGE_KEY = "command_history";
+
 export function CommandHistory({ onExecute }: CommandHistoryProps) {
-  const [history, setHistory] = useState<CommandHistory[]>([]);
+  const [history, setHistory] = useState<CommandHistoryItem[]>([]);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    const saved = localStorage.getItem("command_history");
-    if (saved) {
-      setHistory(JSON.parse(saved));
-    }
+    loadHistory();
   }, []);
 
-  const saveHistory = (newHistory: CommandHistory[]) => {
-    setHistory(newHistory);
-    localStorage.setItem("command_history", JSON.stringify(newHistory));
+  const loadHistory = async () => {
+    try {
+      const res = await fetch("/api/command-history");
+      if (res.ok) {
+        const data = await res.json();
+        setHistory(data);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        return;
+      }
+    } catch {}
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) setHistory(JSON.parse(saved));
   };
 
-  const addCommand = (command: string, output: string) => {
-    const newItem: CommandHistory = {
+  const saveHistory = (newHistory: CommandHistoryItem[]) => {
+    setHistory(newHistory);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory));
+  };
+
+  const addCommand = async (command: string, output: string) => {
+    const newItem: CommandHistoryItem = {
       id: Date.now().toString(),
       command,
       output,
       timestamp: Date.now(),
       favorite: false,
     };
+
+    try {
+      const res = await fetch("/api/command-history", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ command, output }),
+      });
+      if (res.ok) {
+        const saved = await res.json();
+        newItem.id = saved.id;
+      }
+    } catch {}
+
     saveHistory([newItem, ...history].slice(0, 100));
   };
 
@@ -49,11 +75,17 @@ export function CommandHistory({ onExecute }: CommandHistoryProps) {
     );
   };
 
-  const deleteItem = (id: string) => {
+  const deleteItem = async (id: string) => {
+    try {
+      await fetch(`/api/command-history?id=${id}`, { method: "DELETE" });
+    } catch {}
     saveHistory(history.filter((item) => item.id !== id));
   };
 
-  const clearHistory = () => {
+  const clearHistory = async () => {
+    try {
+      await fetch("/api/command-history", { method: "DELETE" });
+    } catch {}
     saveHistory([]);
   };
 
