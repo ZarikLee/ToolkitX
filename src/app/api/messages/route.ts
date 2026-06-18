@@ -3,8 +3,8 @@ import { getCurrentUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 // GET - 获取消息列表
-// 普通用户：看到所有广播公告，unreadCount = 未读公告数
-// 管理员：看到所有广播公告 + 所有用户反馈，unreadCount = 未读反馈数（不包含自己的公告）
+// 普通用户：广播公告 + 自己的反馈（含管理员回复）
+// 管理员：广播公告 + 所有用户反馈
 export async function GET() {
   const user = await getCurrentUser();
   if (!user) {
@@ -13,7 +13,7 @@ export async function GET() {
 
   const isAdmin = user.role === "admin";
 
-  // 广播公告
+  // 广播公告 + 已读状态
   const messages = await prisma.message.findMany({
     orderBy: { createdAt: "desc" },
     include: {
@@ -24,47 +24,6 @@ export async function GET() {
     },
   });
 
-  // 管理员：获取所有反馈 + 跟踪已读状态
-  let feedbackItems: any[] = [];
-  let feedbackUnreadCount = 0;
-
-  if (isAdmin) {
-    const feedbacks = await prisma.feedback.findMany({
-      orderBy: { createdAt: "desc" },
-      include: {
-        user: { select: { name: true } },
-      },
-    });
-
-    // 检查管理员对每条反馈的已读状态（通过 MessageRead 表，messageId 用 fb-{feedbackId}）
-    const feedbackIds = feedbacks.map((f) => `fb-${f.id}`);
-    const reads = await prisma.messageRead.findMany({
-      where: {
-        messageId: { in: feedbackIds },
-        userId: user.userId,
-      },
-    });
-    const readSet = new Set(reads.filter((r) => r.read).map((r) => r.messageId));
-
-    feedbackItems = feedbacks.map((f) => ({
-      id: `fb-${f.id}`,
-      title: `[反馈] ${f.title}`,
-      content: f.content,
-      type: f.type,
-      read: readSet.has(`fb-${f.id}`),
-      createdAt: f.createdAt.getTime(),
-      isFeedback: true,
-      userName: f.user.name,
-      feedbackId: f.id,
-      status: f.status,
-      reply: f.reply,
-    }));
-
-    feedbackUnreadCount = feedbackItems.filter((f) => !f.read).length;
-  }
-
-  // 普通用户：公告的未读数（排除自己发的）
-  // 管理员：公告不计入未读数
   const broadcastItems = messages.map((m) => ({
     id: m.id,
     title: m.title,
@@ -75,17 +34,60 @@ export async function GET() {
     isFeedback: false,
   }));
 
-  const broadcastUnreadCount = isAdmin
-    ? 0
-    : messages.filter((m) => m.reads.length === 0).length;
+  // 反馈列表
+  const feedbackWhere = isAdmin
+    ? {}
+    : { userId: user.userId };
+
+  const feedbacks = await prisma.feedback.findMany({
+    where: feedbackWhere,
+    orderBy: { createdAt: "desc" },
+    include: {
+      user: { select: { name: true } },
+    },
+  });
+
+  // 获取反馈的已读状态
+  const fbIds = feedbacks.map((f) => `fb-${f.id}`);
+  const reads = await prisma.messageRead.findMany({
+    where: {
+      messageId: { in: fbIds },
+      userId: user.userId,
+    },
+  });
+  const readSet = new Set(reads.filter((r) => r.read).map((r) => r.messageId));
+
+  const feedbackItems = feedbacks.map((f) => ({
+    id: `fb-${f.id}`,
+    title: isAdmin ? `[反馈] ${f.title}` : `[我的反馈] ${f.title}`,
+    content: f.content,
+    type: f.type,
+    read: readSet.has(`fb-${f.id}`),
+    createdAt: f.createdAt.getTime(),
+    isFeedback: true,
+    userName: f.user.name,
+    feedbackId: f.id,
+    status: f.status,
+    reply: f.reply,
+  }));
 
   const allMessages = [...broadcastItems, ...feedbackItems].sort(
     (a, b) => b.createdAt - a.createdAt
   );
 
+  // 未读数计算
+  let unreadCount = 0;
+  if (isAdmin) {
+    unreadCount = feedbackItems.filter((f) => !f.read).length;
+  } else {
+    const broadcastUnread = messages.filter((m) => m.reads.length === 0).length;
+    const feedbackUnread = feedbackItems.filter((f) => !f.read).length;
+    unreadCount = broadcastUnread + feedbackUnread;
+  }
+
   return NextResponse.json({
     messages: allMessages,
-    unreadCount: isAdmin ? feedbackUnreadCount : broadcastUnreadCount,
+    unreadCount,
   });
 }
 
@@ -102,11 +104,18 @@ export async function POST(request: Request) {
   // 回复反馈
   if (reply && messageId?.startsWith("fb-")) {
     const feedbackId = messageId.slice(3);
+
+    // 获取反馈信息（用于回复后通知用户）
+    const feedback = await prisma.feedback.findUnique({
+      where: { id: feedbackId },
+    });
+
     await prisma.feedback.update({
       where: { id: feedbackId },
       data: { reply, status: "replied" },
     });
-    // 标记已读
+
+    // 管理员回复后，标记管理员已读
     const existing = await prisma.messageRead.findFirst({
       where: { messageId, userId: user.userId },
     });
@@ -115,6 +124,15 @@ export async function POST(request: Request) {
         data: { messageId, userId: user.userId, read: true },
       });
     }
+
+    // 通知用户：标记用户的反馈为未读，这样用户打开消息中心就能看到管理员的回复
+    if (feedback && feedback.userId !== user.userId) {
+      // 删除用户的已读标记，使其变为未读
+      await prisma.messageRead.deleteMany({
+        where: { messageId, userId: feedback.userId },
+      });
+    }
+
     return NextResponse.json({ success: true });
   }
 
@@ -131,20 +149,21 @@ export async function POST(request: Request) {
         read: true,
       })),
     });
-    // 反馈全部已读（管理员）
-    if (user.role === "admin") {
-      const unreadFeedbacks = await prisma.feedback.findMany({
-        where: { status: "pending" },
-        select: { id: true },
-      });
-      const fbReads = unreadFeedbacks.map((f) => ({
-        messageId: `fb-${f.id}`,
-        userId: user.userId,
-        read: true,
-      }));
-      if (fbReads.length > 0) {
-        await prisma.messageRead.createMany({ data: fbReads });
-      }
+    // 反馈全部已读
+    const feedbackWhere = user.role === "admin"
+      ? { status: "pending" as const }
+      : { userId: user.userId };
+    const unreadFeedbacks = await prisma.feedback.findMany({
+      where: feedbackWhere,
+      select: { id: true },
+    });
+    const fbReads = unreadFeedbacks.map((f) => ({
+      messageId: `fb-${f.id}`,
+      userId: user.userId,
+      read: true,
+    }));
+    if (fbReads.length > 0) {
+      await prisma.messageRead.createMany({ data: fbReads });
     }
   } else if (messageId) {
     if (messageId.startsWith("fb-")) {
