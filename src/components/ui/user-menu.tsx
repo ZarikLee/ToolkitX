@@ -26,6 +26,7 @@ interface Message {
   userName?: string;
   feedbackId?: string;
   status?: string;
+  reply?: string | null;
 }
 
 export function UserMenu() {
@@ -100,7 +101,6 @@ export function UserMenu() {
 
   const handleLogout = async () => {
     if (isGuest) {
-      // 游客退出：清空所有 localStorage
       localStorage.clear();
       document.cookie = "toolkitx_guest=; path=/; max-age=0";
       router.push("/login");
@@ -249,6 +249,7 @@ export function UserMenu() {
       {showMessages && !isGuest && (
         <MessagesPanel
           messages={messages}
+          isAdmin={user?.role === "admin"}
           onClose={() => setShowMessages(false)}
           onRead={markAsRead}
           onRefresh={fetchMessages}
@@ -265,13 +266,17 @@ export function UserMenu() {
   );
 }
 
-function MessagesPanel({ messages, onClose, onRead }: {
+function MessagesPanel({ messages, isAdmin, onClose, onRead, onRefresh }: {
   messages: Message[];
+  isAdmin: boolean;
   onClose: () => void;
   onRead: (messageId?: string) => void;
   onRefresh: () => void;
 }) {
+  const { toast } = useToast();
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [replying, setReplying] = useState(false);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -281,10 +286,31 @@ function MessagesPanel({ messages, onClose, onRead }: {
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
 
+  const handleReply = async (messageId: string) => {
+    if (!replyText.trim()) return;
+    setReplying(true);
+    try {
+      const res = await fetch("/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messageId, reply: replyText }),
+      });
+      if (res.ok) {
+        toast("回复已发送");
+        setReplyText("");
+        onRefresh();
+      }
+    } catch {
+      toast("回复失败", "error");
+    } finally {
+      setReplying(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
-      <div className="glass-heavy rounded-2xl w-full max-w-lg shadow-[0_16px_48px_rgba(0,0,0,0.5)] animate-scale-in max-h-[80vh] flex flex-col">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.06] shrink-0">
+      <div className="glass-heavy rounded-2xl w-[420px] shadow-[0_16px_48px_rgba(0,0,0,0.5)] animate-scale-in flex flex-col" style={{ height: "min(75vh, 600px)" }}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06] shrink-0">
           <h3 className="text-[17px] font-semibold tracking-tight">消息中心</h3>
           <div className="flex items-center gap-2">
             <button
@@ -304,7 +330,7 @@ function MessagesPanel({ messages, onClose, onRead }: {
 
         <div className="overflow-y-auto flex-1 p-4 space-y-2">
           {messages.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground/30">
+            <div className="text-center py-16 text-muted-foreground/30">
               <Bell className="h-8 w-8 mx-auto mb-3 opacity-50" />
               <p className="text-[13px]">暂无消息</p>
             </div>
@@ -318,14 +344,16 @@ function MessagesPanel({ messages, onClose, onRead }: {
                     : "border-[#0a84ff]/20 bg-[#0a84ff]/[0.04]"
                 }`}
                 onClick={() => {
-                  setExpandedId(expandedId === msg.id ? null : msg.id);
-                  if (!msg.read) onRead(msg.id);
+                  const next = expandedId === msg.id ? null : msg.id;
+                  setExpandedId(next);
+                  setReplyText("");
+                  if (!msg.read && next) onRead(msg.id);
                 }}
               >
                 <div className="flex items-start gap-3 px-4 py-3">
-                  <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${msg.read ? "bg-transparent" : "bg-[#0a84ff]"}`} />
+                  <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${msg.read ? "bg-transparent" : msg.isFeedback ? "bg-[#ff9f0a]" : "bg-[#0a84ff]"}`} />
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center justify-between mb-0.5">
                       <div className="flex items-center gap-2 min-w-0">
                         <p className="text-[13px] font-medium truncate">{msg.title}</p>
                         {msg.isFeedback && msg.userName && (
@@ -334,21 +362,52 @@ function MessagesPanel({ messages, onClose, onRead }: {
                       </div>
                       <span className="text-[11px] text-muted-foreground/40 shrink-0 ml-2">{formatTime(msg.createdAt)}</span>
                     </div>
-                    {expandedId === msg.id && (
-                      <div>
-                        <p className="text-[12px] text-muted-foreground/70 leading-relaxed mt-1 whitespace-pre-wrap">{msg.content}</p>
+
+                    {expandedId === msg.id ? (
+                      <div className="mt-2">
+                        <p className="text-[12px] text-muted-foreground/70 leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+
                         {msg.isFeedback && (
-                          <div className="flex items-center gap-2 mt-2">
-                            <span className={`text-[10px] px-1.5 py-0.5 rounded ${
-                              msg.status === "replied" ? "bg-[#30d158]/15 text-[#30d158]" : "bg-[#ff9f0a]/15 text-[#ff9f0a]"
-                            }`}>
-                              {msg.status === "replied" ? "已回复" : "待处理"}
-                            </span>
+                          <div className="mt-3 space-y-2">
+                            <div className="flex items-center gap-2">
+                              <span className={`text-[10px] px-1.5 py-0.5 rounded ${
+                                msg.status === "replied" ? "bg-[#30d158]/15 text-[#30d158]" : "bg-[#ff9f0a]/15 text-[#ff9f0a]"
+                              }`}>
+                                {msg.status === "replied" ? "已回复" : "待处理"}
+                              </span>
+                              <span className="text-[10px] text-muted-foreground/40">类型: {msg.type === "suggestion" ? "功能建议" : msg.type === "bug" ? "Bug 反馈" : "其他"}</span>
+                            </div>
+
+                            {msg.reply && (
+                              <div className="bg-[#30d158]/[0.06] border border-[#30d158]/20 rounded-lg px-3 py-2">
+                                <p className="text-[10px] text-[#30d158] font-medium mb-1">管理员回复</p>
+                                <p className="text-[12px] text-muted-foreground/70 whitespace-pre-wrap">{msg.reply}</p>
+                              </div>
+                            )}
+
+                            {isAdmin && !msg.reply && (
+                              <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                                <input
+                                  type="text"
+                                  value={replyText}
+                                  onChange={(e) => setReplyText(e.target.value)}
+                                  onKeyDown={(e) => e.key === "Enter" && handleReply(msg.id)}
+                                  placeholder="输入回复内容..."
+                                  className="flex-1 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-[12px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
+                                />
+                                <button
+                                  onClick={() => handleReply(msg.id)}
+                                  disabled={replying || !replyText.trim()}
+                                  className="px-3 py-1.5 rounded-lg bg-[#0a84ff] hover:bg-[#0a84ff]/90 text-white text-[12px] font-medium transition-all disabled:opacity-50 shrink-0"
+                                >
+                                  {replying ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />}
+                                </button>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
-                    )}
-                    {expandedId !== msg.id && (
+                    ) : (
                       <p className="text-[12px] text-muted-foreground/40 truncate">{msg.content}</p>
                     )}
                   </div>
