@@ -50,6 +50,9 @@ export function UserMenu() {
     if (!guest) {
       fetchUser();
       fetchMessages();
+      const timer = setInterval(fetchMessages, 30000);
+      setMounted(true);
+      return () => clearInterval(timer);
     }
     setMounted(true);
   }, []);
