@@ -179,7 +179,7 @@ export function UserMenu() {
               </p>
             </div>
 
-            <div className="p-1.5">
+            <div className="p-2 space-y-1">
               {!isGuest && (
                 <>
                   <button
@@ -244,7 +244,7 @@ export function UserMenu() {
               )}
             </div>
 
-            <div className="p-1.5 border-t border-white/[0.06]">
+            <div className="p-2 pt-1 border-t border-white/[0.06]">
               <button
                 onClick={handleLogout}
                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-[#ff453a]/80 hover:bg-[#ff453a]/10 hover:text-[#ff453a] transition-all duration-200"
