@@ -7,7 +7,7 @@
   "deploy": {
     "startCommand": "sh -c \"npx prisma migrate deploy && npx tsx server.ts\"",
     "healthcheckPath": "/",
-    "healthcheckTimeout": 300,
+    "healthcheckTimeout": 600,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
