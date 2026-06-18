@@ -42,4 +42,4 @@ USER nextjs
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx prisma migrate deploy && npx tsx server.ts"]
+CMD ["sh", "-c", "npx prisma migrate deploy; npx tsx server.ts"]
