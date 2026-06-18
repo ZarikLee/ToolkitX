@@ -44,6 +44,16 @@ async function runMigration() {
     }
     console.log('[migration] Created smart monitoring tables');
 
+    // Create advanced features tables
+    const advancedTables = [
+      "CREATE TABLE IF NOT EXISTS `AuditLog` (`id` VARCHAR(191) NOT NULL,`userId` VARCHAR(191) NOT NULL,`action` VARCHAR(191) NOT NULL,`resource` VARCHAR(191) NOT NULL,`detail` TEXT,`ip` VARCHAR(191),`createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),PRIMARY KEY (`id`)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
+      "CREATE TABLE IF NOT EXISTS `CertMonitor` (`id` VARCHAR(191) NOT NULL,`userId` VARCHAR(191) NOT NULL,`domain` VARCHAR(191) NOT NULL,`port` INT NOT NULL DEFAULT 443,`label` VARCHAR(191),`lastCheck` DATETIME(3),`lastStatus` VARCHAR(191),`issuer` VARCHAR(191),`validFrom` DATETIME(3),`validTo` DATETIME(3),`daysLeft` INT,`enabled` BOOLEAN NOT NULL DEFAULT true,`createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),`updatedAt` DATETIME(3) NOT NULL,PRIMARY KEY (`id`)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
+    ];
+    for (const sql of advancedTables) {
+      await conn.execute(sql);
+    }
+    console.log('[migration] Created advanced features tables');
+
     await conn.end();
     console.log('[migration] Done');
 

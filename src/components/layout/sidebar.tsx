@@ -16,6 +16,11 @@ import {
   Activity,
   Shield,
   Bell,
+  BookOpen,
+  Zap,
+  ClipboardList,
+  Layers,
+  Lock,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -31,6 +36,11 @@ const navigation = [
   { name: "服务器监控", href: "/monitor", icon: Activity },
   { name: "配置漂移", href: "/drift", icon: Shield },
   { name: "告警中心", href: "/alerts", icon: Bell },
+  { name: "故障知识库", href: "/kedb", icon: BookOpen },
+  { name: "自动化流程", href: "/runbooks", icon: Zap },
+  { name: "批量操作", href: "/batch", icon: Layers },
+  { name: "证书监控", href: "/certs", icon: Lock },
+  { name: "审计日志", href: "/audit", icon: ClipboardList },
 ];
 
 const bottomNavigation = [

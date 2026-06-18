@@ -29,6 +29,8 @@ model User {
   alertEvents      AlertEvent[]
   configBaselines  ConfigBaseline[]
   alertRules       AlertRule[]
+  auditLogs        AuditLog[]
+  certMonitors     CertMonitor[]
   runbooks         Runbook[]
   knowledgeEntries KnowledgeEntry[]
   changeRecords    ChangeRecord[]
@@ -324,6 +326,41 @@ model AlertRule {
   lastFired DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============ 审计日志 ============
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  resource  String
+  detail    String?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============ 证书监控 ============
+
+model CertMonitor {
+  id          String    @id @default(cuid())
+  userId      String
+  domain      String
+  port        Int       @default(443)
+  label       String?
+  lastCheck   DateTime?
+  lastStatus  String?
+  issuer      String?
+  validFrom   DateTime?
+  validTo     DateTime?
+  daysLeft    Int?
+  enabled     Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
