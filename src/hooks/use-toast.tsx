@@ -44,22 +44,22 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   };
 
   const styles = {
-    success: "border-[#30d158]/30 bg-[#30d158]/10 text-[#30d158]",
-    error: "border-[#ff453a]/30 bg-[#ff453a]/10 text-[#ff453a]",
-    warning: "border-[#ff9f0a]/30 bg-[#ff9f0a]/10 text-[#ff9f0a]",
+    success: "border-[#30d158]/30 bg-[#30d158]/15 text-[#30d158]",
+    error: "border-[#ff453a]/30 bg-[#ff453a]/15 text-[#ff453a]",
+    warning: "border-[#ff9f0a]/30 bg-[#ff9f0a]/15 text-[#ff9f0a]",
   };
 
   return (
     <ToastContext.Provider value={{ toast }}>
       {children}
-      <div className="fixed top-20 right-8 z-[9998] flex flex-col gap-2 pointer-events-none">
+      <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[9998] flex flex-col items-center gap-2 pointer-events-none">
         {toasts.map((t) => {
           const Icon = icons[t.type];
           return (
             <div
               key={t.id}
               className={cn(
-                "pointer-events-auto flex items-center gap-2.5 rounded-xl border px-4 py-3 shadow-[0_4px_24px_rgba(0,0,0,0.3)] animate-slide-in-right backdrop-blur-sm",
+                "pointer-events-auto flex items-center gap-2.5 rounded-xl border px-5 py-3 shadow-[0_4px_24px_rgba(0,0,0,0.3)] animate-toast-down backdrop-blur-md opacity-80",
                 styles[t.type]
               )}
             >
