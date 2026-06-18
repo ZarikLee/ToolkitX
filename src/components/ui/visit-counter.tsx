@@ -3,20 +3,22 @@
 import { useState, useEffect } from "react";
 
 export function VisitCounter() {
-  const [count, setCount] = useState<number | null>(null);
+  const [visitCount, setVisitCount] = useState(0);
 
   useEffect(() => {
     fetch("/api/stats", { method: "POST" })
-      .then((res) => res.json())
-      .then((data) => setCount(data.count))
+      .then((r) => r.json())
+      .then((d) => setVisitCount(d.visits || 0))
       .catch(() => {});
   }, []);
 
-  if (count === null) return null;
+  if (visitCount === 0) return null;
 
   return (
-    <div className="text-center text-xs text-muted-foreground py-4">
-      累计访问 {count.toLocaleString()} 次
+    <div className="text-center mt-8 mb-4">
+      <p className="text-[11px] text-muted-foreground/30">
+        累计访问 {visitCount.toLocaleString()} 次
+      </p>
     </div>
   );
 }

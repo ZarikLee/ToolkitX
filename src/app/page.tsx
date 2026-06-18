@@ -470,12 +470,14 @@ export default function HomePage() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [visitCount, setVisitCount] = useState(0);
 
-  // Load favorites
+  // Load favorites from localStorage
   useEffect(() => {
-    fetch("/api/favorites")
-      .then((r) => r.json())
-      .then((d) => setFavorites(new Set(d.toolIds || [])))
-      .catch(() => {});
+    try {
+      const saved = localStorage.getItem("toolkitx_favorites");
+      if (saved) {
+        setFavorites(new Set(JSON.parse(saved)));
+      }
+    } catch {}
   }, []);
 
   // Increment visit count
@@ -486,18 +488,21 @@ export default function HomePage() {
       .catch(() => {});
   }, []);
 
-  const toggleFavorite = async (toolId: string, e: React.MouseEvent) => {
+  const toggleFavorite = (toolName: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    try {
-      const res = await fetch("/api/favorites", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ toolId }),
-      });
-      const d = await res.json();
-      setFavorites(new Set(d.toolIds || []));
-    } catch {}
+    setFavorites((prev) => {
+      const next = new Set(prev);
+      if (next.has(toolName)) {
+        next.delete(toolName);
+      } else {
+        next.add(toolName);
+      }
+      try {
+        localStorage.setItem("toolkitx_favorites", JSON.stringify([...next]));
+      } catch {}
+      return next;
+    });
   };
 
   const filteredTools = useMemo(() => {

@@ -24,8 +24,8 @@ export function SubPageLayout({
   children,
 }: SubPageLayoutProps) {
   return (
-    <main className="flex-1 overflow-auto">
-      <div className="max-w-7xl mx-auto px-8 py-8">
+    <main className="flex-1 min-h-0 relative z-10">
+      <div className="max-w-7xl mx-auto px-8 py-8 h-full overflow-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-2 animate-fade-in">
           <Link

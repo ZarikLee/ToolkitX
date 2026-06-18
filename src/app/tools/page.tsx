@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { JsonTool } from "@/components/tools/json-tool";
 import { EncodingTool } from "@/components/tools/encoding-tool";
 import { TimestampTool } from "@/components/tools/timestamp-tool";
@@ -112,9 +113,26 @@ const categories = [
 
 const allTools = categories.flatMap((c) => c.tools);
 
-export default function ToolsPage() {
-  const [activeTool, setActiveTool] = useState("json");
+function ToolsContent() {
+  const searchParams = useSearchParams();
+  const toolParam = searchParams.get("tool");
+
+  const [activeTool, setActiveTool] = useState(toolParam || "json");
   const [activeCategory, setActiveCategory] = useState("数据格式");
+
+  // Sync with URL query param
+  useEffect(() => {
+    if (toolParam) {
+      setActiveTool(toolParam);
+      // Find and set the correct category
+      for (const cat of categories) {
+        if (cat.tools.some((t) => t.id === toolParam)) {
+          setActiveCategory(cat.name);
+          break;
+        }
+      }
+    }
+  }, [toolParam]);
 
   const ActiveComponent = allTools.find((t) => t.id === activeTool)?.component;
   const currentCategory = categories.find((c) => c.name === activeCategory);
@@ -164,5 +182,17 @@ export default function ToolsPage() {
         {ActiveComponent && <ActiveComponent />}
       </div>
     </SubPageLayout>
+  );
+}
+
+export default function ToolsPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex-1 flex items-center justify-center">
+        <div className="text-muted-foreground text-[14px]">加载中...</div>
+      </div>
+    }>
+      <ToolsContent />
+    </Suspense>
   );
 }
