@@ -57,6 +57,7 @@ export default function LoginPage() {
         <div className="aurora-blob aurora-blob-1" />
         <div className="aurora-blob aurora-blob-2" />
         <div className="aurora-blob aurora-blob-3" />
+        <div className="aurora-blob aurora-blob-4" />
       </div>
 
       <div className="w-full max-w-sm mx-4 relative z-10 animate-fade-in">

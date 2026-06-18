@@ -10,14 +10,14 @@ import { apiGet, apiPut, isLoginRequired, getLocalStorage } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 
 interface Settings {
-  theme: string;
+  theme: 'dark' | 'light';
   monitorRefreshInterval: number;
   terminalFontSize: number;
   terminalFontFamily: string;
 }
 
 const defaultSettings: Settings = {
-  theme: 'dark-purple',
+  theme: 'dark',
   monitorRefreshInterval: 5000,
   terminalFontSize: 14,
   terminalFontFamily: 'Menlo, Monaco, "Courier New", monospace',

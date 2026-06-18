@@ -3,7 +3,7 @@ import { getCurrentUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 const DEFAULT_SETTINGS = {
-  theme: "dark-purple",
+  theme: "dark",
   monitorInterval: 5000,
   terminalFontSize: 14,
   terminalFontFamily: 'Menlo, Monaco, "Courier New", monospace',

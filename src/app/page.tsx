@@ -87,6 +87,7 @@ export default function HomePage() {
         <div className="aurora-blob aurora-blob-1" />
         <div className="aurora-blob aurora-blob-2" />
         <div className="aurora-blob aurora-blob-3" />
+        <div className="aurora-blob aurora-blob-4" />
       </div>
 
       <div className="max-w-7xl mx-auto px-8 py-12 relative z-10">
