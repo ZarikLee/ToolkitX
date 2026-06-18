@@ -14,6 +14,8 @@ import {
   Globe,
   FileText,
   Activity,
+  Shield,
+  Bell,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -27,6 +29,8 @@ const navigation = [
   { name: "API 测试", href: "/api-tester", icon: Globe },
   { name: "日志查看", href: "/log-viewer", icon: FileText },
   { name: "服务器监控", href: "/monitor", icon: Activity },
+  { name: "配置漂移", href: "/drift", icon: Shield },
+  { name: "告警中心", href: "/alerts", icon: Bell },
 ];
 
 const bottomNavigation = [

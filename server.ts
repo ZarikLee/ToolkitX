@@ -33,6 +33,17 @@ async function runMigration() {
         console.log(`[migration] Created ${table} table`);
       }
     }
+    // Create new tables for smart monitoring
+    const newTables = [
+      "CREATE TABLE IF NOT EXISTS `ConfigBaseline` (`id` VARCHAR(191) NOT NULL,`userId` VARCHAR(191) NOT NULL,`filePath` VARCHAR(191) NOT NULL,`fileName` VARCHAR(191) NOT NULL,`hash` VARCHAR(191) NOT NULL,`content` LONGTEXT NOT NULL,`enabled` BOOLEAN NOT NULL DEFAULT true,`lastCheck` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),`createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),`updatedAt` DATETIME(3) NOT NULL,PRIMARY KEY (`id`)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
+      "CREATE TABLE IF NOT EXISTS `ConfigDrift` (`id` VARCHAR(191) NOT NULL,`baselineId` VARCHAR(191) NOT NULL,`oldHash` VARCHAR(191) NOT NULL,`newHash` VARCHAR(191) NOT NULL,`oldContent` LONGTEXT NOT NULL,`newContent` LONGTEXT NOT NULL,`detectedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),PRIMARY KEY (`id`)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
+      "CREATE TABLE IF NOT EXISTS `AlertRule` (`id` VARCHAR(191) NOT NULL,`userId` VARCHAR(191) NOT NULL,`name` VARCHAR(191) NOT NULL,`type` VARCHAR(191) NOT NULL,`condition` VARCHAR(191) NOT NULL,`threshold` DOUBLE NOT NULL,`severity` VARCHAR(191) NOT NULL DEFAULT 'warning',`enabled` BOOLEAN NOT NULL DEFAULT true,`cooldown` INT NOT NULL DEFAULT 300,`lastFired` DATETIME(3),`createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),`updatedAt` DATETIME(3) NOT NULL,PRIMARY KEY (`id`)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
+    ];
+    for (const sql of newTables) {
+      await conn.execute(sql);
+    }
+    console.log('[migration] Created smart monitoring tables');
+
     await conn.end();
     console.log('[migration] Done');
 
