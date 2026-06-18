@@ -96,7 +96,7 @@ export function ServerList({ onSelect, selectedServerId }: ServerListProps) {
 
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-card rounded-lg p-6 w-full max-w-md">
+          <div className="glass-heavy rounded-2xl p-6 w-full max-w-md">
             <h3 className="text-lg font-semibold mb-4">添加服务器</h3>
             <div className="space-y-4">
               <div>
@@ -105,7 +105,7 @@ export function ServerList({ onSelect, selectedServerId }: ServerListProps) {
                   type="text"
                   value={newServer.name}
                   onChange={(e) => setNewServer({ ...newServer, name: e.target.value })}
-                  className="w-full mt-1 px-3 py-2 border rounded text-sm"
+                  className="input-apple w-full mt-1 text-sm"
                   placeholder="生产服务器"
                 />
               </div>
@@ -116,7 +116,7 @@ export function ServerList({ onSelect, selectedServerId }: ServerListProps) {
                     type="text"
                     value={newServer.host}
                     onChange={(e) => setNewServer({ ...newServer, host: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 border rounded text-sm"
+                    className="input-apple w-full mt-1 text-sm"
                     placeholder="192.168.1.100"
                   />
                 </div>
@@ -126,7 +126,7 @@ export function ServerList({ onSelect, selectedServerId }: ServerListProps) {
                     type="number"
                     value={newServer.port}
                     onChange={(e) => setNewServer({ ...newServer, port: parseInt(e.target.value) || 22 })}
-                    className="w-full mt-1 px-3 py-2 border rounded text-sm"
+                    className="input-apple w-full mt-1 text-sm"
                   />
                 </div>
               </div>
@@ -136,7 +136,7 @@ export function ServerList({ onSelect, selectedServerId }: ServerListProps) {
                   type="text"
                   value={newServer.username}
                   onChange={(e) => setNewServer({ ...newServer, username: e.target.value })}
-                  className="w-full mt-1 px-3 py-2 border rounded text-sm"
+                  className="input-apple w-full mt-1 text-sm"
                   placeholder="root"
                 />
               </div>

@@ -87,7 +87,7 @@ export function MarkdownHtml() {
           </div>
           {output ? (
             <div
-              className="input-apple mt-1 p-4 prose prose-invert prose-sm max-w-none h-[360px] overflow-auto"
+              className="input-apple mt-1 p-4 prose prose-sm max-w-none h-[360px] overflow-auto"
               dangerouslySetInnerHTML={{ __html: output }}
             />
           ) : (

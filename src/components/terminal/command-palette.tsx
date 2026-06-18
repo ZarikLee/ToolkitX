@@ -80,13 +80,13 @@ export function CommandPalette({ onExecute }: CommandPaletteProps) {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 px-3 py-2 border rounded text-sm"
+          className="input-apple flex-1 text-sm"
           placeholder="搜索命令..."
         />
         <select
           value={selectedCategory || ""}
           onChange={(e) => setSelectedCategory(e.target.value || null)}
-          className="px-3 py-2 border rounded text-sm"
+          className="input-apple text-sm"
         >
           <option value="">全部分类</option>
           {categories.map((cat) => (
@@ -139,7 +139,7 @@ export function CommandPalette({ onExecute }: CommandPaletteProps) {
 
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-card rounded-lg p-6 w-full max-w-md">
+          <div className="glass-heavy rounded-2xl p-6 w-full max-w-md">
             <h3 className="text-lg font-semibold mb-4">添加自定义命令</h3>
             <div className="space-y-4">
               <div>
@@ -148,7 +148,7 @@ export function CommandPalette({ onExecute }: CommandPaletteProps) {
                   type="text"
                   value={newCommand.name}
                   onChange={(e) => setNewCommand({ ...newCommand, name: e.target.value })}
-                  className="w-full mt-1 px-3 py-2 border rounded text-sm"
+                  className="input-apple w-full mt-1 text-sm"
                   placeholder="我的命令"
                 />
               </div>
@@ -158,7 +158,7 @@ export function CommandPalette({ onExecute }: CommandPaletteProps) {
                   type="text"
                   value={newCommand.command}
                   onChange={(e) => setNewCommand({ ...newCommand, command: e.target.value })}
-                  className="w-full mt-1 px-3 py-2 border rounded text-sm font-mono"
+                  className="input-apple w-full mt-1 text-sm font-mono"
                   placeholder="ls -la"
                 />
               </div>
@@ -168,7 +168,7 @@ export function CommandPalette({ onExecute }: CommandPaletteProps) {
                   type="text"
                   value={newCommand.description}
                   onChange={(e) => setNewCommand({ ...newCommand, description: e.target.value })}
-                  className="w-full mt-1 px-3 py-2 border rounded text-sm"
+                  className="input-apple w-full mt-1 text-sm"
                   placeholder="命令描述"
                 />
               </div>

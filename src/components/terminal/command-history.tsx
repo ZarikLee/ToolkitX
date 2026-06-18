@@ -138,7 +138,7 @@ export function CommandHistory({ onExecute }: CommandHistoryProps) {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full px-3 py-2 border rounded text-sm"
+          className="input-apple w-full text-sm"
           placeholder="搜索历史命令..."
         />
       </div>

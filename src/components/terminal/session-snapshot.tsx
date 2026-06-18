@@ -166,7 +166,7 @@ export function SessionSnapshot({ serverId, serverName, onRestore }: SessionSnap
 
       {showSaveModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-card rounded-lg p-6 w-full max-w-md">
+          <div className="glass-heavy rounded-2xl p-6 w-full max-w-md">
             <h3 className="text-lg font-semibold mb-4">保存会话快照</h3>
             <div className="space-y-4">
               <div>
@@ -175,7 +175,7 @@ export function SessionSnapshot({ serverId, serverName, onRestore }: SessionSnap
                   type="text"
                   value={snapshotName}
                   onChange={(e) => setSnapshotName(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 border rounded text-sm"
+                  className="input-apple w-full mt-1 text-sm"
                   placeholder="部署前检查"
                 />
               </div>

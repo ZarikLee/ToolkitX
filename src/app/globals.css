@@ -348,6 +348,35 @@ html {
   background: rgba(0, 0, 0, 0.08) !important;
 }
 
+/* bg-white/5 和 bg-white/10 覆盖（非括号语法） */
+.light [class*="bg-white/5"] {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+.light [class*="bg-white/10"] {
+  background: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* 亮色下减轻弹窗/下拉框阴影 */
+.light [class*="shadow-[0_16px_48px"] {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12) !important;
+}
+.light [class*="shadow-[0_8px_32px"] {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+}
+.light [class*="shadow-[0_4px_24px"] {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 亮色下去掉按钮发光阴影 */
+.light [class*="shadow-lg"][class*="shadow-primary"] {
+  box-shadow: none !important;
+}
+
+/* 亮色下去掉 tab 按钮阴影 */
+.light [class*="shadow-[0_1px_2px_rgba(0,0,0"] {
+  box-shadow: none !important;
+}
+
 /* 亮色下 select 元素 */
 .light select {
   background: rgba(255, 255, 255, 0.8) !important;
