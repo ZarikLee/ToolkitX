@@ -52,7 +52,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ toast }}>
       {children}
-      <div className="fixed top-20 right-6 z-[9998] flex flex-col gap-2 pointer-events-none">
+      <div className="fixed top-20 right-8 z-[9998] flex flex-col gap-2 pointer-events-none">
         {toasts.map((t) => {
           const Icon = icons[t.type];
           return (

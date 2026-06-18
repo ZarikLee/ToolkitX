@@ -69,7 +69,7 @@ export default function SettingsPage() {
 
   return (
     <div className="flex-1 overflow-hidden flex flex-col">
-      <div className="flex items-center gap-3 px-6 py-3 border-b border-white/[0.06] shrink-0 pr-24">
+      <div className="flex items-center gap-3 px-8 py-3 border-b border-white/[0.06] shrink-0 pr-24">
         <Link
           href="/"
           className="flex items-center justify-center w-8 h-8 rounded-[10px] bg-white/[0.06] hover:bg-white/[0.1] text-muted-foreground hover:text-foreground transition-all duration-200"

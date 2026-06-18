@@ -21,7 +21,7 @@ export default function RootLayout({
       <body className="h-screen overflow-hidden flex flex-col">
         <MigrationProvider>
           <ToastProvider>
-            <div className="fixed top-3 right-6 z-50 flex items-center gap-2">
+            <div className="fixed top-14 right-8 z-50 flex items-center gap-2">
               <ThemeToggle />
               <UserMenu />
             </div>
