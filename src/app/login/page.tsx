@@ -148,7 +148,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={handleSendCode}
                 disabled={countdown > 0 || loading || !/^1[3-9]\d{9}$/.test(phone)}
-                className="px-4 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-[13px] font-medium text-muted-foreground hover:text-foreground hover:bg-white/[0.08] transition-all disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
+                className="px-4 py-2 rounded-xl btn-secondary text-[13px] font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
               >
                 {countdown > 0 ? `${countdown}s` : "获取验证码"}
               </button>
@@ -180,7 +180,7 @@ export default function LoginPage() {
 
           <button
             onClick={handleGuest}
-            className="w-full py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] hover:bg-white/[0.08] text-foreground/70 text-[14px] font-medium transition-all duration-200 active:scale-[0.98]"
+            className="w-full py-2.5 rounded-xl btn-secondary text-[14px] font-medium transition-all duration-200 active:scale-[0.98]"
           >
             游客访问
           </button>

@@ -72,7 +72,7 @@ export default function SettingsPage() {
       <div className="flex items-center gap-3 px-8 py-3 border-b border-white/[0.06] shrink-0">
         <Link
           href="/"
-          className="flex items-center justify-center w-8 h-8 rounded-[10px] bg-white/[0.06] hover:bg-white/[0.1] text-muted-foreground hover:text-foreground transition-all duration-200 shrink-0"
+          className="btn-close shrink-0"
           title="返回首页"
         >
           <svg

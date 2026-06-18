@@ -30,7 +30,7 @@ export function SubPageLayout({
         <div className="flex items-center gap-3 mb-2 animate-fade-in">
           <Link
             href="/"
-            className="flex items-center justify-center w-8 h-8 rounded-[10px] bg-white/[0.06] hover:bg-white/[0.1] text-muted-foreground hover:text-foreground transition-all duration-200"
+            className="btn-close"
             title="返回首页"
           >
             <svg

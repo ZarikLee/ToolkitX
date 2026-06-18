@@ -23,7 +23,7 @@ export function CopyButton({ text, className = "" }: CopyButtonProps) {
   return (
     <button
       onClick={copyToClipboard}
-      className={`px-3 py-1.5 text-[12px] font-medium bg-white/[0.06] hover:bg-white/[0.1] text-foreground rounded-lg transition-all duration-200 active:scale-[0.97] ${className}`}
+      className={`px-3 py-1.5 text-[12px] font-medium btn-secondary transition-all duration-200 active:scale-[0.97] ${className}`}
     >
       {copied ? "已复制 ✓" : "复制"}
     </button>

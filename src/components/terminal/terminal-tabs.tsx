@@ -225,7 +225,7 @@ function ConnectDialog({ onConnect, onClose }: ConnectDialogProps) {
             )}
           </div>
           <div className="flex gap-2 pt-2">
-            <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-[13px] font-medium text-foreground transition-all duration-200">
+            <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl btn-secondary text-[13px] font-medium transition-all duration-200">
               取消
             </button>
             <button type="submit" className="flex-1 px-4 py-2.5 rounded-xl bg-[#0a84ff] hover:bg-[#0a84ff]/90 text-white text-[13px] font-medium transition-all duration-200 active:scale-[0.98]">

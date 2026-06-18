@@ -120,7 +120,7 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
           <h3 className="text-[17px] font-semibold tracking-tight">个人资料</h3>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.06] hover:bg-white/[0.1] text-muted-foreground hover:text-foreground transition-all duration-200 text-sm"
+            className="btn-close"
           >
             <X className="h-4 w-4" />
           </button>

@@ -213,7 +213,7 @@ export default function KedbPage() {
                 >
                   {selected ? "更新" : "创建"}
                 </button>
-                <button onClick={resetForm} className="btn-apple bg-white/[0.06] text-[12px] px-3 py-1">
+                <button onClick={resetForm} className="btn-apple btn-secondary text-[12px] px-3 py-1">
                   取消
                 </button>
               </div>
@@ -289,7 +289,7 @@ export default function KedbPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => startEdit(selected)}
-                    className="btn-apple bg-white/[0.06] text-[12px] px-3 py-1.5"
+                    className="btn-apple btn-secondary text-[12px] px-3 py-1.5"
                   >
                     编辑
                   </button>

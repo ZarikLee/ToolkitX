@@ -80,7 +80,7 @@ export function HelpButton({ title, content }: HelpButtonProps) {
               </h3>
               <button
                 onClick={handleClose}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.06] hover:bg-white/[0.1] text-muted-foreground hover:text-foreground transition-all duration-200 text-sm"
+                className="btn-close"
               >
                 ✕
               </button>

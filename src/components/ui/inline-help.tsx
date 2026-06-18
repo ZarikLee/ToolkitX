@@ -27,10 +27,10 @@ export function InlineHelp({ content }: InlineHelpProps) {
       {open && (
         <>
           <div
-            className="fixed inset-0 z-[60]"
+            className="fixed inset-0 z-[100]"
             onClick={() => setOpen(false)}
           />
-          <div className="absolute left-0 top-7 z-[60] w-72 rounded-xl p-4 space-y-3 animate-scale-in" style={{ background: 'rgba(28,28,30,0.97)', backdropFilter: 'blur(40px) saturate(200%)', border: '1px solid rgba(255,255,255,0.12)', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}>
+          <div className="absolute left-0 top-7 z-[100] w-72 rounded-xl p-4 space-y-3 animate-scale-in glass-heavy" style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
             {content.map((section, i) => (
               <div key={i}>
                 <h4 className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1.5">

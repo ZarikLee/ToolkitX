@@ -57,13 +57,13 @@ export function CodeEditor({
         <div className="flex gap-1">
           <button
             onClick={copyToClipboard}
-            className="px-2.5 py-1 text-[11px] font-medium bg-white/[0.06] hover:bg-white/[0.1] text-foreground rounded-md transition-all duration-200"
+            className="px-2.5 py-1 text-[11px] font-medium btn-secondary transition-all duration-200"
           >
             {copied ? "已复制" : "复制"}
           </button>
           <button
             onClick={download}
-            className="px-2.5 py-1 text-[11px] font-medium bg-white/[0.06] hover:bg-white/[0.1] text-foreground rounded-md transition-all duration-200"
+            className="px-2.5 py-1 text-[11px] font-medium btn-secondary transition-all duration-200"
           >
             下载
           </button>

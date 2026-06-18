@@ -310,7 +310,7 @@ export default function AlertsPage() {
                 <button onClick={addRule} className="btn-apple bg-[#0a84ff] text-white text-[12px] px-3 py-1">
                   创建
                 </button>
-                <button onClick={() => setShowAddRule(false)} className="btn-apple bg-white/[0.06] text-[12px] px-3 py-1">
+                <button onClick={() => setShowAddRule(false)} className="btn-apple btn-secondary text-[12px] px-3 py-1">
                   取消
                 </button>
               </div>

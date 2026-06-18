@@ -118,7 +118,7 @@ export function ScriptDetail({ script, onClose }: ScriptDetailProps) {
           </button>
           <button
             onClick={downloadScript}
-            className="px-4 py-2 bg-white/[0.06] hover:bg-white/[0.1] text-foreground rounded-xl text-[13px] font-medium transition-all duration-200 active:scale-[0.98]"
+            className="px-4 py-2 btn-secondary rounded-xl text-[13px] font-medium transition-all duration-200 active:scale-[0.98]"
           >
             下载文件
           </button>

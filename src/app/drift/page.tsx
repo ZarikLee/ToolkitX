@@ -154,7 +154,7 @@ export default function DriftPage() {
                 <button onClick={addBaseline} className="btn-apple bg-[#0a84ff] text-white text-[12px] px-3 py-1">
                   确认
                 </button>
-                <button onClick={() => setShowAdd(false)} className="btn-apple bg-white/[0.06] text-[12px] px-3 py-1">
+                <button onClick={() => setShowAdd(false)} className="btn-apple btn-secondary text-[12px] px-3 py-1">
                   取消
                 </button>
               </div>

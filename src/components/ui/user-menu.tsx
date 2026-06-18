@@ -332,7 +332,7 @@ function MessagesPanel({ messages, isAdmin, onClose, onRead, onRefresh, onOpenDe
             </button>
             <button
               onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.06] hover:bg-white/[0.1] text-muted-foreground hover:text-foreground transition-all duration-200 text-sm"
+              className="btn-close"
             >
               <X className="h-4 w-4" />
             </button>
@@ -448,7 +448,7 @@ function MessageDetailModal({ message, isAdmin, onClose, onRefresh }: {
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.06] hover:bg-white/[0.1] text-muted-foreground hover:text-foreground transition-all duration-200 text-sm shrink-0"
+            className="btn-close shrink-0"
           >
             <X className="h-4 w-4" />
           </button>
@@ -566,7 +566,7 @@ function FeedbackModal({ onClose, isGuest }: { onClose: () => void; isGuest: boo
           <h3 className="text-[17px] font-semibold tracking-tight">意见反馈</h3>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.06] hover:bg-white/[0.1] text-muted-foreground hover:text-foreground transition-all duration-200 text-sm"
+            className="btn-close"
           >
             <X className="h-4 w-4" />
           </button>

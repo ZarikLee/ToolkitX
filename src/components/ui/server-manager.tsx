@@ -352,7 +352,7 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
           </h3>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.06] hover:bg-white/[0.1] text-muted-foreground hover:text-foreground transition-all duration-200 text-sm"
+            className="btn-close"
           >
             <X className="h-4 w-4" />
           </button>
@@ -468,7 +468,7 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-[13px] font-medium text-foreground transition-all duration-200"
+              className="flex-1 px-4 py-2.5 rounded-xl btn-secondary text-[13px] font-medium transition-all duration-200"
             >
               取消
             </button>

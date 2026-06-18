@@ -468,6 +468,64 @@ html {
   transform: scale(0.97);
 }
 
+/* Secondary button: white bg + shadow in light, translucent in dark */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-foreground);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  user-select: none;
+}
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.btn-secondary:active {
+  transform: scale(0.97);
+}
+.light .btn-secondary {
+  background: #fff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+.light .btn-secondary:hover {
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+/* Close button: round, small, white+shadow */
+.btn-close {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-muted-foreground);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.btn-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-foreground);
+}
+.light .btn-close {
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+.light .btn-close:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
 .input-apple {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.08);
