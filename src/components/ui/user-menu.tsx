@@ -64,16 +64,24 @@ export function UserMenu() {
       }
     } catch {}
   };
-  const fetchMessagesRef = useRef(fetchMessages);
-  fetchMessagesRef.current = fetchMessages;
 
   useEffect(() => {
     const guest = document.cookie.includes("toolkitx_guest=1") || localStorage.getItem("toolkitx_guest") === "1";
     setIsGuest(guest);
     if (!guest) {
       fetchUser();
-      fetchMessagesRef.current();
-      const timer = setInterval(() => fetchMessagesRef.current(), 5000);
+      fetchMessages();
+      const timer = setInterval(() => {
+        fetch("/api/messages")
+          .then((r) => r.json())
+          .then((data) => {
+            if (data && data.messages) {
+              setMessages(data.messages);
+              setUnreadCount(data.unreadCount);
+            }
+          })
+          .catch(() => {});
+      }, 5000);
       setMounted(true);
       return () => clearInterval(timer);
     }
