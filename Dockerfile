@@ -3,7 +3,7 @@ FROM node:20
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN rm package-lock.json && npm install
+RUN npm ci
 
 COPY . .
 
