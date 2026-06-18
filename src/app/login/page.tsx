@@ -43,6 +43,13 @@ export default function LoginPage() {
     }
   };
 
+  const handleGuest = () => {
+    document.cookie = "toolkitx_guest=1; path=/; max-age=86400";
+    localStorage.setItem("toolkitx_guest", "1");
+    router.push("/");
+    router.refresh();
+  };
+
   return (
     <div className="h-screen flex items-center justify-center relative overflow-hidden">
       {/* Aurora Background */}
@@ -120,6 +127,22 @@ export default function LoginPage() {
               {loading ? "请稍候..." : mode === "login" ? "登录" : "注册"}
             </button>
           </form>
+
+          <div className="relative my-5">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/[0.06]" />
+            </div>
+            <div className="relative flex justify-center text-[12px]">
+              <span className="px-3 text-muted-foreground/40">或</span>
+            </div>
+          </div>
+
+          <button
+            onClick={handleGuest}
+            className="w-full py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] hover:bg-white/[0.08] text-foreground/70 text-[14px] font-medium transition-all duration-200 active:scale-[0.98]"
+          >
+            游客访问
+          </button>
 
           <div className="mt-4 text-center">
             <button

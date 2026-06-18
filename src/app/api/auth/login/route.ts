@@ -34,10 +34,11 @@ export async function POST(req: NextRequest) {
       userId: user.id,
       email: user.email,
       name: user.name,
+      role: user.role,
     });
 
     const response = NextResponse.json({
-      user: { id: user.id, email: user.email, name: user.name },
+      user: { id: user.id, email: user.email, name: user.name, role: user.role },
     });
     const cookies = setAuthCookie(token);
     response.headers.set("Set-Cookie", cookies["Set-Cookie"]);

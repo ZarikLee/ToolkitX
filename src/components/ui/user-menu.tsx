@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { User, LogOut, Settings, ChevronDown, Bell, MessageSquare, Send, X, Loader2, Check } from "lucide-react";
+import { User, LogOut, Settings, ChevronDown, Bell, MessageSquare, Send, X, Loader2, Shield } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ProfileModal } from "./profile-modal";
@@ -11,6 +11,7 @@ interface UserInfo {
   id: string;
   name: string;
   email: string;
+  role?: string;
   avatar?: string | null;
 }
 
@@ -21,12 +22,17 @@ interface Message {
   type: string;
   read: boolean;
   createdAt: number;
+  isFeedback?: boolean;
+  userName?: string;
+  feedbackId?: string;
+  status?: string;
 }
 
 export function UserMenu() {
   const router = useRouter();
   const { toast } = useToast();
   const [user, setUser] = useState<UserInfo | null>(null);
+  const [isGuest, setIsGuest] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -37,14 +43,18 @@ export function UserMenu() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetchUser();
-    fetchMessages();
+    const guest = document.cookie.includes("toolkitx_guest=1") || localStorage.getItem("toolkitx_guest") === "1";
+    setIsGuest(guest);
+    if (!guest) {
+      fetchUser();
+      fetchMessages();
+    }
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (showDropdown) fetchMessages();
-  }, [showDropdown]);
+    if (showDropdown && !isGuest) fetchMessages();
+  }, [showDropdown, isGuest]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -89,24 +99,24 @@ export function UserMenu() {
   };
 
   const handleLogout = async () => {
+    if (isGuest) {
+      // 游客退出：清空所有 localStorage
+      localStorage.clear();
+      document.cookie = "toolkitx_guest=; path=/; max-age=0";
+      router.push("/login");
+      router.refresh();
+      return;
+    }
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/login");
+    router.refresh();
   };
 
   const getInitial = () => {
+    if (isGuest) return "G";
     if (user?.name) return user.name.charAt(0).toUpperCase();
     if (user?.email) return user.email.charAt(0).toUpperCase();
     return "U";
-  };
-
-  const formatTime = (ts: number) => {
-    const d = new Date(ts);
-    const now = new Date();
-    const diff = now.getTime() - d.getTime();
-    if (diff < 60000) return "刚刚";
-    if (diff < 3600000) return `${Math.floor(diff / 60000)}分钟前`;
-    if (diff < 86400000) return `${Math.floor(diff / 3600000)}小时前`;
-    return d.toLocaleDateString("zh-CN");
   };
 
   if (!mounted) return null;
@@ -118,14 +128,14 @@ export function UserMenu() {
           onClick={() => setShowDropdown(!showDropdown)}
           className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-white/[0.06] transition-all duration-200 relative"
         >
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0a84ff] to-[#bf5af2] flex items-center justify-center text-white text-[13px] font-semibold shrink-0">
+          <div className={`w-8 h-8 rounded-full ${isGuest ? "bg-white/[0.08]" : "bg-gradient-to-br from-[#0a84ff] to-[#bf5af2]"} flex items-center justify-center text-white text-[13px] font-semibold shrink-0`}>
             {user?.avatar ? (
               <img src={user.avatar} alt="" className="w-full h-full rounded-full object-cover" />
             ) : (
               getInitial()
             )}
           </div>
-          {unreadCount > 0 && (
+          {!isGuest && unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-[#ff453a] text-white text-[10px] font-bold px-1 leading-none">
               {unreadCount > 99 ? "99+" : unreadCount}
             </span>
@@ -136,48 +146,83 @@ export function UserMenu() {
         {showDropdown && (
           <div className="absolute right-0 top-full mt-2 w-72 glass-heavy rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] overflow-hidden animate-scale-in z-50">
             <div className="px-4 py-3 border-b border-white/[0.06]">
-              <p className="text-[13px] font-medium truncate">{user?.name || "用户"}</p>
-              <p className="text-[11px] text-muted-foreground/50 truncate mt-0.5">{user?.email}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-[13px] font-medium truncate">{isGuest ? "游客" : user?.name || "用户"}</p>
+                {!isGuest && user?.role === "admin" && (
+                  <span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-[#0a84ff]/15 text-[#0a84ff] text-[10px] font-semibold">
+                    <Shield className="h-2.5 w-2.5" />
+                    Admin
+                  </span>
+                )}
+              </div>
+              <p className="text-[11px] text-muted-foreground/50 truncate mt-0.5">
+                {isGuest ? "退出后数据将被清除" : user?.email}
+              </p>
             </div>
 
             <div className="p-1.5">
-              <button
-                onClick={() => { setShowMessages(true); setShowDropdown(false); }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/[0.06] hover:text-foreground transition-all duration-200"
-              >
-                <div className="relative">
-                  <Bell className="h-3.5 w-3.5 text-muted-foreground/50" />
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#ff453a]" />
-                  )}
-                </div>
-                消息中心
-                {unreadCount > 0 && (
-                  <span className="ml-auto text-[11px] text-[#ff453a] font-medium">{unreadCount} 条未读</span>
-                )}
-              </button>
-              <button
-                onClick={() => { setShowFeedback(true); setShowDropdown(false); }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/[0.06] hover:text-foreground transition-all duration-200"
-              >
-                <MessageSquare className="h-3.5 w-3.5 text-muted-foreground/50" />
-                意见反馈
-              </button>
-              <button
-                onClick={() => { setShowProfile(true); setShowDropdown(false); }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/[0.06] hover:text-foreground transition-all duration-200"
-              >
-                <User className="h-3.5 w-3.5 text-muted-foreground/50" />
-                个人资料
-              </button>
-              <Link
-                href="/settings"
-                onClick={() => setShowDropdown(false)}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/[0.06] hover:text-foreground transition-all duration-200"
-              >
-                <Settings className="h-3.5 w-3.5 text-muted-foreground/50" />
-                设置
-              </Link>
+              {!isGuest && (
+                <>
+                  <button
+                    onClick={() => { setShowMessages(true); setShowDropdown(false); }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/[0.06] hover:text-foreground transition-all duration-200"
+                  >
+                    <div className="relative">
+                      <Bell className="h-3.5 w-3.5 text-muted-foreground/50" />
+                      {unreadCount > 0 && (
+                        <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#ff453a]" />
+                      )}
+                    </div>
+                    消息中心
+                    {unreadCount > 0 && (
+                      <span className="ml-auto text-[11px] text-[#ff453a] font-medium">{unreadCount} 条未读</span>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => { setShowFeedback(true); setShowDropdown(false); }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/[0.06] hover:text-foreground transition-all duration-200"
+                  >
+                    <MessageSquare className="h-3.5 w-3.5 text-muted-foreground/50" />
+                    意见反馈
+                  </button>
+                  <button
+                    onClick={() => { setShowProfile(true); setShowDropdown(false); }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/[0.06] hover:text-foreground transition-all duration-200"
+                  >
+                    <User className="h-3.5 w-3.5 text-muted-foreground/50" />
+                    个人资料
+                  </button>
+                </>
+              )}
+              {isGuest && (
+                <button
+                  onClick={() => { setShowFeedback(true); setShowDropdown(false); }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/[0.06] hover:text-foreground transition-all duration-200"
+                >
+                  <MessageSquare className="h-3.5 w-3.5 text-muted-foreground/50" />
+                  意见反馈
+                </button>
+              )}
+              {!isGuest && (
+                <Link
+                  href="/settings"
+                  onClick={() => setShowDropdown(false)}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/[0.06] hover:text-foreground transition-all duration-200"
+                >
+                  <Settings className="h-3.5 w-3.5 text-muted-foreground/50" />
+                  设置
+                </Link>
+              )}
+              {!isGuest && user?.role === "admin" && (
+                <Link
+                  href="/admin/messages"
+                  onClick={() => setShowDropdown(false)}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-[#0a84ff] hover:bg-[#0a84ff]/10 transition-all duration-200"
+                >
+                  <Shield className="h-3.5 w-3.5" />
+                  管理面板
+                </Link>
+              )}
             </div>
 
             <div className="p-1.5 border-t border-white/[0.06]">
@@ -186,14 +231,14 @@ export function UserMenu() {
                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-[#ff453a]/80 hover:bg-[#ff453a]/10 hover:text-[#ff453a] transition-all duration-200"
               >
                 <LogOut className="h-3.5 w-3.5" />
-                退出登录
+                {isGuest ? "退出游客模式" : "退出登录"}
               </button>
             </div>
           </div>
         )}
       </div>
 
-      {showProfile && (
+      {showProfile && !isGuest && (
         <ProfileModal
           user={user}
           onClose={() => setShowProfile(false)}
@@ -201,7 +246,7 @@ export function UserMenu() {
         />
       )}
 
-      {showMessages && (
+      {showMessages && !isGuest && (
         <MessagesPanel
           messages={messages}
           onClose={() => setShowMessages(false)}
@@ -213,13 +258,14 @@ export function UserMenu() {
       {showFeedback && (
         <FeedbackModal
           onClose={() => setShowFeedback(false)}
+          isGuest={isGuest}
         />
       )}
     </>
   );
 }
 
-function MessagesPanel({ messages, onClose, onRead, onRefresh }: {
+function MessagesPanel({ messages, onClose, onRead }: {
   messages: Message[];
   onClose: () => void;
   onRead: (messageId?: string) => void;
@@ -235,10 +281,6 @@ function MessagesPanel({ messages, onClose, onRead, onRefresh }: {
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
 
-  const handleReadAll = () => {
-    onRead();
-  };
-
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
       <div className="glass-heavy rounded-2xl w-full max-w-lg shadow-[0_16px_48px_rgba(0,0,0,0.5)] animate-scale-in max-h-[80vh] flex flex-col">
@@ -246,7 +288,7 @@ function MessagesPanel({ messages, onClose, onRead, onRefresh }: {
           <h3 className="text-[17px] font-semibold tracking-tight">消息中心</h3>
           <div className="flex items-center gap-2">
             <button
-              onClick={handleReadAll}
+              onClick={() => onRead()}
               className="text-[12px] text-[#0a84ff] hover:text-[#0a84ff]/80 transition-colors"
             >
               全部已读
@@ -284,11 +326,27 @@ function MessagesPanel({ messages, onClose, onRead, onRefresh }: {
                   <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${msg.read ? "bg-transparent" : "bg-[#0a84ff]"}`} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
-                      <p className="text-[13px] font-medium truncate">{msg.title}</p>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <p className="text-[13px] font-medium truncate">{msg.title}</p>
+                        {msg.isFeedback && msg.userName && (
+                          <span className="text-[10px] text-muted-foreground/40 shrink-0">来自 {msg.userName}</span>
+                        )}
+                      </div>
                       <span className="text-[11px] text-muted-foreground/40 shrink-0 ml-2">{formatTime(msg.createdAt)}</span>
                     </div>
                     {expandedId === msg.id && (
-                      <p className="text-[12px] text-muted-foreground/70 leading-relaxed mt-1 whitespace-pre-wrap">{msg.content}</p>
+                      <div>
+                        <p className="text-[12px] text-muted-foreground/70 leading-relaxed mt-1 whitespace-pre-wrap">{msg.content}</p>
+                        {msg.isFeedback && (
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded ${
+                              msg.status === "replied" ? "bg-[#30d158]/15 text-[#30d158]" : "bg-[#ff9f0a]/15 text-[#ff9f0a]"
+                            }`}>
+                              {msg.status === "replied" ? "已回复" : "待处理"}
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     )}
                     {expandedId !== msg.id && (
                       <p className="text-[12px] text-muted-foreground/40 truncate">{msg.content}</p>
@@ -304,7 +362,7 @@ function MessagesPanel({ messages, onClose, onRead, onRefresh }: {
   );
 }
 
-function FeedbackModal({ onClose }: { onClose: () => void }) {
+function FeedbackModal({ onClose, isGuest }: { onClose: () => void; isGuest: boolean }) {
   const { toast } = useToast();
   const [type, setType] = useState("suggestion");
   const [title, setTitle] = useState("");
@@ -336,7 +394,11 @@ function FeedbackModal({ onClose }: { onClose: () => void }) {
         onClose();
       } else {
         const data = await res.json();
-        toast(data.error || "提交失败", "error");
+        if (isGuest && res.status === 401) {
+          toast("游客无法提交反馈，请先登录", "error");
+        } else {
+          toast(data.error || "提交失败", "error");
+        }
       }
     } catch {
       toast("网络错误", "error");
@@ -365,6 +427,11 @@ function FeedbackModal({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="px-6 py-5 space-y-4 overflow-y-auto flex-1">
+          {isGuest && (
+            <div className="text-[12px] text-[#ff9f0a] bg-[#ff9f0a]/10 px-3 py-2 rounded-lg">
+              游客提交的反馈不会关联到账号，登录后可追踪回复
+            </div>
+          )}
           <div>
             <label className="text-[12px] text-muted-foreground/60 uppercase tracking-wider mb-1.5 block">类型</label>
             <div className="flex gap-2">
