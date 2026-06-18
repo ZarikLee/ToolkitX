@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { UserMenu } from "@/components/ui/user-menu";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Footer } from "@/components/layout/footer";
 import { MigrationProvider } from "@/components/layout/migration-provider";
+import { ToastProvider } from "@/hooks/use-toast";
 
 export const metadata: Metadata = {
   title: "ToolkitX - 运维工具平台",
@@ -18,11 +20,14 @@ export default function RootLayout({
     <html lang="zh-CN" className="dark" suppressHydrationWarning>
       <body className="h-screen overflow-hidden flex flex-col">
         <MigrationProvider>
-          <div className="fixed top-4 right-4 z-50">
-            <UserMenu />
-          </div>
-          <div className="flex-1 overflow-hidden flex flex-col">{children}</div>
-          <Footer />
+          <ToastProvider>
+            <div className="fixed top-3 right-6 z-50 flex items-center gap-2">
+              <ThemeToggle />
+              <UserMenu />
+            </div>
+            <div className="flex-1 overflow-hidden flex flex-col">{children}</div>
+            <Footer />
+          </ToastProvider>
         </MigrationProvider>
       </body>
     </html>

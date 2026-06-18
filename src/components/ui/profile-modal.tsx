@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Loader2, Check, Eye, EyeOff } from "lucide-react";
+import { X, Eye, EyeOff } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface UserInfo {
   id: string;
@@ -17,6 +18,7 @@ interface ProfileModalProps {
 }
 
 export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
+  const { toast } = useToast();
   const [name, setName] = useState(user?.name || "");
   const [email, setEmail] = useState(user?.email || "");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -25,7 +27,6 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [activeTab, setActiveTab] = useState<"profile" | "password">("profile");
 
   useEffect(() => {
@@ -38,11 +39,10 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
 
   const handleSaveProfile = async () => {
     if (!name.trim()) {
-      setMessage({ type: "error", text: "用户名不能为空" });
+      toast("用户名不能为空", "error");
       return;
     }
     setLoading(true);
-    setMessage(null);
     try {
       const res = await fetch("/api/auth/profile", {
         method: "PUT",
@@ -51,14 +51,14 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
       });
       const data = await res.json();
       if (!res.ok) {
-        setMessage({ type: "error", text: data.error || "保存失败" });
+        toast(data.error || "保存失败", "error");
       } else {
-        setMessage({ type: "success", text: "保存成功" });
+        toast("资料已保存");
         onUpdate(data.user);
-        setTimeout(() => setMessage(null), 2000);
+        onClose();
       }
     } catch {
-      setMessage({ type: "error", text: "网络错误" });
+      toast("网络错误", "error");
     } finally {
       setLoading(false);
     }
@@ -66,23 +66,22 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
 
   const handleChangePassword = async () => {
     if (!currentPassword) {
-      setMessage({ type: "error", text: "请输入当前密码" });
+      toast("请输入当前密码", "error");
       return;
     }
     if (!newPassword) {
-      setMessage({ type: "error", text: "请输入新密码" });
+      toast("请输入新密码", "error");
       return;
     }
     if (newPassword.length < 6) {
-      setMessage({ type: "error", text: "新密码至少需要 6 个字符" });
+      toast("新密码至少需要 6 个字符", "error");
       return;
     }
     if (newPassword !== confirmPassword) {
-      setMessage({ type: "error", text: "两次输入的密码不一致" });
+      toast("两次输入的密码不一致", "error");
       return;
     }
     setLoading(true);
-    setMessage(null);
     try {
       const res = await fetch("/api/auth/profile", {
         method: "PUT",
@@ -91,16 +90,15 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
       });
       const data = await res.json();
       if (!res.ok) {
-        setMessage({ type: "error", text: data.error || "修改失败" });
+        toast(data.error || "修改失败", "error");
       } else {
-        setMessage({ type: "success", text: "密码修改成功" });
+        toast("密码修改成功");
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
-        setTimeout(() => setMessage(null), 2000);
       }
     } catch {
-      setMessage({ type: "error", text: "网络错误" });
+      toast("网络错误", "error");
     } finally {
       setLoading(false);
     }
@@ -118,7 +116,6 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
       style={{ zIndex: 9999 }}
     >
       <div className="glass-heavy rounded-2xl w-full max-w-md shadow-[0_16px_48px_rgba(0,0,0,0.5)] animate-scale-in max-h-[90vh] flex flex-col">
-        {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.06] shrink-0">
           <h3 className="text-[17px] font-semibold tracking-tight">个人资料</h3>
           <button
@@ -129,7 +126,6 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
           </button>
         </div>
 
-        {/* Avatar */}
         <div className="flex flex-col items-center py-6 shrink-0">
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#0a84ff] to-[#bf5af2] flex items-center justify-center text-white text-[22px] font-semibold">
             {getInitial()}
@@ -138,7 +134,6 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
           <p className="text-[12px] text-muted-foreground/50">{user?.email}</p>
         </div>
 
-        {/* Tabs */}
         <div className="flex border-b border-white/[0.06] shrink-0">
           <button
             onClick={() => setActiveTab("profile")}
@@ -162,7 +157,6 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
           </button>
         </div>
 
-        {/* Content */}
         <div className="px-6 py-5 overflow-y-auto flex-1">
           {activeTab === "profile" ? (
             <div className="space-y-4">
@@ -257,33 +251,14 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
               </div>
             </div>
           )}
-
-          {/* Message */}
-          {message && (
-            <div
-              className={`mt-4 px-3 py-2 rounded-xl text-[12px] ${
-                message.type === "success"
-                  ? "bg-[#30d158]/10 text-[#30d158]"
-                  : "bg-[#ff453a]/10 text-[#ff453a]"
-              }`}
-            >
-              {message.text}
-            </div>
-          )}
         </div>
 
-        {/* Footer */}
         <div className="px-6 py-4 border-t border-white/[0.06] shrink-0">
           <button
             onClick={activeTab === "profile" ? handleSaveProfile : handleChangePassword}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0a84ff] hover:bg-[#0a84ff]/90 text-white text-[13px] font-medium transition-all duration-200 active:scale-[0.98] disabled:opacity-50"
+            className="w-full px-4 py-2.5 rounded-xl bg-[#0a84ff] hover:bg-[#0a84ff]/90 text-white text-[13px] font-medium transition-all duration-200 active:scale-[0.98] disabled:opacity-50"
           >
-            {loading ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <Check className="h-3.5 w-3.5" />
-            )}
             {activeTab === "profile" ? "保存修改" : "修改密码"}
           </button>
         </div>

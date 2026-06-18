@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, createContext, useContext } from "react";
 import { CheckCircle, XCircle, AlertCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -12,62 +12,69 @@ interface Toast {
   type: ToastType;
 }
 
-const icons = {
-  success: CheckCircle,
-  error: XCircle,
-  warning: AlertCircle,
-};
+interface ToastContextValue {
+  toast: (message: string, type?: ToastType) => void;
+}
 
-const styles = {
-  success: "border-green-500/50 bg-green-500/10 text-green-500",
-  error: "border-red-500/50 bg-red-500/10 text-red-500",
-  warning: "border-yellow-500/50 bg-yellow-500/10 text-yellow-500",
-};
+const ToastContext = createContext<ToastContextValue>({ toast: () => {} });
 
 export function useToast() {
+  return useContext(ToastContext);
+}
+
+export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const addToast = useCallback(
-    (message: string, type: ToastType = "success") => {
-      const id = Math.random().toString(36).substring(2, 9);
-      setToasts((prev) => [...prev, { id, message, type }]);
-
-      setTimeout(() => {
-        setToasts((prev) => prev.filter((t) => t.id !== id));
-      }, 3000);
-    },
-    []
-  );
+  const toast = useCallback((message: string, type: ToastType = "success") => {
+    const id = Math.random().toString(36).substring(2, 9);
+    setToasts((prev) => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 3000);
+  }, []);
 
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  const ToastContainer = () => (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
-      {toasts.map((toast) => {
-        const Icon = icons[toast.type];
-        return (
-          <div
-            key={toast.id}
-            className={cn(
-              "flex items-center gap-2 rounded-lg border p-4 shadow-lg animate-in slide-in-from-right",
-              styles[toast.type]
-            )}
-          >
-            <Icon className="h-4 w-4" />
-            <span className="text-sm">{toast.message}</span>
-            <button
-              onClick={() => removeToast(toast.id)}
-              className="ml-2 opacity-70 hover:opacity-100"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        );
-      })}
-    </div>
-  );
+  const icons = {
+    success: CheckCircle,
+    error: XCircle,
+    warning: AlertCircle,
+  };
 
-  return { addToast, ToastContainer };
+  const styles = {
+    success: "border-[#30d158]/30 bg-[#30d158]/10 text-[#30d158]",
+    error: "border-[#ff453a]/30 bg-[#ff453a]/10 text-[#ff453a]",
+    warning: "border-[#ff9f0a]/30 bg-[#ff9f0a]/10 text-[#ff9f0a]",
+  };
+
+  return (
+    <ToastContext.Provider value={{ toast }}>
+      {children}
+      <div className="fixed top-20 right-6 z-[9998] flex flex-col gap-2 pointer-events-none">
+        {toasts.map((t) => {
+          const Icon = icons[t.type];
+          return (
+            <div
+              key={t.id}
+              className={cn(
+                "pointer-events-auto flex items-center gap-2.5 rounded-xl border px-4 py-3 shadow-[0_4px_24px_rgba(0,0,0,0.3)] animate-slide-in-right backdrop-blur-sm",
+                styles[t.type]
+              )}
+            >
+              <Icon className="h-4 w-4 shrink-0" />
+              <span className="text-[13px] font-medium whitespace-nowrap">{t.message}</span>
+              <button
+                onClick={() => removeToast(t.id)}
+                className="ml-1 opacity-50 hover:opacity-100 transition-opacity shrink-0"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    </ToastContext.Provider>
+  );
 }

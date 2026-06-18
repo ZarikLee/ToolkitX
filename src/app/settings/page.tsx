@@ -7,6 +7,7 @@ import { MonitorSettings } from '@/components/settings/monitor-settings';
 import { TerminalSettings } from '@/components/settings/terminal-settings';
 import { Save } from 'lucide-react';
 import { apiGet, apiPut, isLoginRequired, getLocalStorage } from '@/lib/api';
+import { useToast } from '@/hooks/use-toast';
 
 interface Settings {
   theme: 'dark' | 'light' | 'system';
@@ -26,7 +27,7 @@ const SETTINGS_KEY = 'toolkitx_settings';
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState<Settings>(defaultSettings);
-  const [saved, setSaved] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     loadSettings();
@@ -49,8 +50,7 @@ export default function SettingsPage() {
   const saveSettings = async () => {
     if (isLoginRequired()) {
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+      toast('设置已保存');
       return;
     }
     try {
@@ -60,8 +60,7 @@ export default function SettingsPage() {
     } catch {
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
     }
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    toast('设置已保存');
   };
 
   const updateSettings = (partial: Partial<Settings>) => {
@@ -70,7 +69,7 @@ export default function SettingsPage() {
 
   return (
     <div className="flex-1 overflow-hidden flex flex-col">
-      <div className="flex items-center gap-3 px-6 py-3 border-b border-white/[0.06] shrink-0">
+      <div className="flex items-center gap-3 px-6 py-3 border-b border-white/[0.06] shrink-0 pr-24">
         <Link
           href="/"
           className="flex items-center justify-center w-8 h-8 rounded-[10px] bg-white/[0.06] hover:bg-white/[0.1] text-muted-foreground hover:text-foreground transition-all duration-200"
@@ -95,7 +94,7 @@ export default function SettingsPage() {
           className="ml-auto flex items-center gap-2 px-4 py-2 bg-[#0a84ff] hover:bg-[#0a84ff]/90 text-white rounded-xl text-[13px] font-medium transition-all duration-200 active:scale-[0.98]"
         >
           <Save className="w-3.5 h-3.5" />
-          {saved ? '已保存' : '保存设置'}
+          保存设置
         </button>
       </div>
 
