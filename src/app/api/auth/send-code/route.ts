@@ -1,40 +1,52 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// Spug 推送平台配置
-const SPUG_SMS_URL = process.env.SPUG_SMS_URL || "https://push.spug.cc/send/n2D7LjX7LVmGkWNZ";
+// 互亿无线短信配置
+const IHUYI_ACCOUNT = process.env.IHUYI_ACCOUNT || "";
+const IHUYI_APIKEY = process.env.IHUYI_APIKEY || "";
 
 // 生成6位随机验证码
 function generateCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-// 通过 Spug 发送短信
-async function sendSms(phone: string, code: string): Promise<boolean> {
+// 通过互亿无线发送短信
+async function sendSms(phone: string, code: string): Promise<{ ok: boolean; msg?: string }> {
+  // 开发模式：没有配置账号时打印到控制台
+  if (!IHUYI_ACCOUNT || !IHUYI_APIKEY) {
+    console.log(`[SMS Dev Mode] 手机号: ${phone}, 验证码: ${code}`);
+    return { ok: true };
+  }
+
   try {
-    const response = await fetch(SPUG_SMS_URL, {
+    const content = `您的验证码是:${code}。请不要把验证码泄露给其他人。`;
+
+    const params = new URLSearchParams({
+      account: IHUYI_ACCOUNT,
+      password: IHUYI_APIKEY,
+      mobile: phone,
+      content: content,
+      format: "json",
+    });
+
+    const response = await fetch("https://106.ihuyi.com/webservice/sms.php?method=Submit", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: "ToolkitX",
-        code: code,
-        targets: phone,
-      }),
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: params.toString(),
     });
 
     const result = await response.json();
-    console.log("[SMS Spug] Response:", result);
+    console.log("[SMS ihuyi] Response:", result);
 
-    // Spug 返回格式: { success: true, info: "..." } 或 { success: false, info: "..." }
-    if (result.success) {
-      return true;
+    // code=2 表示成功
+    if (result.code === "2" || result.code === 2) {
+      return { ok: true };
     }
 
-    console.error("[SMS Spug] Error:", result.info);
-    return false;
+    return { ok: false, msg: result.msg || "短信发送失败" };
   } catch (error) {
-    console.error("[SMS Spug] Send failed:", error);
-    return false;
+    console.error("[SMS ihuyi] Send failed:", error);
+    return { ok: false, msg: "短信发送异常" };
   }
 }
 
@@ -73,10 +85,10 @@ export async function POST(req: NextRequest) {
     });
 
     // 发送短信
-    const sent = await sendSms(phone, code);
+    const result = await sendSms(phone, code);
 
-    if (!sent) {
-      return NextResponse.json({ error: "短信发送失败，请稍后重试" }, { status: 500 });
+    if (!result.ok) {
+      return NextResponse.json({ error: result.msg || "短信发送失败" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, message: "验证码已发送" });
