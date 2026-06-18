@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { User, LogOut, Settings, ChevronDown } from "lucide-react";
+import { User, LogOut, Settings, ChevronDown, Bell, MessageSquare, Send, X, Loader2, Check } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ProfileModal } from "./profile-modal";
+import { useToast } from "@/hooks/use-toast";
 
 interface UserInfo {
   id: string;
@@ -13,18 +14,37 @@ interface UserInfo {
   avatar?: string | null;
 }
 
+interface Message {
+  id: string;
+  title: string;
+  content: string;
+  type: string;
+  read: boolean;
+  createdAt: number;
+}
+
 export function UserMenu() {
   const router = useRouter();
+  const { toast } = useToast();
   const [user, setUser] = useState<UserInfo | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [showMessages, setShowMessages] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchUser();
+    fetchMessages();
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (showDropdown) fetchMessages();
+  }, [showDropdown]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -46,6 +66,28 @@ export function UserMenu() {
     } catch {}
   };
 
+  const fetchMessages = async () => {
+    try {
+      const res = await fetch("/api/messages");
+      if (res.ok) {
+        const data = await res.json();
+        setMessages(data.messages);
+        setUnreadCount(data.unreadCount);
+      }
+    } catch {}
+  };
+
+  const markAsRead = async (messageId?: string) => {
+    try {
+      await fetch("/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(messageId ? { messageId } : { markAll: true }),
+      });
+      fetchMessages();
+    } catch {}
+  };
+
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/login");
@@ -57,6 +99,16 @@ export function UserMenu() {
     return "U";
   };
 
+  const formatTime = (ts: number) => {
+    const d = new Date(ts);
+    const now = new Date();
+    const diff = now.getTime() - d.getTime();
+    if (diff < 60000) return "刚刚";
+    if (diff < 3600000) return `${Math.floor(diff / 60000)}分钟前`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)}小时前`;
+    return d.toLocaleDateString("zh-CN");
+  };
+
   if (!mounted) return null;
 
   return (
@@ -64,7 +116,7 @@ export function UserMenu() {
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setShowDropdown(!showDropdown)}
-          className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-white/[0.06] transition-all duration-200"
+          className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-white/[0.06] transition-all duration-200 relative"
         >
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0a84ff] to-[#bf5af2] flex items-center justify-center text-white text-[13px] font-semibold shrink-0">
             {user?.avatar ? (
@@ -73,17 +125,44 @@ export function UserMenu() {
               getInitial()
             )}
           </div>
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-[#ff453a] text-white text-[10px] font-bold px-1 leading-none">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
           <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground/60 transition-transform duration-200 ${showDropdown ? "rotate-180" : ""}`} />
         </button>
 
         {showDropdown && (
-          <div className="absolute right-0 top-full mt-2 w-56 glass-heavy rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] overflow-hidden animate-scale-in z-50">
+          <div className="absolute right-0 top-full mt-2 w-72 glass-heavy rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] overflow-hidden animate-scale-in z-50">
             <div className="px-4 py-3 border-b border-white/[0.06]">
               <p className="text-[13px] font-medium truncate">{user?.name || "用户"}</p>
               <p className="text-[11px] text-muted-foreground/50 truncate mt-0.5">{user?.email}</p>
             </div>
 
             <div className="p-1.5">
+              <button
+                onClick={() => { setShowMessages(true); setShowDropdown(false); }}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/[0.06] hover:text-foreground transition-all duration-200"
+              >
+                <div className="relative">
+                  <Bell className="h-3.5 w-3.5 text-muted-foreground/50" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#ff453a]" />
+                  )}
+                </div>
+                消息中心
+                {unreadCount > 0 && (
+                  <span className="ml-auto text-[11px] text-[#ff453a] font-medium">{unreadCount} 条未读</span>
+                )}
+              </button>
+              <button
+                onClick={() => { setShowFeedback(true); setShowDropdown(false); }}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/[0.06] hover:text-foreground transition-all duration-200"
+              >
+                <MessageSquare className="h-3.5 w-3.5 text-muted-foreground/50" />
+                意见反馈
+              </button>
               <button
                 onClick={() => { setShowProfile(true); setShowDropdown(false); }}
                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/[0.06] hover:text-foreground transition-all duration-200"
@@ -121,6 +200,231 @@ export function UserMenu() {
           onUpdate={(updated) => setUser(updated)}
         />
       )}
+
+      {showMessages && (
+        <MessagesPanel
+          messages={messages}
+          onClose={() => setShowMessages(false)}
+          onRead={markAsRead}
+          onRefresh={fetchMessages}
+        />
+      )}
+
+      {showFeedback && (
+        <FeedbackModal
+          onClose={() => setShowFeedback(false)}
+        />
+      )}
     </>
   );
+}
+
+function MessagesPanel({ messages, onClose, onRead, onRefresh }: {
+  messages: Message[];
+  onClose: () => void;
+  onRead: (messageId?: string) => void;
+  onRefresh: () => void;
+}) {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  const handleReadAll = () => {
+    onRead();
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
+      <div className="glass-heavy rounded-2xl w-full max-w-lg shadow-[0_16px_48px_rgba(0,0,0,0.5)] animate-scale-in max-h-[80vh] flex flex-col">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.06] shrink-0">
+          <h3 className="text-[17px] font-semibold tracking-tight">消息中心</h3>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleReadAll}
+              className="text-[12px] text-[#0a84ff] hover:text-[#0a84ff]/80 transition-colors"
+            >
+              全部已读
+            </button>
+            <button
+              onClick={onClose}
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.06] hover:bg-white/[0.1] text-muted-foreground hover:text-foreground transition-all duration-200 text-sm"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+
+        <div className="overflow-y-auto flex-1 p-4 space-y-2">
+          {messages.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground/30">
+              <Bell className="h-8 w-8 mx-auto mb-3 opacity-50" />
+              <p className="text-[13px]">暂无消息</p>
+            </div>
+          ) : (
+            messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`rounded-xl border transition-all duration-200 cursor-pointer ${
+                  msg.read
+                    ? "border-white/[0.04] bg-white/[0.02]"
+                    : "border-[#0a84ff]/20 bg-[#0a84ff]/[0.04]"
+                }`}
+                onClick={() => {
+                  setExpandedId(expandedId === msg.id ? null : msg.id);
+                  if (!msg.read) onRead(msg.id);
+                }}
+              >
+                <div className="flex items-start gap-3 px-4 py-3">
+                  <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${msg.read ? "bg-transparent" : "bg-[#0a84ff]"}`} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-[13px] font-medium truncate">{msg.title}</p>
+                      <span className="text-[11px] text-muted-foreground/40 shrink-0 ml-2">{formatTime(msg.createdAt)}</span>
+                    </div>
+                    {expandedId === msg.id && (
+                      <p className="text-[12px] text-muted-foreground/70 leading-relaxed mt-1 whitespace-pre-wrap">{msg.content}</p>
+                    )}
+                    {expandedId !== msg.id && (
+                      <p className="text-[12px] text-muted-foreground/40 truncate">{msg.content}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FeedbackModal({ onClose }: { onClose: () => void }) {
+  const { toast } = useToast();
+  const [type, setType] = useState("suggestion");
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  const handleSubmit = async () => {
+    if (!title.trim() || !content.trim()) {
+      toast("请填写标题和内容", "error");
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, title, content }),
+      });
+      if (res.ok) {
+        toast("反馈已提交，感谢您的建议");
+        onClose();
+      } else {
+        const data = await res.json();
+        toast(data.error || "提交失败", "error");
+      }
+    } catch {
+      toast("网络错误", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const types = [
+    { value: "suggestion", label: "功能建议" },
+    { value: "bug", label: "Bug 反馈" },
+    { value: "other", label: "其他" },
+  ];
+
+  return (
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
+      <div className="glass-heavy rounded-2xl w-full max-w-md shadow-[0_16px_48px_rgba(0,0,0,0.5)] animate-scale-in max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.06] shrink-0">
+          <h3 className="text-[17px] font-semibold tracking-tight">意见反馈</h3>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.06] hover:bg-white/[0.1] text-muted-foreground hover:text-foreground transition-all duration-200 text-sm"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="px-6 py-5 space-y-4 overflow-y-auto flex-1">
+          <div>
+            <label className="text-[12px] text-muted-foreground/60 uppercase tracking-wider mb-1.5 block">类型</label>
+            <div className="flex gap-2">
+              {types.map((t) => (
+                <button
+                  key={t.value}
+                  onClick={() => setType(t.value)}
+                  className={`px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all duration-200 ${
+                    type === t.value
+                      ? "bg-[#0a84ff] text-white"
+                      : "bg-white/[0.04] border border-white/[0.06] text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="text-[12px] text-muted-foreground/60 uppercase tracking-wider mb-1.5 block">标题</label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
+              placeholder="简要描述"
+            />
+          </div>
+          <div>
+            <label className="text-[12px] text-muted-foreground/60 uppercase tracking-wider mb-1.5 block">详细内容</label>
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="w-full px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors resize-none h-28"
+              placeholder="请详细描述您遇到的问题或建议..."
+            />
+          </div>
+        </div>
+
+        <div className="px-6 py-4 border-t border-white/[0.06] shrink-0">
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0a84ff] hover:bg-[#0a84ff]/90 text-white text-[13px] font-medium transition-all duration-200 active:scale-[0.98] disabled:opacity-50"
+          >
+            {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+            提交反馈
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function formatTime(ts: number) {
+  const d = new Date(ts);
+  const now = new Date();
+  const diff = now.getTime() - d.getTime();
+  if (diff < 60000) return "刚刚";
+  if (diff < 3600000) return `${Math.floor(diff / 60000)}分钟前`;
+  if (diff < 86400000) return `${Math.floor(diff / 3600000)}小时前`;
+  return d.toLocaleDateString("zh-CN");
 }
