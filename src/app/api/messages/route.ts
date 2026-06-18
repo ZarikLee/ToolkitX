@@ -81,7 +81,8 @@ export async function GET() {
     unreadCount = feedbackItems.filter((f) => !f.read).length;
   } else {
     const broadcastUnread = messages.filter((m) => m.reads.length === 0).length;
-    const feedbackUnread = feedbackItems.filter((f) => !f.read).length;
+    // 普通用户：只有管理员已回复的反馈才算未读
+    const feedbackUnread = feedbackItems.filter((f) => !f.read && f.reply).length;
     unreadCount = broadcastUnread + feedbackUnread;
   }
 
