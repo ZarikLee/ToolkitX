@@ -14,7 +14,7 @@ function verifyTokenEdge(token: string): { userId: string; role?: string } | nul
   }
 }
 
-const PUBLIC_PATHS = ["/login", "/api/auth/login", "/api/auth/register", "/api/auth/me", "/api/auth/send-code", "/api/auth/verify-code"];
+const PUBLIC_PATHS = ["/login", "/api/auth/login", "/api/auth/register", "/api/auth/me", "/api/auth/send-code", "/api/auth/verify-code", "/api/stats", "/api/favorites"];
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;

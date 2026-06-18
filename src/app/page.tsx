@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   FileCode,
@@ -36,6 +36,7 @@ import {
   Globe2,
   FileSearch,
   FileCode2,
+  Star,
 } from "lucide-react";
 
 const allTools = [
@@ -466,18 +467,58 @@ const allTools = [
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [visitCount, setVisitCount] = useState(0);
+
+  // Load favorites
+  useEffect(() => {
+    fetch("/api/favorites")
+      .then((r) => r.json())
+      .then((d) => setFavorites(new Set(d.toolIds || [])))
+      .catch(() => {});
+  }, []);
+
+  // Increment visit count
+  useEffect(() => {
+    fetch("/api/stats", { method: "POST" })
+      .then((r) => r.json())
+      .then((d) => setVisitCount(d.visits || 0))
+      .catch(() => {});
+  }, []);
+
+  const toggleFavorite = async (toolId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      const res = await fetch("/api/favorites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ toolId }),
+      });
+      const d = await res.json();
+      setFavorites(new Set(d.toolIds || []));
+    } catch {}
+  };
 
   const filteredTools = useMemo(() => {
-    if (!searchQuery.trim()) return allTools;
-    const query = searchQuery.toLowerCase();
-    return allTools.filter(
-      (tool) =>
-        tool.name.toLowerCase().includes(query) ||
-        tool.description.toLowerCase().includes(query) ||
-        tool.category.toLowerCase().includes(query) ||
-        tool.tags.some((tag) => tag.includes(query))
-    );
-  }, [searchQuery]);
+    let tools = allTools;
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      tools = tools.filter(
+        (tool) =>
+          tool.name.toLowerCase().includes(query) ||
+          tool.description.toLowerCase().includes(query) ||
+          tool.category.toLowerCase().includes(query) ||
+          tool.tags.some((tag) => tag.includes(query))
+      );
+    }
+    // Sort: favorited tools first
+    return [...tools].sort((a, b) => {
+      const aFav = favorites.has(a.name) ? 1 : 0;
+      const bFav = favorites.has(b.name) ? 1 : 0;
+      return bFav - aFav;
+    });
+  }, [searchQuery, favorites]);
 
   return (
     <main className="flex-1 overflow-auto relative">
@@ -543,9 +584,21 @@ export default function HomePage() {
                   >
                     <tool.icon className="h-4 w-4 text-white" />
                   </div>
-                  <span className="text-[11px] text-muted-foreground/50 font-medium">
+                  <span className="text-[11px] text-muted-foreground/50 font-medium flex-1">
                     {tool.category}
                   </span>
+                  <button
+                    onClick={(e) => toggleFavorite(tool.name, e)}
+                    className="p-1 rounded-md hover:bg-white/[0.1] transition-all"
+                  >
+                    <Star
+                      className={`h-3.5 w-3.5 transition-all ${
+                        favorites.has(tool.name)
+                          ? "fill-[#ff9f0a] text-[#ff9f0a]"
+                          : "text-muted-foreground/30 hover:text-muted-foreground/60"
+                      }`}
+                    />
+                  </button>
                 </div>
                 <h3 className="text-[13px] font-semibold tracking-tight mb-0.5">
                   {tool.name}
@@ -570,6 +623,15 @@ export default function HomePage() {
             >
               清除搜索
             </button>
+          </div>
+        )}
+
+        {/* Visit Counter */}
+        {visitCount > 0 && (
+          <div className="text-center mt-8 mb-4">
+            <p className="text-[11px] text-muted-foreground/30">
+              累计访问 {visitCount.toLocaleString()} 次
+            </p>
           </div>
         )}
       </div>
