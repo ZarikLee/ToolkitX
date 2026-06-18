@@ -43,14 +43,16 @@ export function UserMenu() {
   const [mounted, setMounted] = useState(false);
   const [detailMsg, setDetailMsg] = useState<Message | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const fetchMessagesRef = useRef(fetchMessages);
+  fetchMessagesRef.current = fetchMessages;
 
   useEffect(() => {
     const guest = document.cookie.includes("toolkitx_guest=1") || localStorage.getItem("toolkitx_guest") === "1";
     setIsGuest(guest);
     if (!guest) {
       fetchUser();
-      fetchMessages();
-      const timer = setInterval(fetchMessages, 30000);
+      fetchMessagesRef.current();
+      const timer = setInterval(() => fetchMessagesRef.current(), 5000);
       setMounted(true);
       return () => clearInterval(timer);
     }
