@@ -136,7 +136,7 @@ model ConfigFile {
 model UserSettings {
   id                 String @id @default(cuid())
   userId             String @unique
-  theme              String @default("dark")
+  theme              String @default("dark-purple")
   monitorInterval    Int    @default(5000)
   terminalFontSize   Int    @default(14)
   terminalFontFamily String @default("Menlo, Monaco, \"Courier New\", monospace")
