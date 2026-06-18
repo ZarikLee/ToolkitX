@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { UserMenu } from "@/components/ui/user-menu";
 import { Footer } from "@/components/layout/footer";
 import { MigrationProvider } from "@/components/layout/migration-provider";
 
@@ -19,7 +19,7 @@ export default function RootLayout({
       <body className="h-screen overflow-hidden flex flex-col">
         <MigrationProvider>
           <div className="fixed top-4 right-4 z-50">
-            <ThemeToggle />
+            <UserMenu />
           </div>
           <div className="flex-1 overflow-hidden flex flex-col">{children}</div>
           <Footer />
