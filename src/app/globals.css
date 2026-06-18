@@ -577,215 +577,215 @@ body {
 
 /* ============ 白黄主题 ============ */
 .light[data-theme="white-yellow"] {
-  --color-background: #fdfcf8;
+  --color-background: #fef9e8;
   --color-foreground: #1d1d1f;
-  --color-card: rgba(200, 170, 60, 0.06);
+  --color-card: rgba(200, 170, 60, 0.1);
   --color-card-foreground: #1d1d1f;
-  --color-popover: #fffef9;
+  --color-popover: #fffcf0;
   --color-popover-foreground: #1d1d1f;
-  --color-primary: #c8a032;
+  --color-primary: #b89020;
   --color-primary-foreground: #ffffff;
-  --color-secondary: rgba(200, 170, 60, 0.08);
+  --color-secondary: rgba(200, 170, 60, 0.12);
   --color-secondary-foreground: #1d1d1f;
-  --color-muted: rgba(200, 170, 60, 0.06);
-  --color-muted-foreground: #7a7a7e;
-  --color-accent: rgba(200, 170, 60, 0.08);
+  --color-muted: rgba(200, 170, 60, 0.08);
+  --color-muted-foreground: #6a6040;
+  --color-accent: rgba(200, 170, 60, 0.12);
   --color-accent-foreground: #1d1d1f;
-  --color-border: rgba(200, 170, 60, 0.12);
-  --color-input: rgba(200, 170, 60, 0.1);
-  --color-ring: rgba(200, 170, 60, 0.4);
-  --color-surface-1: rgba(200, 170, 60, 0.02);
-  --color-surface-2: rgba(200, 170, 60, 0.04);
-  --color-surface-3: rgba(200, 170, 60, 0.06);
-  --color-blue: #c8a032;
+  --color-border: rgba(200, 170, 60, 0.18);
+  --color-input: rgba(200, 170, 60, 0.14);
+  --color-ring: rgba(200, 170, 60, 0.5);
+  --color-surface-1: rgba(200, 170, 60, 0.04);
+  --color-surface-2: rgba(200, 170, 60, 0.07);
+  --color-surface-3: rgba(200, 170, 60, 0.1);
+  --color-blue: #b89020;
   --color-green: #7db84a;
   --color-purple: #a07bc8;
-  --color-orange: #d4a020;
+  --color-orange: #c8a020;
   --color-cyan: #5ac0c8;
   --color-pink: #d86070;
   --color-teal: #5ab8a0;
   --color-indigo: #7070b8;
-  --shadow-glow: 0 0 20px rgba(200, 170, 60, 0.15);
+  --shadow-glow: 0 0 20px rgba(200, 170, 60, 0.2);
 }
 
 .light[data-theme="white-yellow"] .aurora-blob-1 {
-  background: radial-gradient(circle, rgba(200, 170, 60, 0.45) 0%, rgba(200, 170, 60, 0.18) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(200, 170, 60, 0.5) 0%, rgba(200, 170, 60, 0.2) 50%, transparent 70%);
 }
 .light[data-theme="white-yellow"] .aurora-blob-2 {
-  background: radial-gradient(circle, rgba(220, 190, 80, 0.4) 0%, rgba(220, 190, 80, 0.15) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(220, 190, 80, 0.45) 0%, rgba(220, 190, 80, 0.18) 50%, transparent 70%);
 }
 .light[data-theme="white-yellow"] .aurora-blob-3 {
-  background: radial-gradient(circle, rgba(180, 150, 50, 0.38) 0%, rgba(180, 150, 50, 0.12) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(180, 150, 50, 0.42) 0%, rgba(180, 150, 50, 0.15) 50%, transparent 70%);
 }
 
 /* ============ 白黄橙主题 ============ */
 .light[data-theme="white-yellow-orange"] {
-  --color-background: #fdf9f4;
+  --color-background: #fef6e4;
   --color-foreground: #1d1d1f;
-  --color-card: rgba(210, 150, 50, 0.06);
+  --color-card: rgba(210, 140, 40, 0.1);
   --color-card-foreground: #1d1d1f;
-  --color-popover: #fffdf8;
+  --color-popover: #fffaf0;
   --color-popover-foreground: #1d1d1f;
-  --color-primary: #d4962a;
+  --color-primary: #c88820;
   --color-primary-foreground: #ffffff;
-  --color-secondary: rgba(210, 150, 50, 0.08);
+  --color-secondary: rgba(210, 140, 40, 0.12);
   --color-secondary-foreground: #1d1d1f;
-  --color-muted: rgba(210, 150, 50, 0.06);
-  --color-muted-foreground: #7a7a7e;
-  --color-accent: rgba(210, 150, 50, 0.08);
+  --color-muted: rgba(210, 140, 40, 0.08);
+  --color-muted-foreground: #6a5830;
+  --color-accent: rgba(210, 140, 40, 0.12);
   --color-accent-foreground: #1d1d1f;
-  --color-border: rgba(210, 150, 50, 0.12);
-  --color-input: rgba(210, 150, 50, 0.1);
-  --color-ring: rgba(210, 150, 50, 0.4);
-  --color-surface-1: rgba(210, 150, 50, 0.02);
-  --color-surface-2: rgba(210, 150, 50, 0.04);
-  --color-surface-3: rgba(210, 150, 50, 0.06);
-  --color-blue: #d4962a;
+  --color-border: rgba(210, 140, 40, 0.18);
+  --color-input: rgba(210, 140, 40, 0.14);
+  --color-ring: rgba(210, 140, 40, 0.5);
+  --color-surface-1: rgba(210, 140, 40, 0.04);
+  --color-surface-2: rgba(210, 140, 40, 0.07);
+  --color-surface-3: rgba(210, 140, 40, 0.1);
+  --color-blue: #c88820;
   --color-green: #7db84a;
   --color-purple: #a07bc8;
-  --color-orange: #e09020;
+  --color-orange: #d89018;
   --color-cyan: #5ac0c8;
   --color-pink: #d86070;
   --color-teal: #5ab8a0;
   --color-indigo: #7070b8;
-  --shadow-glow: 0 0 20px rgba(210, 150, 50, 0.15);
+  --shadow-glow: 0 0 20px rgba(210, 140, 40, 0.2);
 }
 
 .light[data-theme="white-yellow-orange"] .aurora-blob-1 {
-  background: radial-gradient(circle, rgba(210, 150, 50, 0.45) 0%, rgba(210, 150, 50, 0.18) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(210, 140, 40, 0.5) 0%, rgba(210, 140, 40, 0.2) 50%, transparent 70%);
 }
 .light[data-theme="white-yellow-orange"] .aurora-blob-2 {
-  background: radial-gradient(circle, rgba(230, 170, 60, 0.4) 0%, rgba(230, 170, 60, 0.15) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(230, 160, 50, 0.45) 0%, rgba(230, 160, 50, 0.18) 50%, transparent 70%);
 }
 .light[data-theme="white-yellow-orange"] .aurora-blob-3 {
-  background: radial-gradient(circle, rgba(190, 130, 40, 0.38) 0%, rgba(190, 130, 40, 0.12) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(190, 120, 30, 0.42) 0%, rgba(190, 120, 30, 0.15) 50%, transparent 70%);
 }
 
 /* ============ 白橙主题 ============ */
 .light[data-theme="white-orange"] {
-  --color-background: #faf6f0;
+  --color-background: #fef2e0;
   --color-foreground: #1d1d1f;
-  --color-card: rgba(220, 130, 50, 0.06);
+  --color-card: rgba(220, 120, 40, 0.1);
   --color-card-foreground: #1d1d1f;
-  --color-popover: #fffdf8;
+  --color-popover: #fff8ec;
   --color-popover-foreground: #1d1d1f;
-  --color-primary: #e08020;
+  --color-primary: #d07018;
   --color-primary-foreground: #ffffff;
-  --color-secondary: rgba(220, 130, 50, 0.08);
+  --color-secondary: rgba(220, 120, 40, 0.12);
   --color-secondary-foreground: #1d1d1f;
-  --color-muted: rgba(220, 130, 50, 0.06);
-  --color-muted-foreground: #7a7a7e;
-  --color-accent: rgba(220, 130, 50, 0.08);
+  --color-muted: rgba(220, 120, 40, 0.08);
+  --color-muted-foreground: #6a4820;
+  --color-accent: rgba(220, 120, 40, 0.12);
   --color-accent-foreground: #1d1d1f;
-  --color-border: rgba(220, 130, 50, 0.12);
-  --color-input: rgba(220, 130, 50, 0.1);
-  --color-ring: rgba(220, 130, 50, 0.4);
-  --color-surface-1: rgba(220, 130, 50, 0.02);
-  --color-surface-2: rgba(220, 130, 50, 0.04);
-  --color-surface-3: rgba(220, 130, 50, 0.06);
-  --color-blue: #e08020;
+  --color-border: rgba(220, 120, 40, 0.18);
+  --color-input: rgba(220, 120, 40, 0.14);
+  --color-ring: rgba(220, 120, 40, 0.5);
+  --color-surface-1: rgba(220, 120, 40, 0.04);
+  --color-surface-2: rgba(220, 120, 40, 0.07);
+  --color-surface-3: rgba(220, 120, 40, 0.1);
+  --color-blue: #d07018;
   --color-green: #7db84a;
   --color-purple: #a07bc8;
-  --color-orange: #e87818;
+  --color-orange: #e07010;
   --color-cyan: #5ac0c8;
   --color-pink: #d86070;
   --color-teal: #5ab8a0;
   --color-indigo: #7070b8;
-  --shadow-glow: 0 0 20px rgba(220, 130, 50, 0.15);
+  --shadow-glow: 0 0 20px rgba(220, 120, 40, 0.2);
 }
 
 .light[data-theme="white-orange"] .aurora-blob-1 {
-  background: radial-gradient(circle, rgba(220, 130, 50, 0.45) 0%, rgba(220, 130, 50, 0.18) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(220, 120, 40, 0.5) 0%, rgba(220, 120, 40, 0.2) 50%, transparent 70%);
 }
 .light[data-theme="white-orange"] .aurora-blob-2 {
-  background: radial-gradient(circle, rgba(240, 150, 60, 0.4) 0%, rgba(240, 150, 60, 0.15) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(240, 140, 50, 0.45) 0%, rgba(240, 140, 50, 0.18) 50%, transparent 70%);
 }
 .light[data-theme="white-orange"] .aurora-blob-3 {
-  background: radial-gradient(circle, rgba(200, 110, 40, 0.38) 0%, rgba(200, 110, 40, 0.12) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(200, 100, 30, 0.42) 0%, rgba(200, 100, 30, 0.15) 50%, transparent 70%);
 }
 
 /* ============ 白橙红主题 ============ */
 .light[data-theme="white-orange-red"] {
-  --color-background: #faf4f0;
+  --color-background: #fdeee0;
   --color-foreground: #1d1d1f;
-  --color-card: rgba(220, 100, 60, 0.06);
+  --color-card: rgba(220, 90, 50, 0.1);
   --color-card-foreground: #1d1d1f;
-  --color-popover: #fffdf8;
+  --color-popover: #fff6ee;
   --color-popover-foreground: #1d1d1f;
-  --color-primary: #d86040;
+  --color-primary: #c85030;
   --color-primary-foreground: #ffffff;
-  --color-secondary: rgba(220, 100, 60, 0.08);
+  --color-secondary: rgba(220, 90, 50, 0.12);
   --color-secondary-foreground: #1d1d1f;
-  --color-muted: rgba(220, 100, 60, 0.06);
-  --color-muted-foreground: #7a7a7e;
-  --color-accent: rgba(220, 100, 60, 0.08);
+  --color-muted: rgba(220, 90, 50, 0.08);
+  --color-muted-foreground: #6a3828;
+  --color-accent: rgba(220, 90, 50, 0.12);
   --color-accent-foreground: #1d1d1f;
-  --color-border: rgba(220, 100, 60, 0.12);
-  --color-input: rgba(220, 100, 60, 0.1);
-  --color-ring: rgba(220, 100, 60, 0.4);
-  --color-surface-1: rgba(220, 100, 60, 0.02);
-  --color-surface-2: rgba(220, 100, 60, 0.04);
-  --color-surface-3: rgba(220, 100, 60, 0.06);
-  --color-blue: #d86040;
+  --color-border: rgba(220, 90, 50, 0.18);
+  --color-input: rgba(220, 90, 50, 0.14);
+  --color-ring: rgba(220, 90, 50, 0.5);
+  --color-surface-1: rgba(220, 90, 50, 0.04);
+  --color-surface-2: rgba(220, 90, 50, 0.07);
+  --color-surface-3: rgba(220, 90, 50, 0.1);
+  --color-blue: #c85030;
   --color-green: #7db84a;
   --color-purple: #a07bc8;
-  --color-orange: #e86830;
+  --color-orange: #d85828;
   --color-cyan: #5ac0c8;
-  --color-pink: #d85060;
+  --color-pink: #d84858;
   --color-teal: #5ab8a0;
   --color-indigo: #7070b8;
-  --shadow-glow: 0 0 20px rgba(220, 100, 60, 0.15);
+  --shadow-glow: 0 0 20px rgba(220, 90, 50, 0.2);
 }
 
 .light[data-theme="white-orange-red"] .aurora-blob-1 {
-  background: radial-gradient(circle, rgba(220, 100, 60, 0.45) 0%, rgba(220, 100, 60, 0.18) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(220, 90, 50, 0.5) 0%, rgba(220, 90, 50, 0.2) 50%, transparent 70%);
 }
 .light[data-theme="white-orange-red"] .aurora-blob-2 {
-  background: radial-gradient(circle, rgba(240, 80, 70, 0.4) 0%, rgba(240, 80, 70, 0.15) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(240, 70, 60, 0.45) 0%, rgba(240, 70, 60, 0.18) 50%, transparent 70%);
 }
 .light[data-theme="white-orange-red"] .aurora-blob-3 {
-  background: radial-gradient(circle, rgba(200, 90, 50, 0.38) 0%, rgba(200, 90, 50, 0.12) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(200, 80, 40, 0.42) 0%, rgba(200, 80, 40, 0.15) 50%, transparent 70%);
 }
 
 /* ============ 黑绿主题 ============ */
 .dark[data-theme="black-green"] {
-  --color-background: #000a04;
-  --color-foreground: #f0f5f2;
-  --color-card: rgba(48, 209, 88, 0.06);
-  --color-card-foreground: #f0f5f2;
-  --color-popover: #0c1a10;
-  --color-popover-foreground: #f0f5f2;
-  --color-primary: #30d158;
+  --color-background: #001a08;
+  --color-foreground: #e8f5ec;
+  --color-card: rgba(48, 209, 88, 0.08);
+  --color-card-foreground: #e8f5ec;
+  --color-popover: #0a2010;
+  --color-popover-foreground: #e8f5ec;
+  --color-primary: #38e060;
   --color-primary-foreground: #000000;
-  --color-secondary: rgba(48, 209, 88, 0.1);
-  --color-secondary-foreground: #f0f5f2;
-  --color-muted: rgba(48, 209, 88, 0.08);
-  --color-muted-foreground: #7e9e8a;
-  --color-accent: rgba(48, 209, 88, 0.1);
-  --color-accent-foreground: #f0f5f2;
-  --color-border: rgba(48, 209, 88, 0.12);
-  --color-input: rgba(48, 209, 88, 0.1);
-  --color-ring: rgba(48, 209, 88, 0.4);
-  --color-surface-1: rgba(48, 209, 88, 0.03);
-  --color-surface-2: rgba(48, 209, 88, 0.06);
-  --color-surface-3: rgba(48, 209, 88, 0.09);
-  --color-blue: #30d158;
-  --color-green: #63e888;
-  --color-purple: #40c8a0;
-  --color-orange: #50d870;
-  --color-cyan: #48e0c0;
-  --color-pink: #50d888;
-  --color-teal: #40d0b0;
-  --color-indigo: #48c8a0;
-  --shadow-glow: 0 0 20px rgba(48, 209, 88, 0.15);
+  --color-secondary: rgba(48, 209, 88, 0.12);
+  --color-secondary-foreground: #e8f5ec;
+  --color-muted: rgba(48, 209, 88, 0.1);
+  --color-muted-foreground: #6e9e7a;
+  --color-accent: rgba(48, 209, 88, 0.12);
+  --color-accent-foreground: #e8f5ec;
+  --color-border: rgba(48, 209, 88, 0.16);
+  --color-input: rgba(48, 209, 88, 0.12);
+  --color-ring: rgba(48, 209, 88, 0.5);
+  --color-surface-1: rgba(48, 209, 88, 0.04);
+  --color-surface-2: rgba(48, 209, 88, 0.07);
+  --color-surface-3: rgba(48, 209, 88, 0.1);
+  --color-blue: #38e060;
+  --color-green: #60f090;
+  --color-purple: #40d8a0;
+  --color-orange: #50e878;
+  --color-cyan: #48f0d0;
+  --color-pink: #50e898;
+  --color-teal: #40e0c0;
+  --color-indigo: #48d8a0;
+  --shadow-glow: 0 0 20px rgba(48, 209, 88, 0.2);
 }
 
 .dark[data-theme="black-green"] .aurora-blob-1 {
-  background: radial-gradient(circle, rgba(48, 209, 88, 0.55) 0%, rgba(48, 209, 88, 0.25) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(48, 209, 88, 0.6) 0%, rgba(48, 209, 88, 0.28) 50%, transparent 70%);
 }
 .dark[data-theme="black-green"] .aurora-blob-2 {
-  background: radial-gradient(circle, rgba(64, 200, 160, 0.5) 0%, rgba(64, 200, 160, 0.22) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(64, 200, 160, 0.55) 0%, rgba(64, 200, 160, 0.25) 50%, transparent 70%);
 }
 .dark[data-theme="black-green"] .aurora-blob-3 {
-  background: radial-gradient(circle, rgba(80, 216, 136, 0.48) 0%, rgba(80, 216, 136, 0.2) 50%, transparent 70%);
+  background: radial-gradient(circle, rgba(80, 216, 136, 0.52) 0%, rgba(80, 216, 136, 0.22) 50%, transparent 70%);
 }

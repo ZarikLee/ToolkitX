@@ -12,12 +12,12 @@ interface ThemeDef {
 }
 
 const THEMES: ThemeDef[] = [
-  { id: "light-yellow",        label: "白黄",   mode: "light", colors: ["#fdfcf8", "#c8a032", "#e8d070"] },
-  { id: "light-yellow-orange", label: "白黄橙", mode: "light", colors: ["#fdf9f4", "#d4962a", "#e8b050"] },
-  { id: "light-orange",        label: "白橙",   mode: "light", colors: ["#faf6f0", "#e08020", "#f0a040"] },
-  { id: "light-orange-red",    label: "白橙红", mode: "light", colors: ["#faf4f0", "#d86040", "#e87050"] },
+  { id: "light-yellow",        label: "白黄",   mode: "light", colors: ["#fef9e8", "#b89020", "#e0c050"] },
+  { id: "light-yellow-orange", label: "白黄橙", mode: "light", colors: ["#fef6e4", "#c88820", "#e0a030"] },
+  { id: "light-orange",        label: "白橙",   mode: "light", colors: ["#fef2e0", "#d07018", "#e88020"] },
+  { id: "light-orange-red",    label: "白橙红", mode: "light", colors: ["#fdeee0", "#c85030", "#e06040"] },
   { id: "dark-purple",         label: "黑紫蓝", mode: "dark",  colors: ["#000000", "#0a84ff", "#bf5af2"] },
-  { id: "dark-green",          label: "黑绿",   mode: "dark",  colors: ["#000a04", "#30d158", "#40c8a0"] },
+  { id: "dark-green",          label: "黑绿",   mode: "dark",  colors: ["#001a08", "#38e060", "#40d8a0"] },
 ];
 
 function applyTheme(theme: ThemeDef) {
