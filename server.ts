@@ -9,10 +9,50 @@ const dev = process.env.NODE_ENV !== 'production';
 const hostname = '0.0.0.0';
 const port = parseInt(process.env.PORT || '3000', 10);
 
+async function runMigration() {
+  const url = process.env.DATABASE_URL;
+  if (!url) return;
+  try {
+    const mysql = await import('mysql2/promise');
+    const conn = await mysql.createConnection(url);
+    const [cols] = await conn.execute("SHOW COLUMNS FROM `User` LIKE 'role'");
+    if ((cols as any[]).length === 0) {
+      await conn.execute("ALTER TABLE `User` ADD COLUMN `role` VARCHAR(191) NOT NULL DEFAULT 'user'");
+      console.log('[migration] Added role column');
+    }
+    for (const table of ['Message', 'MessageRead', 'Feedback']) {
+      const [t] = await conn.execute(`SHOW TABLES LIKE '${table}'`);
+      if ((t as any[]).length === 0) {
+        if (table === 'Message') {
+          await conn.execute("CREATE TABLE IF NOT EXISTS `Message` (`id` VARCHAR(191) NOT NULL,`title` VARCHAR(191) NOT NULL,`content` TEXT NOT NULL,`type` VARCHAR(191) NOT NULL DEFAULT 'info',`createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),PRIMARY KEY (`id`)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+        } else if (table === 'MessageRead') {
+          await conn.execute("CREATE TABLE IF NOT EXISTS `MessageRead` (`id` VARCHAR(191) NOT NULL,`messageId` VARCHAR(191) NOT NULL,`userId` VARCHAR(191) NOT NULL,`read` BOOLEAN NOT NULL DEFAULT false,`createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),PRIMARY KEY (`id`),UNIQUE KEY `MessageRead_messageId_userId_key` (`messageId`,`userId`)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+        } else if (table === 'Feedback') {
+          await conn.execute("CREATE TABLE IF NOT EXISTS `Feedback` (`id` VARCHAR(191) NOT NULL,`userId` VARCHAR(191) NOT NULL,`type` VARCHAR(191) NOT NULL DEFAULT 'suggestion',`title` VARCHAR(191) NOT NULL,`content` TEXT NOT NULL,`status` VARCHAR(191) NOT NULL DEFAULT 'pending',`reply` VARCHAR(191),`createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),`updatedAt` DATETIME(3) NOT NULL,PRIMARY KEY (`id`)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+        }
+        console.log(`[migration] Created ${table} table`);
+      }
+    }
+    await conn.end();
+    console.log('[migration] Done');
+
+    const conn2 = await mysql.createConnection(url);
+    const [rows] = await conn2.execute("SELECT `id` FROM `User` WHERE `email` = '2338240737@qq.com'");
+    if ((rows as any[]).length > 0) {
+      await conn2.execute("UPDATE `User` SET `role` = 'admin' WHERE `email` = '2338240737@qq.com'");
+      console.log('[admin] 2338240737@qq.com set as admin');
+    }
+    await conn2.end();
+  } catch (e: any) {
+    console.error('[migration] Failed:', e.message);
+  }
+}
+
 const app = next({ dev, hostname, port });
 const handle = app.getRequestHandler();
 
-app.prepare().then(() => {
+app.prepare().then(async () => {
+  await runMigration();
   const server = createServer(async (req, res) => {
     try {
       const parsedUrl = parse(req.url!, true);

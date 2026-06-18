@@ -18,4 +18,4 @@ ENV HOSTNAME="0.0.0.0"
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "for i in 1 2 3 4 5 6 7 8 9 10; do npx tsx prisma/migrate.ts 2>&1 && echo 'Migration OK' && break || echo \"Migration attempt $i failed, retrying...\" && sleep 3; done; npx tsx prisma/set-admin.ts 2>&1; exec npx tsx server.ts"]
+CMD ["npx", "tsx", "server.ts"]
