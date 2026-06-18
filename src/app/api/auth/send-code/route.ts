@@ -19,7 +19,7 @@ async function sendSms(phone: string, code: string): Promise<{ ok: boolean; msg?
   }
 
   try {
-    const content = `您的验证码是:${code}。请不要把验证码泄露给其他人。`;
+    const content = `您的验证码是：${code}。请不要把验证码泄露给其他人。`;
 
     const params = new URLSearchParams({
       account: IHUYI_ACCOUNT,
