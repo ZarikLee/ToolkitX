@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { User, LogOut, Settings, ChevronDown, Moon, Sun, Loader2 } from "lucide-react";
+import { User, LogOut, Settings, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ProfileModal } from "./profile-modal";
@@ -18,14 +18,11 @@ export function UserMenu() {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchUser();
-    const saved = localStorage.getItem("theme") as "dark" | "light" | null;
-    setTheme(saved || "dark");
     setMounted(true);
   }, []);
 
@@ -52,18 +49,6 @@ export function UserMenu() {
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/login");
-  };
-
-  const toggleTheme = () => {
-    const next = theme === "dark" ? "light" : "dark";
-    setTheme(next);
-    document.documentElement.className = next;
-    localStorage.setItem("theme", next);
-    fetch("/api/settings", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ theme: next }),
-    }).catch(() => {});
   };
 
   const getInitial = () => {
@@ -93,13 +78,11 @@ export function UserMenu() {
 
         {showDropdown && (
           <div className="absolute right-0 top-full mt-2 w-56 glass-heavy rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] overflow-hidden animate-scale-in z-50">
-            {/* User Info */}
             <div className="px-4 py-3 border-b border-white/[0.06]">
               <p className="text-[13px] font-medium truncate">{user?.name || "用户"}</p>
               <p className="text-[11px] text-muted-foreground/50 truncate mt-0.5">{user?.email}</p>
             </div>
 
-            {/* Menu Items */}
             <div className="p-1.5">
               <button
                 onClick={() => { setShowProfile(true); setShowDropdown(false); }}
@@ -116,20 +99,8 @@ export function UserMenu() {
                 <Settings className="h-3.5 w-3.5 text-muted-foreground/50" />
                 设置
               </Link>
-              <button
-                onClick={toggleTheme}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/[0.06] hover:text-foreground transition-all duration-200"
-              >
-                {theme === "dark" ? (
-                  <Sun className="h-3.5 w-3.5 text-muted-foreground/50" />
-                ) : (
-                  <Moon className="h-3.5 w-3.5 text-muted-foreground/50" />
-                )}
-                {theme === "dark" ? "亮色主题" : "暗色主题"}
-              </button>
             </div>
 
-            {/* Logout */}
             <div className="p-1.5 border-t border-white/[0.06]">
               <button
                 onClick={handleLogout}

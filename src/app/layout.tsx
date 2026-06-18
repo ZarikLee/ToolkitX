@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { UserMenu } from "@/components/ui/user-menu";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { TopBar } from "@/components/ui/top-bar";
 import { Footer } from "@/components/layout/footer";
 import { MigrationProvider } from "@/components/layout/migration-provider";
 import { ToastProvider } from "@/hooks/use-toast";
@@ -21,10 +20,7 @@ export default function RootLayout({
       <body className="h-screen overflow-hidden flex flex-col">
         <MigrationProvider>
           <ToastProvider>
-            <div className="fixed top-14 right-8 z-50 flex items-center gap-2">
-              <ThemeToggle />
-              <UserMenu />
-            </div>
+            <TopBar />
             <div className="flex-1 overflow-hidden flex flex-col">{children}</div>
             <Footer />
           </ToastProvider>
