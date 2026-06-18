@@ -16,6 +16,7 @@ async function sendSms(phone: string, code: string): Promise<boolean> {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        name: "ToolkitX",
         code: code,
         targets: phone,
       }),
