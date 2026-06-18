@@ -63,7 +63,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm mx-4 relative z-10 animate-fade-in">
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-gradient text-[32px] font-bold tracking-tight">
+            <h1 className="text-gradient text-[48px] font-bold tracking-tight">
             ToolkitX
           </h1>
           <p className="text-muted-foreground text-[13px] mt-2">

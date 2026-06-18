@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN" className="dark" suppressHydrationWarning>
+    <html lang="zh-CN" className="light" suppressHydrationWarning>
       <body className="h-screen overflow-hidden flex flex-col">
         <MigrationProvider>
           <ToastProvider>

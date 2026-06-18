@@ -6,7 +6,7 @@ import { Moon, Sun } from "lucide-react";
 const THEME_KEY = "theme";
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
 
   useEffect(() => {
     loadTheme();

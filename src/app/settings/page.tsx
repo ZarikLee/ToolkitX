@@ -17,7 +17,7 @@ interface Settings {
 }
 
 const defaultSettings: Settings = {
-  theme: 'dark',
+  theme: 'light',
   monitorRefreshInterval: 5000,
   terminalFontSize: 14,
   terminalFontFamily: 'Menlo, Monaco, "Courier New", monospace',
