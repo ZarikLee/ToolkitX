@@ -1,0 +1,12 @@
+[
+  {
+    "name": "测试",
+    "type": "mysql",
+    "host": "172.24.144.144",
+    "port": 5432,
+    "database": "fs_uas",
+    "username": "kbss",
+    "password": "gxzq@82130833",
+    "id": "89xn0ud"
+  }
+]

@@ -1,0 +1,10 @@
+[
+  {
+    "name": "数据库服务器",
+    "host": "172.24.144.144",
+    "port": 22,
+    "username": "root",
+    "status": "unknown",
+    "id": "60d8dgg"
+  }
+]

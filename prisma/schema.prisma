@@ -1,0 +1,231 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ============ 用户系统 ============
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  servers          Server[]
+  apiHistory       ApiHistory[]
+  commandHistory   CommandHistory[]
+  sessionSnapshots SessionSnapshot[]
+  scripts          Script[]
+  configFiles      ConfigFile[]
+  settings         UserSettings?
+  alertEvents      AlertEvent[]
+  runbooks         Runbook[]
+  knowledgeEntries KnowledgeEntry[]
+  changeRecords    ChangeRecord[]
+}
+
+// ============ 服务器管理 ============
+
+model Server {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  host      String
+  port      Int      @default(22)
+  username  String
+  password  String?
+  privateKey String?
+  tags      String?  @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  commandHistory CommandHistory[]
+  snapshots      SessionSnapshot[]
+  alertEvents    AlertEvent[]
+  configSnapshots ConfigSnapshot[]
+}
+
+// ============ API 测试历史 ============
+
+model ApiHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  method    String
+  url       String
+  headers   String   @default("[]")
+  body      String?
+  status    Int?
+  time      Int?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============ 终端命令历史 ============
+
+model CommandHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  serverId  String?
+  command   String
+  output    String?
+  createdAt DateTime @default(now())
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  server Server? @relation(fields: [serverId], references: [id], onDelete: SetNull)
+}
+
+// ============ 会话快照 ============
+
+model SessionSnapshot {
+  id        String   @id @default(cuid())
+  userId    String
+  serverId  String?
+  name      String
+  commands  String   @default("[]")
+  createdAt DateTime @default(now())
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  server Server? @relation(fields: [serverId], references: [id], onDelete: SetNull)
+}
+
+// ============ 脚本库 ============
+
+model Script {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  content   String
+  language  String
+  source    String   @default("manual")
+  tags      String   @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============ 配置文件 ============
+
+model ConfigFile {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  content   String
+  type      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============ 用户设置 ============
+
+model UserSettings {
+  id                  String @id @default(cuid())
+  userId              String @unique
+  theme               String @default("dark")
+  monitorInterval     Int    @default(5000)
+  terminalFontSize    Int    @default(14)
+  terminalFontFamily  String @default("Menlo, Monaco, \"Courier New\", monospace")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============ 告警事件 ============
+
+model AlertEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  serverId  String?
+  type      String
+  severity  String
+  title     String
+  message   String
+  resolved  Boolean  @default(false)
+  metadata  String?  @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  server Server? @relation(fields: [serverId], references: [id], onDelete: SetNull)
+}
+
+// ============ 配置快照（漂移检测） ============
+
+model ConfigSnapshot {
+  id        String   @id @default(cuid())
+  serverId  String
+  filePath  String
+  content   String
+  hash      String
+  createdAt DateTime @default(now())
+
+  server Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+}
+
+// ============ Runbook ============
+
+model Runbook {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  description String?
+  triggerType String
+  triggerConfig String @default("{}")
+  steps       String   @default("[]")
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============ 知识图谱 KEDB ============
+
+model KnowledgeEntry {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  symptom     String
+  cause       String
+  solution    String
+  tags        String   @default("[]")
+  severity    String   @default("medium")
+  usageCount  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============ 变更记录 ============
+
+model ChangeRecord {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  description String?
+  type        String
+  riskLevel   String   @default("low")
+  status      String   @default("pending")
+  serverIds   String   @default("[]")
+  steps       String   @default("[]")
+  result      String?
+  approvedBy  String?
+  approvedAt  DateTime?
+  executedAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
