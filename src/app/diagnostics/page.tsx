@@ -6,6 +6,7 @@ import { DnsChecker } from "@/components/diagnostics/dns-checker";
 import { SslChecker } from "@/components/diagnostics/ssl-checker";
 import { HttpChecker } from "@/components/diagnostics/http-checker";
 import { Traceroute } from "@/components/diagnostics/traceroute";
+import { DiagnosticReport } from "@/components/diagnostics/diagnostic-report";
 import { SubPageLayout } from "@/components/layout/sub-page-layout";
 import { TabButton } from "@/components/ui/tab-button";
 
@@ -27,6 +28,7 @@ const helpContent = [
       "SSL 证书：输入域名，检查证书有效期和颁发者信息",
       "HTTP 检测：输入 URL，检测 HTTP 响应状态码和响应头",
       "路由追踪：输入 IP 或域名，追踪数据包经过的路由节点",
+      "诊断报告：选择多个诊断项，一键生成综合报告",
     ],
   },
   {
@@ -44,6 +46,7 @@ const tools = [
   { id: "ssl", name: "SSL 证书", icon: "🔐", component: SslChecker },
   { id: "http", name: "HTTP 检测", icon: "📡", component: HttpChecker },
   { id: "trace", name: "路由追踪", icon: "🗺️", component: Traceroute },
+  { id: "report", name: "诊断报告", icon: "📊", component: DiagnosticReport },
 ];
 
 export default function DiagnosticsPage() {

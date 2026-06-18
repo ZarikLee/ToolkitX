@@ -36,8 +36,8 @@
 - [x] 4.4 SSL 证书检查组件 (src/components/diagnostics/ssl-checker.tsx)
 - [x] 4.5 HTTP 响应检测组件 (src/components/diagnostics/http-checker.tsx)
 - [x] 4.6 Traceroute 组件 (src/components/diagnostics/traceroute.tsx)
-- [ ] 4.7 诊断报告生成器 (src/components/diagnostics/diagnostic-report.tsx)
-- [ ] 4.8 诊断 API 路由 (src/app/api/diagnostics/route.ts)
+- [x] 4.7 诊断报告生成器 (src/components/diagnostics/diagnostic-report.tsx)
+- [x] 4.8 诊断 API 路由 (src/app/api/diagnostics/route.ts)
 
 ## 5. 数据处理模块
 
