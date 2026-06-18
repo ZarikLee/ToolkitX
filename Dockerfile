@@ -18,4 +18,4 @@ ENV HOSTNAME="0.0.0.0"
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx prisma migrate deploy --schema ./prisma/schema.prisma 2>&1; echo 'Migration done, starting server...'; npx tsx server.ts"]
+CMD ["sh", "-c", "npx prisma db push --skip-generate; npx tsx server.ts"]
