@@ -18,4 +18,4 @@ ENV HOSTNAME="0.0.0.0"
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx prisma db push --skip-generate; npx tsx server.ts"]
+CMD ["sh", "-c", "npx prisma db push --skip-generate --accept-data-loss 2>&1; exec npx tsx server.ts"]
