@@ -44,6 +44,29 @@ export function UserMenu() {
   const [detailMsg, setDetailMsg] = useState<Message | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const fetchUser = async () => {
+    try {
+      const res = await fetch("/api/auth/me");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.user) setUser(data.user);
+      }
+    } catch {}
+  };
+
+  const fetchMessages = async () => {
+    try {
+      const res = await fetch("/api/messages");
+      if (res.ok) {
+        const data = await res.json();
+        setMessages(data.messages);
+        setUnreadCount(data.unreadCount);
+      }
+    } catch {}
+  };
+  const fetchMessagesRef = useRef(fetchMessages);
+  fetchMessagesRef.current = fetchMessages;
+
   useEffect(() => {
     const guest = document.cookie.includes("toolkitx_guest=1") || localStorage.getItem("toolkitx_guest") === "1";
     setIsGuest(guest);
@@ -70,29 +93,6 @@ export function UserMenu() {
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
-
-  const fetchUser = async () => {
-    try {
-      const res = await fetch("/api/auth/me");
-      if (res.ok) {
-        const data = await res.json();
-        if (data.user) setUser(data.user);
-      }
-    } catch {}
-  };
-
-  const fetchMessages = async () => {
-    try {
-      const res = await fetch("/api/messages");
-      if (res.ok) {
-        const data = await res.json();
-        setMessages(data.messages);
-        setUnreadCount(data.unreadCount);
-      }
-    } catch {}
-  };
-  const fetchMessagesRef = useRef(fetchMessages);
-  fetchMessagesRef.current = fetchMessages;
 
   const markAsRead = async (messageId?: string) => {
     try {
