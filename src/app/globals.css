@@ -119,11 +119,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  transition: background-color 0.5s ease, color 0.4s ease;
+  transition: background-color 1.3s ease, color 1.3s ease;
 }
 
 html {
-  transition: background-color 0.5s ease;
+  transition: background-color 1.3s ease;
 }
 
 ::selection {
@@ -191,7 +191,7 @@ html {
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: background 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+  transition: background 1.3s ease, border-color 1.3s ease, box-shadow 1.3s ease;
 }
 
 .glass-heavy {
@@ -497,13 +497,13 @@ html {
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
-  transition: opacity 0.6s ease;
+  transition: opacity 1.3s ease;
 }
 
 .aurora-blob {
   position: absolute;
   will-change: transform, opacity;
-  transition: background 0.8s ease, opacity 0.6s ease;
+  transition: background 1.3s ease, opacity 1.3s ease;
 }
 
 /* ============ 暗色主题 · 水墨蓝紫 ============ */
