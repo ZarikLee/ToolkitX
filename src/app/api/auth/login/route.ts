@@ -22,6 +22,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (!user.password) {
+      return NextResponse.json(
+        { error: "该账号使用手机验证码登录" },
+        { status: 401 }
+      );
+    }
+
     const isValid = await verifyPassword(password, user.password);
     if (!isValid) {
       return NextResponse.json(
@@ -32,13 +39,13 @@ export async function POST(req: NextRequest) {
 
     const token = generateToken({
       userId: user.id,
-      email: user.email,
+      email: user.email || "",
       name: user.name,
       role: user.role,
     });
 
     const response = NextResponse.json({
-      user: { id: user.id, email: user.email, name: user.name, role: user.role },
+      user: { id: user.id, email: user.email || null, name: user.name, role: user.role },
     });
     const cookies = setAuthCookie(token);
     response.headers.set("Set-Cookie", cookies["Set-Cookie"]);

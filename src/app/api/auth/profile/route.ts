@@ -44,6 +44,9 @@ export async function PUT(request: Request) {
     if (!user) {
       return NextResponse.json({ error: "用户不存在" }, { status: 404 });
     }
+    if (!user.password) {
+      return NextResponse.json({ error: "该账号使用手机验证码登录，无法修改密码" }, { status: 400 });
+    }
     const valid = await verifyPassword(currentPassword, user.password);
     if (!valid) {
       return NextResponse.json({ error: "当前密码错误" }, { status: 400 });

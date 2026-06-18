@@ -1,48 +1,82 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [mode, setMode] = useState<"login" | "register">("login");
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
+  const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [codeSent, setCodeSent] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     document.documentElement.className = "light";
     localStorage.setItem("theme", "light");
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
+    if (countdown > 0) {
+      timerRef.current = setTimeout(() => setCountdown(countdown - 1), 1000);
+    }
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [countdown]);
+
+  const handleSendCode = async () => {
+    if (!phone || !/^1[3-9]\d{9}$/.test(phone)) {
+      setError("请输入正确的手机号");
+      return;
+    }
     setError("");
     setLoading(true);
-
     try {
-      const url = mode === "login" ? "/api/auth/login" : "/api/auth/register";
-      const body = mode === "login" ? { email, password } : { email, name, password };
-
-      const res = await fetch(url, {
+      const res = await fetch("/api/auth/send-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ phone }),
       });
-
       const data = await res.json();
-
       if (!res.ok) {
-        setError(data.error || "操作失败");
+        setError(data.error || "发送失败");
         return;
       }
+      setCodeSent(true);
+      setCountdown(60);
+    } catch {
+      setError("网络错误");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!phone || !code) {
+      setError("请输入手机号和验证码");
+      return;
+    }
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/verify-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, code }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "验证失败");
+        return;
+      }
       router.push("/");
       router.refresh();
     } catch {
-      setError("网络错误，请稍后重试");
+      setError("网络错误");
     } finally {
       setLoading(false);
     }
@@ -68,7 +102,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm mx-4 relative z-10 animate-fade-in">
         {/* Logo */}
         <div className="text-center mb-8">
-            <h1 className="text-gradient text-[48px] font-bold tracking-tight">
+          <h1 className="text-gradient text-[48px] font-bold tracking-tight">
             ToolkitX
           </h1>
           <p className="text-muted-foreground text-[13px] mt-2">
@@ -78,45 +112,46 @@ export default function LoginPage() {
 
         {/* Card */}
         <div className="glass rounded-2xl p-6">
-          <h2 className="text-[16px] font-semibold mb-5">
-            {mode === "login" ? "登录" : "注册"}
-          </h2>
+          <h2 className="text-[16px] font-semibold mb-5">登录 / 注册</h2>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
+          <form onSubmit={handleVerify} className="space-y-4">
+            {/* Phone Input */}
+            <div className="flex gap-2">
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="邮箱"
+                type="tel"
+                value={phone}
+                onChange={(e) => {
+                  setPhone(e.target.value.replace(/\D/g, "").slice(0, 11));
+                  setCodeSent(false);
+                  setCode("");
+                }}
+                placeholder="手机号"
                 required
-                className="input-apple w-full"
+                maxLength={11}
+                className="input-apple flex-1"
               />
             </div>
 
-            {mode === "register" && (
-              <div className="animate-fade-in">
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="用户名"
-                  required
-                  className="input-apple w-full"
-                />
-              </div>
-            )}
-
-            <div>
+            {/* Code Input + Send Button */}
+            <div className="flex gap-2">
               <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="密码"
+                type="text"
+                value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                placeholder="验证码"
                 required
-                minLength={6}
-                className="input-apple w-full"
+                maxLength={6}
+                className="input-apple flex-1"
+                disabled={!codeSent}
               />
+              <button
+                type="button"
+                onClick={handleSendCode}
+                disabled={countdown > 0 || loading || !/^1[3-9]\d{9}$/.test(phone)}
+                className="px-4 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-[13px] font-medium text-muted-foreground hover:text-foreground hover:bg-white/[0.08] transition-all disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
+              >
+                {countdown > 0 ? `${countdown}s` : "获取验证码"}
+              </button>
             </div>
 
             {error && (
@@ -127,10 +162,10 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !codeSent || code.length !== 6}
               className="w-full py-2.5 rounded-xl bg-[#0a84ff] hover:bg-[#0a84ff]/90 text-white text-[14px] font-medium transition-all duration-200 active:scale-[0.98] disabled:opacity-50"
             >
-              {loading ? "请稍候..." : mode === "login" ? "登录" : "注册"}
+              {loading ? "验证中..." : "登录 / 注册"}
             </button>
           </form>
 
@@ -150,17 +185,9 @@ export default function LoginPage() {
             游客访问
           </button>
 
-          <div className="mt-4 text-center">
-            <button
-              onClick={() => {
-                setMode(mode === "login" ? "register" : "login");
-                setError("");
-              }}
-              className="text-[12px] text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {mode === "login" ? "没有账号？立即注册" : "已有账号？立即登录"}
-            </button>
-          </div>
+          <p className="mt-4 text-center text-[11px] text-muted-foreground/40">
+            首次登录自动创建账号
+          </p>
         </div>
       </div>
     </div>

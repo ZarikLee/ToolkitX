@@ -5,44 +5,44 @@ import { setAuthCookie } from "@/lib/auth-server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, name, password } = await req.json();
+    const { phone, email, name, password } = await req.json();
 
-    if (!email || !name || !password) {
+    if (!phone || !name) {
       return NextResponse.json(
-        { error: "请填写所有必填字段" },
+        { error: "请填写手机号和用户名" },
         { status: 400 }
       );
     }
 
-    if (password.length < 6) {
+    if (!/^1[3-9]\d{9}$/.test(phone)) {
       return NextResponse.json(
-        { error: "密码至少需要 6 个字符" },
+        { error: "请输入正确的手机号" },
         { status: 400 }
       );
     }
 
-    const existing = await prisma.user.findUnique({ where: { email } });
+    const existing = await prisma.user.findUnique({ where: { phone } });
     if (existing) {
       return NextResponse.json(
-        { error: "该邮箱已被注册" },
+        { error: "该手机号已注册" },
         { status: 409 }
       );
     }
 
-    const hashedPassword = await hashPassword(password);
+    const hashedPassword = password ? await hashPassword(password) : null;
     const user = await prisma.user.create({
-      data: { email, name, password: hashedPassword },
+      data: { phone, email: email || null, name, password: hashedPassword },
     });
 
     const token = generateToken({
       userId: user.id,
-      email: user.email,
+      email: user.email || "",
       name: user.name,
       role: user.role,
     });
 
     const response = NextResponse.json({
-      user: { id: user.id, email: user.email, name: user.name, role: user.role },
+      user: { id: user.id, phone: user.phone, email: user.email, name: user.name, role: user.role },
     });
     const cookies = setAuthCookie(token);
     response.headers.set("Set-Cookie", cookies["Set-Cookie"]);

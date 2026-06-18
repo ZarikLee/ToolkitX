@@ -54,6 +54,31 @@ async function runMigration() {
     }
     console.log('[migration] Created advanced features tables');
 
+    // Create SmsCode table
+    await conn.execute("CREATE TABLE IF NOT EXISTS `SmsCode` (`id` VARCHAR(191) NOT NULL,`phone` VARCHAR(191) NOT NULL,`code` VARCHAR(191) NOT NULL,`purpose` VARCHAR(191) NOT NULL DEFAULT 'login',`used` BOOLEAN NOT NULL DEFAULT false,`expiresAt` DATETIME(3) NOT NULL,`createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),PRIMARY KEY (`id`),INDEX `SmsCode_phone_purpose_idx` (`phone`,`purpose`)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+    console.log('[migration] Created SmsCode table');
+
+    // Add phone column to User if not exists
+    const [phoneCol] = await conn.execute("SHOW COLUMNS FROM `User` LIKE 'phone'");
+    if ((phoneCol as any[]).length === 0) {
+      await conn.execute("ALTER TABLE `User` ADD COLUMN `phone` VARCHAR(191) UNIQUE");
+      console.log('[migration] Added phone column to User');
+    }
+
+    // Make email and password nullable for phone login
+    const [emailCol] = await conn.execute("SHOW COLUMNS FROM `User` LIKE 'email'");
+    const emailInfo = (emailCol as any[])[0];
+    if (emailInfo && emailInfo.Null === 'NO') {
+      await conn.execute("ALTER TABLE `User` MODIFY COLUMN `email` VARCHAR(191) UNIQUE");
+      console.log('[migration] Made email nullable');
+    }
+    const [pwdCol] = await conn.execute("SHOW COLUMNS FROM `User` LIKE 'password'");
+    const pwdInfo = (pwdCol as any[])[0];
+    if (pwdInfo && pwdInfo.Null === 'NO') {
+      await conn.execute("ALTER TABLE `User` MODIFY COLUMN `password` VARCHAR(191)");
+      console.log('[migration] Made password nullable');
+    }
+
     await conn.end();
     console.log('[migration] Done');
 
