@@ -114,7 +114,7 @@ export async function PUT(request: Request) {
   }
 
   const entry = await prisma.knowledgeEntry.update({
-    where: { id },
+    where: { id, userId: user.userId },
     data: updateData,
   });
 

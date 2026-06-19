@@ -73,8 +73,16 @@ export async function POST(request: Request) {
     }
   }
 
-  const targetDomain = certRecord?.domain || domain;
+  if (domain && !/^[a-zA-Z0-9.-]+$/.test(domain)) {
+    return NextResponse.json({ error: "Invalid domain" }, { status: 400 });
+  }
+
   const targetPort = certRecord?.port || port || 443;
+  if (targetPort < 1 || targetPort > 65535) {
+    return NextResponse.json({ error: "Invalid port" }, { status: 400 });
+  }
+
+  const targetDomain = certRecord?.domain || domain;
 
   const result = await checkCertificate(targetDomain, targetPort);
 

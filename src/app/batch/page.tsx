@@ -23,7 +23,7 @@ interface BatchHistory {
   command: string;
   serverCount: number;
   successCount: number;
-  timestamp: number;
+  createdAt: number;
 }
 
 export default function BatchPage() {
@@ -68,12 +68,12 @@ export default function BatchPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           command: command.trim(),
-          serverIds: selectedServers.map((s) => s.id),
+          servers: selectedServers.map(s => ({ host: s.host, port: s.port, username: s.username, password: s.password, privateKey: s.privateKey })),
         }),
       });
       if (res.ok) {
         const data = await res.json();
-        setResults(data.results);
+        setResults(data.results.map((r: any, i: number) => ({ serverId: selectedServers[i]?.id || '', serverName: selectedServers[i]?.name || '', host: r.host, output: r.stdout || r.stderr || '', exitCode: r.exitCode, status: r.success ? 'success' : 'error' })));
         loadHistory();
       }
     } catch {}
@@ -216,11 +216,11 @@ export default function BatchPage() {
                         <span className="font-mono text-[12px] text-muted-foreground">{h.command}</span>
                       </div>
                       <span className="text-[11px] text-muted-foreground/60">
-                        {new Date(h.timestamp).toLocaleString()}
+                        {new Date(h.createdAt).toLocaleString()}
                       </span>
                     </div>
                     <div className="text-[11px] text-muted-foreground mt-1">
-                      {h.serverCount} 台服务器 · {h.successCount} 成功
+                      {h.command}
                     </div>
                   </div>
                 ))

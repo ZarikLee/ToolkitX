@@ -84,7 +84,7 @@ export async function PUT(request: Request) {
   }
 
   const rule = await prisma.alertRule.update({
-    where: { id },
+    where: { id, userId: user.userId },
     data: updates,
   });
 

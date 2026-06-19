@@ -90,7 +90,7 @@ export async function PUT(request: Request) {
   }
 
   const runbook = await prisma.runbook.update({
-    where: { id },
+    where: { id, userId: user.userId },
     data: updateData,
   });
 

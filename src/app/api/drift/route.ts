@@ -89,7 +89,7 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "Missing id" }, { status: 400 });
   }
 
-  await prisma.configBaseline.delete({ where: { id } });
+  await prisma.configBaseline.deleteMany({ where: { id, userId: user.userId } });
 
   return NextResponse.json({ success: true });
 }

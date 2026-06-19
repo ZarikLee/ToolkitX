@@ -13,11 +13,11 @@ interface Certificate {
   domain: string;
   port: number;
   label: string;
-  status: "valid" | "expiring" | "expired";
+  lastStatus: "valid" | "expiring" | "expired";
   daysLeft: number;
   issuer: string;
-  notAfter: number;
-  lastChecked: number;
+  validTo: number;
+  lastCheck: number;
 }
 
 const statusColors: Record<string, string> = {
@@ -189,10 +189,10 @@ export default function CertsPage() {
                   <div className="flex items-center gap-2">
                     <div
                       className="w-2.5 h-2.5 rounded-full"
-                      style={{ backgroundColor: statusColors[cert.status] }}
+                      style={{ backgroundColor: statusColors[cert.lastStatus] }}
                     />
-                    <span className="text-[12px]" style={{ color: statusColors[cert.status] }}>
-                      {statusLabels[cert.status]}
+                    <span className="text-[12px]" style={{ color: statusColors[cert.lastStatus] }}>
+                      {statusLabels[cert.lastStatus]}
                     </span>
                   </div>
                   <span
@@ -207,10 +207,10 @@ export default function CertsPage() {
                 <div className="text-[11px] text-muted-foreground/60">
                   <div>颁发者: {cert.issuer}</div>
                   <div className="mt-0.5">
-                    过期时间: {new Date(cert.notAfter).toLocaleDateString()}
+                    过期时间: {new Date(cert.validTo).toLocaleDateString()}
                   </div>
                   <div className="mt-0.5">
-                    上次检查: {new Date(cert.lastChecked).toLocaleString()}
+                    上次检查: {new Date(cert.lastCheck).toLocaleString()}
                   </div>
                 </div>
               </div>

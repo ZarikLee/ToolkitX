@@ -85,7 +85,7 @@ export async function PUT(request: Request) {
   }
 
   const alert = await prisma.alertEvent.update({
-    where: { id },
+    where: { id, userId: user.userId },
     data: { resolved: resolved ?? true },
   });
 
@@ -106,7 +106,7 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "Missing id" }, { status: 400 });
   }
 
-  await prisma.alertEvent.delete({ where: { id } });
+  await prisma.alertEvent.deleteMany({ where: { id, userId: user.userId } });
 
   return NextResponse.json({ success: true });
 }

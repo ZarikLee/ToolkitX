@@ -11,7 +11,7 @@ const helpContent = [
 
 interface AuditLog {
   id: string;
-  timestamp: number;
+  createdAt: number;
   user: string;
   action: string;
   resource: string;
@@ -52,8 +52,8 @@ export default function AuditPage() {
       const params = new URLSearchParams();
       if (actionFilter !== "all") params.set("action", actionFilter);
       if (resourceFilter) params.set("resource", resourceFilter);
-      if (dateFrom) params.set("from", dateFrom);
-      if (dateTo) params.set("to", dateTo);
+      if (dateFrom) params.set("startDate", dateFrom);
+      if (dateTo) params.set("endDate", dateTo);
       const res = await fetch(`/api/audit?${params.toString()}`);
       if (res.ok) {
         const data = await res.json();
@@ -66,8 +66,8 @@ export default function AuditPage() {
   const exportCsv = () => {
     const headers = ["时间", "用户", "操作", "资源", "详情"];
     const rows = logs.map((log) => [
-      new Date(log.timestamp).toLocaleString(),
-      log.user,
+      new Date(log.createdAt).toLocaleString(),
+      log.resource,
       log.action,
       log.resource,
       log.detail,
@@ -171,9 +171,9 @@ export default function AuditPage() {
                 {logs.map((log) => (
                   <tr key={log.id} className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors">
                     <td className="px-4 py-2.5 text-muted-foreground whitespace-nowrap">
-                      {new Date(log.timestamp).toLocaleString()}
+                      {new Date(log.createdAt).toLocaleString()}
                     </td>
-                    <td className="px-4 py-2.5 font-medium">{log.user}</td>
+                    <td className="px-4 py-2.5 font-medium">{log.resource}</td>
                     <td className="px-4 py-2.5">
                       <span className="px-1.5 py-0.5 text-[11px] bg-white/[0.06] rounded-md">
                         {log.action}

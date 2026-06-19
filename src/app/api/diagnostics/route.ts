@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { exec } from "child_process";
 import { promisify } from "util";
+import { getCurrentUser } from "@/lib/auth-server";
 
 const execAsync = promisify(exec);
 
@@ -15,11 +16,20 @@ async function runCommand(cmd: string, timeout = 10000): Promise<string> {
 
 // POST - Run a diagnostic
 export async function POST(request: Request) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const body = await request.json();
   const { type, target, options } = body;
 
-  if (!type || !target) {
-    return NextResponse.json({ error: "Missing type or target" }, { status: 400 });
+  if (!target || !/^[a-zA-Z0-9._:-]+$/.test(target)) {
+    return NextResponse.json({ error: "Invalid target" }, { status: 400 });
+  }
+
+  if (!type) {
+    return NextResponse.json({ error: "Missing type" }, { status: 400 });
   }
 
   let result: any = {};
@@ -27,6 +37,9 @@ export async function POST(request: Request) {
   switch (type) {
     case "port": {
       const ports = options?.ports || [22, 80, 443];
+      if (!Array.isArray(ports) || !ports.every((p: any) => Number.isInteger(p) && p >= 1 && p <= 65535)) {
+        return NextResponse.json({ error: "Invalid port(s)" }, { status: 400 });
+      }
       const portResults = [];
       for (const port of ports) {
         const out = await runCommand(`nc -z -w 2 ${target} ${port} 2>&1 && echo "open" || echo "closed"`);
@@ -97,6 +110,9 @@ export async function POST(request: Request) {
 
     case "ping": {
       const count = options?.count || 10;
+      if (!Number.isInteger(count) || count < 1 || count > 30) {
+        return NextResponse.json({ error: "Invalid count" }, { status: 400 });
+      }
       const out = await runCommand(`ping -c ${count} ${target} 2>&1`, 15000);
       const statsMatch = out.match(/rtt min\/avg\/max\/mdev = ([\d.]+)\/([\d.]+)\/([\d.]+)\/([\d.]+)/);
       const lossMatch = out.match(/(\d+)% packet loss/);

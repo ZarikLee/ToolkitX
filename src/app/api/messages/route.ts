@@ -104,6 +104,10 @@ export async function POST(request: Request) {
 
   // 回复反馈
   if (reply && messageId?.startsWith("fb-")) {
+    if (user.role !== "admin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const feedbackId = messageId.slice(3);
 
     // 获取反馈信息（用于回复后通知用户）
@@ -200,6 +204,10 @@ export async function DELETE(request: Request) {
 
   if (!id) {
     return NextResponse.json({ error: "Missing id" }, { status: 400 });
+  }
+
+  if (user.role !== "admin") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   await prisma.message.delete({ where: { id } });

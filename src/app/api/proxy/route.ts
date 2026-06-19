@@ -1,12 +1,26 @@
 import { NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth-server";
 
 export async function POST(request: Request) {
   try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { method, url, headers, body } = await request.json();
 
     if (!url) {
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
     }
+
+    try {
+      const urlObj = new URL(url);
+      const hostname = urlObj.hostname;
+      if (/^(127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|169\.254\.|0\.|localhost)/.test(hostname) || hostname === '::1') {
+        return NextResponse.json({ error: "Access to private networks is forbidden" }, { status: 403 });
+      }
+    } catch { return NextResponse.json({ error: "Invalid URL" }, { status: 400 }); }
 
     const startTime = Date.now();
 
