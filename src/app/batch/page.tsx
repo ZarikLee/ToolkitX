@@ -43,7 +43,7 @@ export default function BatchPage() {
       const res = await fetch("/api/batch/history");
       if (res.ok) {
         const data = await res.json();
-        setHistory(data.history);
+        setHistory(data);
       }
     } catch {}
   };

@@ -57,7 +57,7 @@ export default function KedbPage() {
       const res = await fetch("/api/kedb");
       if (res.ok) {
         const data = await res.json();
-        setEntries(data.entries);
+        setEntries(data);
       }
     } catch {}
     setLoading(false);

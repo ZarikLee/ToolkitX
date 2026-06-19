@@ -59,7 +59,7 @@ export default function RunbooksPage() {
       const res = await fetch("/api/runbooks");
       if (res.ok) {
         const data = await res.json();
-        setRunbooks(data.runbooks);
+        setRunbooks(data);
       }
     } catch {}
     setLoading(false);

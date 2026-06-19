@@ -48,7 +48,7 @@ export default function CertsPage() {
       const res = await fetch("/api/certs");
       if (res.ok) {
         const data = await res.json();
-        setCerts(data.certs);
+        setCerts(data);
       }
     } catch {}
     setLoading(false);
