@@ -1,3 +1,10 @@
+---
+name: fullstack-tech-stack
+description: Full-stack web app tech stack (Next.js 16 + React 19 + Tailwind v4 + Prisma 6 + MySQL + SSH/WebSocket + Railway deployment). Use when starting a new web project with this stack.
+license: MIT
+compatibility: Requires Node.js 20, MySQL 8.0, Railway account
+---
+
 # Full-Stack Web App Tech Stack (ToolkitX Pattern)
 
 Reusable tech stack reference for building production web apps. Copy this skill when starting new projects.
