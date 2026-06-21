@@ -58,6 +58,7 @@ export function PortScanner() {
   });
   const [results, setResults] = useState<PortResult[]>([]);
   const [scanning, setScanning] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ host, portRange }));
@@ -68,24 +69,32 @@ export function PortScanner() {
 
     setScanning(true);
     setResults([]);
+    setError(null);
 
     const ports = portRange
       .split(",")
       .map((p: string) => parseInt(p.trim()))
       .filter((p: number) => !isNaN(p));
 
-    const mockResults: PortResult[] = ports.map((port: number) => ({
-      port,
-      status: Math.random() > 0.3 ? "open" : "closed",
-      service: portServices[port] || "Unknown",
-    }));
-
-    for (let i = 0; i < mockResults.length; i++) {
-      await new Promise((resolve) => setTimeout(resolve, 200));
-      setResults((prev) => [...prev, mockResults[i]]);
+    try {
+      const res = await fetch("/api/diagnostics", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ type: "port", target: host, options: { ports } }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "扫描失败");
+      const enriched = data.result.ports.map((p: PortResult) => ({
+        ...p,
+        service: p.service || portServices[p.port] || "Unknown",
+      }));
+      setResults(enriched);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "扫描失败");
+    } finally {
+      setScanning(false);
     }
-
-    setScanning(false);
   };
 
   const scanCommonPorts = () => {
@@ -142,6 +151,12 @@ export function PortScanner() {
       >
         {scanning ? "扫描中..." : "开始扫描"}
       </button>
+
+      {error && (
+        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+          {error}
+        </div>
+      )}
 
       {results.length > 0 && (
         <div className="space-y-2">

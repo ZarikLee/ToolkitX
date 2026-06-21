@@ -128,7 +128,7 @@ export default function DriftPage() {
             <button
               onClick={() => checkDrift()}
               disabled={checking}
-              className="btn-apple bg-white/[0.06] text-[13px] px-3 py-1.5"
+              className="btn-apple btn-secondary text-[13px] px-3 py-1.5"
             >
               {checking ? "检测中..." : "全部检测"}
             </button>
@@ -209,7 +209,7 @@ export default function DriftPage() {
                   <button
                     onClick={() => checkDrift(selected.id)}
                     disabled={checking}
-                    className="btn-apple bg-white/[0.06] text-[12px] px-3 py-1.5"
+                    className="btn-apple btn-secondary text-[12px] px-3 py-1.5"
                   >
                     检测
                   </button>

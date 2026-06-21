@@ -14,8 +14,6 @@ interface SslInfo {
   validFrom: string;
   validTo: string;
   daysLeft: number;
-  serialNumber: string;
-  signatureAlgorithm: string;
 }
 
 const STORAGE_KEY = "diagnostics_ssl_checker";
@@ -30,6 +28,7 @@ export function SslChecker() {
   });
   const [sslInfo, setSslInfo] = useState<SslInfo | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ domain }));
@@ -37,23 +36,38 @@ export function SslChecker() {
 
   const checkSsl = async () => {
     if (!domain) return;
-
     setLoading(true);
     setSslInfo(null);
+    setError("");
 
-    setTimeout(() => {
-      const mockInfo: SslInfo = {
-        issuer: "Let's Encrypt Authority X3",
-        subject: domain,
-        validFrom: "2024-01-01",
-        validTo: "2024-04-01",
-        daysLeft: 45,
-        serialNumber: "03:AB:CD:EF:12:34:56:78",
-        signatureAlgorithm: "RSA-SHA256",
-      };
-      setSslInfo(mockInfo);
-      setLoading(false);
-    }, 1000);
+    try {
+      const res = await fetch("/api/diagnostics", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ type: "ssl", target: domain }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "检查失败");
+
+      const cert = data.result?.certificate;
+      if (!cert || !cert.validTo) throw new Error("无法获取证书信息");
+
+      const validTo = new Date(cert.validTo);
+      const now = new Date();
+      const daysLeft = Math.ceil((validTo.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+      setSslInfo({
+        issuer: cert.issuer || "未知",
+        subject: cert.subject || domain,
+        validFrom: cert.validFrom || "未知",
+        validTo: cert.validTo,
+        daysLeft,
+      });
+    } catch (e: any) {
+      setError(e.message || "检查失败");
+    }
+    setLoading(false);
   };
 
   const getStatusColor = (days: number) => {
@@ -79,6 +93,7 @@ export function SslChecker() {
           type="text"
           value={domain}
           onChange={(e) => setDomain(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && checkSsl()}
           className="flex-1 input-apple"
           placeholder="example.com"
         />
@@ -90,6 +105,12 @@ export function SslChecker() {
           {loading ? "检查中..." : "检查 SSL"}
         </button>
       </div>
+
+      {error && (
+        <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm">
+          {error}
+        </div>
+      )}
 
       {sslInfo && (
         <div className="space-y-4">
@@ -125,14 +146,6 @@ export function SslChecker() {
                 <tr className="border-t border-white/5">
                   <td className="p-3 bg-white/5 font-medium">过期日期</td>
                   <td className="p-3">{sslInfo.validTo}</td>
-                </tr>
-                <tr className="border-t border-white/5">
-                  <td className="p-3 bg-white/5 font-medium">序列号</td>
-                  <td className="p-3 font-mono text-xs">{sslInfo.serialNumber}</td>
-                </tr>
-                <tr className="border-t border-white/5">
-                  <td className="p-3 bg-white/5 font-medium">签名算法</td>
-                  <td className="p-3">{sslInfo.signatureAlgorithm}</td>
                 </tr>
               </tbody>
             </table>

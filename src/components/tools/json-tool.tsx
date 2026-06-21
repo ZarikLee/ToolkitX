@@ -94,14 +94,14 @@ export function JsonTool() {
         </button>
         <button
           onClick={minify}
-          className="btn-apple bg-white/5 hover:bg-white/10"
+          className="btn-apple btn-secondary"
         >
           压缩
         </button>
         <button
           onClick={copyToClipboard}
           disabled={!output}
-          className="btn-apple bg-white/5 hover:bg-white/10 disabled:opacity-50"
+          className="btn-apple btn-secondary disabled:opacity-50"
         >
           复制
         </button>

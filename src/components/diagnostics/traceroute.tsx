@@ -29,6 +29,7 @@ export function Traceroute() {
   });
   const [hops, setHops] = useState<Hop[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ host }));
@@ -39,23 +40,23 @@ export function Traceroute() {
 
     setLoading(true);
     setHops([]);
+    setError(null);
 
-    const mockHops: Hop[] = [
-      { hop: 1, ip: "192.168.1.1", host: "gateway", time1: 1.2, time2: 1.1, time3: 1.3 },
-      { hop: 2, ip: "10.0.0.1", host: "", time1: 5.4, time2: 5.2, time3: 5.6 },
-      { hop: 3, ip: "72.14.236.126", host: "", time1: 12.3, time2: 12.1, time3: 12.5 },
-      { hop: 4, ip: "72.14.236.126", host: "", time1: 12.8, time2: 12.6, time3: 13.0 },
-      { hop: 5, ip: "108.170.252.1", host: "", time1: 15.2, time2: 15.0, time3: 15.4 },
-      { hop: 6, ip: "142.250.80.46", host: "", time1: 16.8, time2: 16.6, time3: 17.0 },
-      { hop: 7, ip: "216.58.214.174", host: "sea09s16-in-f174.1e100.net", time1: 18.2, time2: 18.0, time3: 18.4 },
-    ];
-
-    for (let i = 0; i < mockHops.length; i++) {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      setHops((prev) => [...prev, mockHops[i]]);
+    try {
+      const res = await fetch("/api/diagnostics", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ type: "trace", target: host }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "追踪失败");
+      setHops(data.result.hops);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "追踪失败");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -86,6 +87,12 @@ export function Traceroute() {
           {loading ? "追踪中..." : "开始追踪"}
         </button>
       </div>
+
+      {error && (
+        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+          {error}
+        </div>
+      )}
 
       {hops.length > 0 && (
         <div className="space-y-2">

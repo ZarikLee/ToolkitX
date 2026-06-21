@@ -35,6 +35,7 @@ export function HttpChecker() {
   });
   const [result, setResult] = useState<HttpResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ url, method }));
@@ -45,22 +46,23 @@ export function HttpChecker() {
 
     setLoading(true);
     setResult(null);
+    setError(null);
 
-    setTimeout(() => {
-      const mockResult: HttpResult = {
-        status: 200,
-        statusText: "OK",
-        headers: {
-          "Content-Type": "text/html; charset=UTF-8",
-          Server: "nginx/1.18.0",
-          "X-Powered-By": "Express",
-        },
-        time: 156,
-        size: 12345,
-      };
-      setResult(mockResult);
+    try {
+      const res = await fetch("/api/diagnostics", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ type: "http", target: url }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "检测失败");
+      setResult(data.result);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "检测失败");
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -102,6 +104,12 @@ export function HttpChecker() {
           {loading ? "检测中..." : "开始检测"}
         </button>
       </div>
+
+      {error && (
+        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+          {error}
+        </div>
+      )}
 
       {result && (
         <div className="space-y-4">
