@@ -122,7 +122,7 @@ export function URLParser() {
                 {field.value && field.value !== "(无)" && field.value !== "(默认)" && (
                   <button
                     onClick={() => copyToClipboard(field.value!)}
-                    className="ml-2 px-3 py-1 text-sm rounded-lg bg-white/5 hover:bg-white/10 transition-colors shrink-0"
+                    className="ml-2 px-3 py-1 text-sm btn-ghost shrink-0"
                   >
                     复制
                   </button>
@@ -146,7 +146,7 @@ export function URLParser() {
                   </div>
                   <button
                     onClick={() => copyToClipboard(value)}
-                    className="px-3 py-1 text-sm rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                    className="px-3 py-1 text-sm btn-ghost"
                   >
                     复制
                   </button>

@@ -118,7 +118,7 @@ export function ColorConverter() {
             <label className="text-sm font-medium">HEX</label>
             <button
               onClick={() => copyToClipboard(hex)}
-              className="px-3 py-1 text-sm rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+              className="px-3 py-1 text-sm btn-ghost"
             >
               复制
             </button>
@@ -136,7 +136,7 @@ export function ColorConverter() {
             <label className="text-sm font-medium">RGB</label>
             <button
               onClick={() => copyToClipboard(`rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`)}
-              className="px-3 py-1 text-sm rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+              className="px-3 py-1 text-sm btn-ghost"
             >
               复制
             </button>
@@ -166,7 +166,7 @@ export function ColorConverter() {
             <label className="text-sm font-medium">HSL</label>
             <button
               onClick={() => copyToClipboard(`hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`)}
-              className="px-3 py-1 text-sm rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+              className="px-3 py-1 text-sm btn-ghost"
             >
               复制
             </button>

@@ -80,7 +80,7 @@ export function MarkdownHtml() {
             <button
               onClick={copyToClipboard}
               disabled={!output}
-              className="px-3 py-1 text-sm rounded-lg bg-white/5 hover:bg-white/10 transition-colors disabled:opacity-50"
+              className="px-3 py-1 text-sm btn-ghost disabled:opacity-50"
             >
               复制 HTML
             </button>
@@ -115,7 +115,7 @@ export function MarkdownHtml() {
             <h3 className="text-sm font-medium">HTML 源码</h3>
             <button
               onClick={copyToClipboard}
-              className="px-3 py-1 text-sm rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+              className="px-3 py-1 text-sm btn-ghost"
             >
               复制
             </button>

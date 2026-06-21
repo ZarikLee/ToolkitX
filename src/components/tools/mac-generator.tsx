@@ -113,7 +113,7 @@ export function MACGenerator() {
             <h3 className="text-sm font-medium">生成结果</h3>
             <button
               onClick={copyAll}
-              className="px-3 py-1 text-sm rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+              className="px-3 py-1 text-sm btn-ghost"
             >
               复制全部
             </button>
@@ -127,7 +127,7 @@ export function MACGenerator() {
                 <p className="font-mono text-sm">{mac}</p>
                 <button
                   onClick={() => copyToClipboard(mac)}
-                  className="ml-2 px-3 py-1 text-sm rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                  className="ml-2 px-3 py-1 text-sm btn-ghost"
                 >
                   复制
                 </button>

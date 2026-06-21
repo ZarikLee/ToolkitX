@@ -97,7 +97,7 @@ export function CaseConverter() {
                 </div>
                 <button
                   onClick={() => copyToClipboard(format.value)}
-                  className="ml-2 px-3 py-1 text-sm rounded-lg bg-white/5 hover:bg-white/10 transition-colors shrink-0"
+                  className="ml-2 px-3 py-1 text-sm btn-ghost shrink-0"
                 >
                   复制
                 </button>

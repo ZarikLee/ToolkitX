@@ -125,7 +125,7 @@ export function PasswordGenerator() {
               <p className="font-mono text-lg break-all">{password}</p>
               <button
                 onClick={copyToClipboard}
-                className="px-3 py-1 text-sm rounded-lg bg-white/5 hover:bg-white/10 transition-colors ml-2"
+                className="px-3 py-1 text-sm btn-ghost"
               >
                 复制
               </button>

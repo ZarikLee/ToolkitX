@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   const body = await request.json();
   const { type, target, options } = body;
 
-  if (!target || !/^[a-zA-Z0-9._:-]+$/.test(target)) {
+  if (!target || !/^[a-zA-Z0-9._:\-\/\?=&%+@#~]+$/.test(target)) {
     return NextResponse.json({ error: "Invalid target" }, { status: 400 });
   }
 

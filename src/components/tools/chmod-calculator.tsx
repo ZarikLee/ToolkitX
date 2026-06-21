@@ -119,7 +119,7 @@ export function ChmodCalculator() {
             <span className="text-sm text-muted-foreground">数字表示</span>
             <button
               onClick={() => copyToClipboard(octal)}
-              className="px-2 py-1 text-xs rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+              className="px-2 py-1 text-xs btn-ghost"
             >
               复制
             </button>
@@ -131,7 +131,7 @@ export function ChmodCalculator() {
             <span className="text-sm text-muted-foreground">符号表示</span>
             <button
               onClick={() => copyToClipboard(symbolic)}
-              className="px-2 py-1 text-xs rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+              className="px-2 py-1 text-xs btn-ghost"
             >
               复制
             </button>

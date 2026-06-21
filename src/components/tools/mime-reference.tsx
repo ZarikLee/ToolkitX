@@ -159,7 +159,7 @@ export function MimeReference() {
             </div>
             <button
               onClick={() => copyToClipboard(item.type)}
-              className="ml-2 px-2 py-1 text-xs rounded-lg bg-white/5 hover:bg-white/10 transition-colors shrink-0"
+              className="ml-2 px-2 py-1 text-xs btn-ghost shrink-0"
             >
               复制
             </button>

@@ -132,7 +132,7 @@ export function OTPGenerator() {
             <p className="text-4xl font-mono font-bold tracking-[0.3em]">{otp}</p>
             <button
               onClick={copyToClipboard}
-              className="px-3 py-1 text-sm rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+              className="px-3 py-1 text-sm btn-ghost"
             >
               复制
             </button>

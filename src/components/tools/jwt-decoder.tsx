@@ -85,7 +85,7 @@ export function JWTDecoder() {
               <h3 className="text-sm font-medium text-blue-400">Header</h3>
               <button
                 onClick={() => copyToClipboard(header)}
-                className="px-3 py-1 text-sm rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                className="px-3 py-1 text-sm btn-ghost"
               >
                 复制
               </button>
@@ -100,7 +100,7 @@ export function JWTDecoder() {
               <h3 className="text-sm font-medium text-green-400">Payload</h3>
               <button
                 onClick={() => copyToClipboard(payload)}
-                className="px-3 py-1 text-sm rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                className="px-3 py-1 text-sm btn-ghost"
               >
                 复制
               </button>
@@ -115,7 +115,7 @@ export function JWTDecoder() {
               <h3 className="text-sm font-medium text-yellow-400">Signature</h3>
               <button
                 onClick={() => copyToClipboard(signature)}
-                className="px-3 py-1 text-sm rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                className="px-3 py-1 text-sm btn-ghost"
               >
                 复制
               </button>

@@ -111,7 +111,7 @@ export function UUIDGenerator() {
             <h3 className="text-sm font-medium">生成结果</h3>
             <button
               onClick={copyAll}
-              className="px-3 py-1 text-sm rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+              className="px-3 py-1 text-sm btn-ghost"
             >
               复制全部
             </button>
@@ -125,7 +125,7 @@ export function UUIDGenerator() {
                 <p className="font-mono text-sm break-all">{uuid}</p>
                 <button
                   onClick={() => copyToClipboard(uuid)}
-                  className="ml-2 px-3 py-1 text-sm rounded-lg bg-white/5 hover:bg-white/10 transition-colors shrink-0"
+                  className="ml-2 px-3 py-1 text-sm btn-ghost shrink-0"
                 >
                   复制
                 </button>

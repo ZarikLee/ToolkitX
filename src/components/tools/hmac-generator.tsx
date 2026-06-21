@@ -120,7 +120,7 @@ export function HMACGenerator() {
             <h3 className="text-sm font-medium">HMAC 结果</h3>
             <button
               onClick={copyToClipboard}
-              className="px-3 py-1 text-sm rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+              className="px-3 py-1 text-sm btn-ghost"
             >
               复制
             </button>
