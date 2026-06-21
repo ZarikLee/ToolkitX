@@ -121,7 +121,7 @@ export function JsonDiff() {
       <button
         onClick={compare}
         disabled={!input1 || !input2}
-        className="btn-apple bg-primary text-primary-foreground disabled:opacity-50"
+        className="btn-primary disabled:opacity-50"
       >
         比较
       </button>

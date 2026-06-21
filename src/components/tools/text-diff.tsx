@@ -90,7 +90,7 @@ export function TextDiff() {
 
       <button
         onClick={compare}
-        className="btn-apple bg-primary text-primary-foreground"
+        className="btn-primary"
       >
         比较
       </button>

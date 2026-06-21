@@ -100,7 +100,7 @@ export function UUIDGenerator() {
 
       <button
         onClick={generate}
-        className="w-full btn-apple bg-primary text-primary-foreground"
+        className="w-full btn-primary"
       >
         生成 UUID
       </button>

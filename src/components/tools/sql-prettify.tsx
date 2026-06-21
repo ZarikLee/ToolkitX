@@ -104,7 +104,7 @@ export function SQLPrettify() {
         <button
           onClick={format}
           disabled={!input}
-          className="btn-apple bg-primary text-primary-foreground disabled:opacity-50"
+          className="btn-primary disabled:opacity-50"
         >
           格式化
         </button>

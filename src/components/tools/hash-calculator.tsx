@@ -85,7 +85,7 @@ export function HashCalculator() {
       <button
         onClick={calculateAll}
         disabled={!input}
-        className="btn-apple bg-primary text-primary-foreground disabled:opacity-50"
+        className="btn-primary disabled:opacity-50"
       >
         计算哈希
       </button>

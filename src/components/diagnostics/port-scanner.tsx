@@ -147,7 +147,7 @@ export function PortScanner() {
       <button
         onClick={scanPorts}
         disabled={!host || scanning}
-        className="btn-apple bg-primary text-primary-foreground disabled:opacity-50"
+        className="btn-primary disabled:opacity-50"
       >
         {scanning ? "扫描中..." : "开始扫描"}
       </button>

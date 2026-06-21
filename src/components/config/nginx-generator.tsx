@@ -193,7 +193,7 @@ server {
 
       <button
         onClick={generateConfig}
-        className="btn-apple bg-primary text-primary-foreground"
+        className="btn-primary"
       >
         生成配置
       </button>

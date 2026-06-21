@@ -67,7 +67,7 @@ export function JWTDecoder() {
       <button
         onClick={decode}
         disabled={!token}
-        className="btn-apple bg-primary text-primary-foreground disabled:opacity-50"
+        className="btn-primary disabled:opacity-50"
       >
         解码
       </button>

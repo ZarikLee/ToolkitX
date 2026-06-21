@@ -103,7 +103,7 @@ export function HMACGenerator() {
       <button
         onClick={generateHMAC}
         disabled={!message || !secret}
-        className="btn-apple bg-primary text-primary-foreground disabled:opacity-50"
+        className="btn-primary disabled:opacity-50"
       >
         生成 HMAC
       </button>

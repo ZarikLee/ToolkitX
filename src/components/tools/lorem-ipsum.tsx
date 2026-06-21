@@ -119,7 +119,7 @@ export function LoremIpsum() {
       <div className="flex gap-2">
         <button
           onClick={generate}
-          className="btn-apple bg-primary text-primary-foreground"
+          className="btn-primary"
         >
           生成
         </button>

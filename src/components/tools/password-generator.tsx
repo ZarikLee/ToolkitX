@@ -113,7 +113,7 @@ export function PasswordGenerator() {
 
       <button
         onClick={generatePassword}
-        className="w-full btn-apple bg-primary text-primary-foreground"
+        className="w-full btn-primary"
       >
         生成密码
       </button>

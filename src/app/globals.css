@@ -239,15 +239,6 @@ html {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-.light .btn-apple {
-  background: rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.light .btn-apple:hover {
-  background: rgba(0, 0, 0, 0.1);
-}
-
 .light .input-apple {
   background: rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(0, 0, 0, 0.12);
@@ -466,6 +457,44 @@ html {
 
 .btn-apple:active {
   transform: scale(0.97);
+}
+
+/* Primary button: works in both light and dark modes */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 980px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  background: #0a84ff;
+  color: #fff;
+  border: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  user-select: none;
+}
+.btn-primary:hover {
+  background: #0070e0;
+}
+.btn-primary:active {
+  transform: scale(0.97);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.light .btn-primary {
+  background: #0a84ff;
+  color: #fff;
+  box-shadow: 0 1px 4px rgba(10, 132, 255, 0.3);
+}
+.light .btn-primary:hover {
+  background: #0070e0;
+  box-shadow: 0 2px 8px rgba(10, 132, 255, 0.4);
 }
 
 /* Secondary button: white bg + shadow in light, translucent in dark */

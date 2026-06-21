@@ -161,7 +161,7 @@ sudo journalctl -u ${serviceName || "myservice"} -f`;
       <button
         onClick={generateConfig}
         disabled={!serviceName || !execStart}
-        className="btn-apple bg-primary text-primary-foreground disabled:opacity-50"
+        className="btn-primary disabled:opacity-50"
       >
         生成配置
       </button>

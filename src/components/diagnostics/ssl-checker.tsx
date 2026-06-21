@@ -100,7 +100,7 @@ export function SslChecker() {
         <button
           onClick={checkSsl}
           disabled={!domain || loading}
-          className="btn-apple bg-primary text-primary-foreground disabled:opacity-50"
+          className="btn-primary disabled:opacity-50"
         >
           {loading ? "检查中..." : "检查 SSL"}
         </button>

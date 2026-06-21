@@ -88,7 +88,7 @@ export function JsonTool() {
       <div className="flex gap-2">
         <button
           onClick={format}
-          className="btn-apple bg-primary text-primary-foreground"
+          className="btn-primary"
         >
           格式化
         </button>

@@ -91,7 +91,7 @@ export function TimestampTool() {
           />
           <button
             onClick={timestampToDate}
-            className="w-full btn-apple bg-primary text-primary-foreground"
+            className="w-full btn-primary"
           >
             转换
           </button>
@@ -107,7 +107,7 @@ export function TimestampTool() {
           />
           <button
             onClick={dateToTimestamp}
-            className="w-full btn-apple bg-primary text-primary-foreground"
+            className="w-full btn-primary"
           >
             转换
           </button>

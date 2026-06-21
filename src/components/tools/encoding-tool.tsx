@@ -140,7 +140,7 @@ export function EncodingTool() {
       <div className="flex gap-2">
         <button
           onClick={encode}
-          className="btn-apple bg-primary text-primary-foreground"
+          className="btn-primary"
         >
           编码
         </button>

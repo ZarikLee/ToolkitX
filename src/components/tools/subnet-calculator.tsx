@@ -129,7 +129,7 @@ export function SubnetCalculator() {
       <button
         onClick={calculate}
         disabled={!ip}
-        className="btn-apple bg-primary text-primary-foreground disabled:opacity-50"
+        className="btn-primary disabled:opacity-50"
       >
         计算
       </button>

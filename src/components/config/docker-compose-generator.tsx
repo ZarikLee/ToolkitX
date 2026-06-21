@@ -220,7 +220,7 @@ ${Object.entries(config.services)
         <button
           onClick={generateConfig}
           disabled={services.length === 0}
-          className="btn-apple bg-primary text-primary-foreground disabled:opacity-50"
+          className="btn-primary disabled:opacity-50"
         >
           生成配置
         </button>

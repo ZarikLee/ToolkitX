@@ -82,7 +82,7 @@ export function Traceroute() {
         <button
           onClick={traceRoute}
           disabled={!host || loading}
-          className="btn-apple bg-primary text-primary-foreground disabled:opacity-50"
+          className="btn-primary disabled:opacity-50"
         >
           {loading ? "追踪中..." : "开始追踪"}
         </button>

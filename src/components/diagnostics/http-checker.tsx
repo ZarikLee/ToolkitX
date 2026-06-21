@@ -99,7 +99,7 @@ export function HttpChecker() {
         <button
           onClick={checkHttp}
           disabled={!url || loading}
-          className="btn-apple bg-primary text-primary-foreground disabled:opacity-50"
+          className="btn-primary disabled:opacity-50"
         >
           {loading ? "检测中..." : "开始检测"}
         </button>

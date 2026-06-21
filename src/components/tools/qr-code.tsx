@@ -98,7 +98,7 @@ export function QRCode() {
         <button
           onClick={generate}
           disabled={!input}
-          className="btn-apple bg-primary text-primary-foreground disabled:opacity-50"
+          className="btn-primary disabled:opacity-50"
         >
           生成 QR 码
         </button>

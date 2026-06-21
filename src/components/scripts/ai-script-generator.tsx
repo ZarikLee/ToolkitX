@@ -137,7 +137,7 @@ export function AiScriptGenerator() {
             <button
               onClick={sendMessage}
               disabled={loading || !input.trim()}
-              className="btn-apple bg-primary text-primary-foreground disabled:opacity-50"
+              className="btn-primary disabled:opacity-50"
             >
               发送
             </button>

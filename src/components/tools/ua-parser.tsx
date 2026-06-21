@@ -122,7 +122,7 @@ export function UAParser() {
         <button
           onClick={parse}
           disabled={!ua}
-          className="btn-apple bg-primary text-primary-foreground disabled:opacity-50"
+          className="btn-primary disabled:opacity-50"
         >
           解析
         </button>

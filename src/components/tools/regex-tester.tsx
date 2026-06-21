@@ -137,7 +137,7 @@ export function RegexTester() {
       <button
         onClick={testRegex}
         disabled={!pattern}
-        className="btn-apple bg-primary text-primary-foreground disabled:opacity-50"
+        className="btn-primary disabled:opacity-50"
       >
         测试
       </button>

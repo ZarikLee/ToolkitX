@@ -158,7 +158,7 @@ export function YamlJson() {
         <button
           onClick={convert}
           disabled={!input}
-          className="btn-apple bg-primary text-primary-foreground disabled:opacity-50"
+          className="btn-primary disabled:opacity-50"
         >
           转换
         </button>

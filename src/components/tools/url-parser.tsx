@@ -95,7 +95,7 @@ export function URLParser() {
       <button
         onClick={parse}
         disabled={!url}
-        className="btn-apple bg-primary text-primary-foreground disabled:opacity-50"
+        className="btn-primary disabled:opacity-50"
       >
         解析
       </button>
