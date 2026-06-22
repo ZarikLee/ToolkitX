@@ -192,7 +192,7 @@ export function DiagnosticReport() {
         <button
           onClick={generateReport}
           disabled={!target.trim() || selected.length === 0 || running}
-          className="btn-apple bg-[#0a84ff] text-white hover:bg-[#0a84ff]/90 disabled:opacity-40"
+          className="btn-primary"
         >
           {running ? progress : "生成报告"}
         </button>

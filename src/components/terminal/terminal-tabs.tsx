@@ -124,7 +124,7 @@ export function TerminalTabs() {
               <p className="text-[12px] text-muted-foreground/15 mb-4">点击 + 新建连接，或从服务器列表快速连接</p>
               <button
                 onClick={() => setShowConnectDialog(true)}
-                className="px-4 py-2 rounded-xl bg-[#0a84ff] hover:bg-[#0a84ff]/90 text-white text-[13px] font-medium transition-all duration-200 active:scale-[0.98]"
+                className="btn-primary"
               >
                 新建连接
               </button>
@@ -228,7 +228,7 @@ function ConnectDialog({ onConnect, onClose }: ConnectDialogProps) {
             <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl btn-secondary text-[13px] font-medium transition-all duration-200">
               取消
             </button>
-            <button type="submit" className="flex-1 px-4 py-2.5 rounded-xl bg-[#0a84ff] hover:bg-[#0a84ff]/90 text-white text-[13px] font-medium transition-all duration-200 active:scale-[0.98]">
+            <button type="submit" className="flex-1 btn-primary">
               连接
             </button>
           </div>

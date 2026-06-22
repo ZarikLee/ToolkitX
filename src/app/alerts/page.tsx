@@ -253,7 +253,7 @@ export default function AlertsPage() {
         <div className="space-y-4">
           <button
             onClick={() => setShowAddRule(true)}
-            className="btn-apple bg-[#0a84ff] text-white text-[13px]"
+            className="btn-primary text-[13px]"
           >
             + 新建规则
           </button>
@@ -307,10 +307,10 @@ export default function AlertsPage() {
                 </select>
               </div>
               <div className="flex gap-2">
-                <button onClick={addRule} className="btn-apple bg-[#0a84ff] text-white text-[12px] px-3 py-1">
+                <button onClick={addRule} className="btn-primary text-[12px]">
                   创建
                 </button>
-                <button onClick={() => setShowAddRule(false)} className="btn-apple btn-secondary text-[12px] px-3 py-1">
+                <button onClick={() => setShowAddRule(false)} className="btn-secondary text-[12px] px-3 py-1">
                   取消
                 </button>
               </div>

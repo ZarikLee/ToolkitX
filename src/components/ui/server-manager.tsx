@@ -474,7 +474,7 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2.5 rounded-xl bg-[#0a84ff] hover:bg-[#0a84ff]/90 text-white text-[13px] font-medium transition-all duration-200 active:scale-[0.98]"
+              className="flex-1 btn-primary"
             >
               {server ? "保存" : "添加"}
             </button>

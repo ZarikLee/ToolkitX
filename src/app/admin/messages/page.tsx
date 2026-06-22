@@ -69,8 +69,8 @@ export default function AdminMessagesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#000000] text-foreground">
-      <div className="sticky top-0 z-50 h-14 flex items-center px-4 border-b border-white/[0.04] bg-[#000000]/80 backdrop-blur-xl">
+    <div className="min-h-screen bg-background text-foreground">
+      <div className="sticky top-0 z-50 h-14 flex items-center px-4 border-b border-border bg-background/80 backdrop-blur-xl">
         <Link
           href="/"
           className="flex items-center gap-2 text-foreground/70 hover:text-foreground transition-colors"
@@ -132,7 +132,7 @@ export default function AdminMessagesPage() {
             <button
               onClick={handleSend}
               disabled={loading}
-              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0a84ff] hover:bg-[#0a84ff]/90 text-white text-[13px] font-medium transition-all duration-200 active:scale-[0.98] disabled:opacity-50"
+              className="flex items-center justify-center gap-2 btn-primary disabled:opacity-50"
             >
               {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
               发送广播

@@ -16,15 +16,10 @@ async function runCommand(cmd: string, timeout = 10000): Promise<string> {
 
 // POST - Run a diagnostic
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await request.json();
   const { type, target, options } = body;
 
-  if (!target || /[;&|`$(){}<>!\\]/.test(target)) {
+  if (!target || /[;&|`$(){}<>!\\]/.test(target) || target.trim().length === 0) {
     return NextResponse.json({ error: "Invalid target" }, { status: 400 });
   }
 

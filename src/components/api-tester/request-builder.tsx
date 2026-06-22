@@ -122,7 +122,7 @@ export const RequestBuilder = forwardRef<RequestBuilderRef, RequestBuilderProps>
           <button
             onClick={handleSend}
             disabled={loading || !url}
-            className="px-6 py-2.5 rounded-xl bg-[#0a84ff] hover:bg-[#0a84ff]/90 disabled:opacity-40 disabled:cursor-not-allowed text-white text-[13px] font-semibold transition-all duration-200 active:scale-[0.97]"
+            className="btn-primary"
           >
             {loading ? (
               <span className="flex items-center gap-2">

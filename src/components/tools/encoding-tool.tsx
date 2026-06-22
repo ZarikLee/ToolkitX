@@ -146,14 +146,14 @@ export function EncodingTool() {
         </button>
         <button
           onClick={decode}
-          className="btn-apple btn-secondary"
+          className="btn-secondary"
         >
           解码
         </button>
         <button
           onClick={copyToClipboard}
           disabled={!output}
-          className="btn-apple btn-secondary disabled:opacity-50"
+          className="btn-secondary disabled:opacity-50"
         >
           复制
         </button>

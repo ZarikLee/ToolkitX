@@ -141,7 +141,7 @@ export default function BatchPage() {
             <button
               onClick={executeBatch}
               disabled={executing || !command.trim() || selectedServers.length === 0}
-              className="btn-apple bg-[#0a84ff] text-white text-[13px] px-4 py-1.5 disabled:opacity-40"
+              className="btn-primary text-[13px]"
             >
               {executing ? "执行中..." : "执行"}
             </button>

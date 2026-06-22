@@ -496,7 +496,7 @@ function MessageDetailModal({ message, isAdmin, onClose, onRefresh }: {
             <button
               onClick={handleReply}
               disabled={replying || !replyText.trim()}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[#0a84ff] hover:bg-[#0a84ff]/90 text-white text-[13px] font-medium transition-all duration-200 active:scale-[0.98] disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 btn-primary disabled:opacity-50"
             >
               {replying ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
               发送回复
@@ -621,7 +621,7 @@ function FeedbackModal({ onClose, isGuest }: { onClose: () => void; isGuest: boo
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0a84ff] hover:bg-[#0a84ff]/90 text-white text-[13px] font-medium transition-all duration-200 active:scale-[0.98] disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 btn-primary disabled:opacity-50"
           >
             {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
             提交反馈

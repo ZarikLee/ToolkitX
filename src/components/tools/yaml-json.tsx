@@ -165,7 +165,7 @@ export function YamlJson() {
         <button
           onClick={copyToClipboard}
           disabled={!output}
-          className="btn-apple btn-secondary disabled:opacity-50"
+          className="btn-secondary disabled:opacity-50"
         >
           复制
         </button>

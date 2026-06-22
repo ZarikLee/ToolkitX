@@ -92,7 +92,7 @@ export default function SettingsPage() {
         <div className="ml-auto" />
         <button
           onClick={saveSettings}
-          className="flex items-center gap-2 px-4 py-2 bg-[#0a84ff] hover:bg-[#0a84ff]/90 text-white rounded-xl text-[13px] font-medium transition-all duration-200 active:scale-[0.98]"
+          className="flex items-center gap-2 btn-primary"
         >
           <Save className="w-3.5 h-3.5" />
           保存设置

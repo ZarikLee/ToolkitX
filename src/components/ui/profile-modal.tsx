@@ -257,7 +257,7 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
           <button
             onClick={activeTab === "profile" ? handleSaveProfile : handleChangePassword}
             disabled={loading}
-            className="w-full px-4 py-2.5 rounded-xl bg-[#0a84ff] hover:bg-[#0a84ff]/90 text-white text-[13px] font-medium transition-all duration-200 active:scale-[0.98] disabled:opacity-50"
+            className="w-full btn-primary disabled:opacity-50"
           >
             {activeTab === "profile" ? "保存修改" : "修改密码"}
           </button>

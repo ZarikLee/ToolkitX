@@ -154,7 +154,7 @@ export function ChmodCalculator() {
           <button
             onClick={calculateFromNumeric}
             disabled={numericInput.length !== 3}
-            className="btn-apple btn-secondary disabled:opacity-50"
+            className="btn-secondary disabled:opacity-50"
           >
             计算
           </button>

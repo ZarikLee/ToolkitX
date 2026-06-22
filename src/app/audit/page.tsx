@@ -123,7 +123,7 @@ export default function AuditPage() {
             onChange={(e) => setDateTo(e.target.value)}
             className="input-apple text-[13px] w-40"
           />
-          <button onClick={loadLogs} className="btn-apple btn-secondary text-[12px] px-3 py-1.5">
+          <button onClick={loadLogs} className="btn-secondary text-[12px] px-3 py-1.5">
             筛选
           </button>
           <div className="flex-1" />
@@ -135,7 +135,7 @@ export default function AuditPage() {
           >
             {autoRefresh ? "自动刷新中" : "自动刷新"}
           </button>
-          <button onClick={exportCsv} className="btn-apple btn-secondary text-[12px] px-3 py-1.5">
+          <button onClick={exportCsv} className="btn-secondary text-[12px] px-3 py-1.5">
             导出 CSV
           </button>
         </div>

@@ -112,7 +112,7 @@ export function HelpButton({ title, content }: HelpButtonProps) {
             <div className="px-6 pb-5">
               <button
                 onClick={handleClose}
-                className="w-full px-4 py-2.5 bg-[#0a84ff] hover:bg-[#0a84ff]/90 text-white rounded-xl text-[13px] font-medium transition-all duration-200 active:scale-[0.98]"
+                className="btn-primary"
               >
                 我知道了
               </button>

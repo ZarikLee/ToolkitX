@@ -108,14 +108,14 @@ export default function CertsPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowAdd(true)}
-            className="btn-apple bg-[#0a84ff] text-white text-[13px] px-3 py-1.5"
+            className="btn-primary text-[13px]"
           >
             + 添加证书
           </button>
           <button
             onClick={checkAll}
             disabled={checking}
-            className="btn-apple btn-secondary text-[13px] px-3 py-1.5"
+            className="btn-secondary text-[13px] px-3 py-1.5"
           >
             {checking ? "检查中..." : "检查全部"}
           </button>
@@ -148,10 +148,10 @@ export default function CertsPage() {
               />
             </div>
             <div className="flex gap-2">
-              <button onClick={addCert} className="btn-apple bg-[#0a84ff] text-white text-[12px] px-3 py-1">
+              <button onClick={addCert} className="btn-primary text-[12px]">
                 添加
               </button>
-              <button onClick={() => setShowAdd(false)} className="btn-apple btn-secondary text-[12px] px-3 py-1">
+              <button onClick={() => setShowAdd(false)} className="btn-secondary text-[12px] px-3 py-1">
                 取消
               </button>
             </div>

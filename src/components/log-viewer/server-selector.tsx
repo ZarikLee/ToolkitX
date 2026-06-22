@@ -168,7 +168,7 @@ export function ServerSelector({ onSelect, disabled }: ServerSelectorProps) {
       <button
         onClick={handleConnect}
         disabled={disabled || !selectedServer || (!selectedLog && !customLog)}
-        className="w-full px-4 py-2 rounded-xl bg-[#0a84ff] hover:bg-[#0a84ff]/90 disabled:opacity-40 disabled:cursor-not-allowed text-white text-[13px] font-medium transition-all duration-200 active:scale-[0.98]"
+        className="btn-primary"
       >
         {disabled ? "连接中..." : "开始查看"}
       </button>

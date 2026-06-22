@@ -192,7 +192,7 @@ export default function RunbooksPage() {
                 resetForm();
                 setShowForm(true);
               }}
-              className="btn-apple bg-[#0a84ff] text-white text-[13px] px-3 py-1.5"
+              className="btn-primary text-[13px]"
             >
               + 新建流程
             </button>
@@ -225,11 +225,11 @@ export default function RunbooksPage() {
               <div className="flex gap-2">
                 <button
                   onClick={selected ? updateRunbook : addRunbook}
-                  className="btn-apple bg-[#0a84ff] text-white text-[12px] px-3 py-1"
+                  className="btn-primary text-[12px]"
                 >
                   {selected ? "更新" : "创建"}
                 </button>
-                <button onClick={resetForm} className="btn-apple btn-secondary text-[12px] px-3 py-1">
+                <button onClick={resetForm} className="btn-secondary text-[12px] px-3 py-1">
                   取消
                 </button>
               </div>
@@ -313,7 +313,7 @@ export default function RunbooksPage() {
                       });
                       setShowForm(true);
                     }}
-                    className="btn-apple btn-secondary text-[12px] px-3 py-1.5"
+                    className="btn-secondary text-[12px] px-3 py-1.5"
                   >
                     编辑
                   </button>

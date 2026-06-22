@@ -105,14 +105,14 @@ export function QRCode() {
         <button
           onClick={downloadSVG}
           disabled={!qrSvg}
-          className="btn-apple btn-secondary disabled:opacity-50"
+          className="btn-secondary disabled:opacity-50"
         >
           下载 SVG
         </button>
         <button
           onClick={copyToClipboard}
           disabled={!qrSvg}
-          className="btn-apple btn-secondary disabled:opacity-50"
+          className="btn-secondary disabled:opacity-50"
         >
           复制 SVG
         </button>

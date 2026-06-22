@@ -168,7 +168,7 @@ export function SSHTerminal({
             <button
               onClick={connect}
               disabled={isConnecting}
-              className="px-3 py-1 text-[12px] font-medium bg-[#0a84ff] hover:bg-[#0a84ff]/90 disabled:bg-muted-foreground/20 rounded-lg transition-colors"
+              className="btn-primary text-[12px] px-3 py-1"
             >
               {isConnecting ? '连接中...' : '连接'}
             </button>

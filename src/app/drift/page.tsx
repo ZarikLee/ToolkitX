@@ -121,14 +121,14 @@ export default function DriftPage() {
           <div className="flex items-center gap-2 mb-4">
             <button
               onClick={() => setShowAdd(true)}
-              className="btn-apple bg-[#0a84ff] text-white text-[13px] px-3 py-1.5"
+              className="btn-primary text-[13px]"
             >
               + 添加文件
             </button>
             <button
               onClick={() => checkDrift()}
               disabled={checking}
-              className="btn-apple btn-secondary text-[13px] px-3 py-1.5"
+              className="btn-secondary text-[13px] px-3 py-1.5"
             >
               {checking ? "检测中..." : "全部检测"}
             </button>
@@ -151,10 +151,10 @@ export default function DriftPage() {
                 className="input-apple text-[13px]"
               />
               <div className="flex gap-2">
-                <button onClick={addBaseline} className="btn-apple bg-[#0a84ff] text-white text-[12px] px-3 py-1">
+                <button onClick={addBaseline} className="btn-primary text-[12px]">
                   确认
                 </button>
-                <button onClick={() => setShowAdd(false)} className="btn-apple btn-secondary text-[12px] px-3 py-1">
+                <button onClick={() => setShowAdd(false)} className="btn-secondary text-[12px] px-3 py-1">
                   取消
                 </button>
               </div>
@@ -209,7 +209,7 @@ export default function DriftPage() {
                   <button
                     onClick={() => checkDrift(selected.id)}
                     disabled={checking}
-                    className="btn-apple btn-secondary text-[12px] px-3 py-1.5"
+                    className="btn-secondary text-[12px] px-3 py-1.5"
                   >
                     检测
                   </button>

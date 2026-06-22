@@ -128,7 +128,7 @@ export function UAParser() {
         </button>
         <button
           onClick={() => { setUA(navigator.userAgent); setResult(null); }}
-          className="btn-apple btn-secondary"
+          className="btn-secondary"
         >
           使用当前 UA
         </button>

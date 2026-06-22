@@ -145,7 +145,7 @@ export default function LogViewerPage() {
               <button
                 onClick={handleStart}
                 disabled={!server || (!logFile && !customLog)}
-                className="px-4 py-2.5 rounded-xl bg-[#0a84ff] hover:bg-[#0a84ff]/90 disabled:opacity-40 disabled:cursor-not-allowed text-white text-[13px] font-medium transition-all duration-200 active:scale-[0.98] shrink-0"
+                className="btn-primary shrink-0"
               >
                 开始查看
               </button>

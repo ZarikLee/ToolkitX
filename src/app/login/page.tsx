@@ -163,7 +163,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading || !codeSent || code.length !== 6}
-              className="w-full py-2.5 rounded-xl bg-[#0a84ff] hover:bg-[#0a84ff]/90 text-white text-[14px] font-medium transition-all duration-200 active:scale-[0.98] disabled:opacity-50"
+              className="btn-primary w-full py-2.5"
             >
               {loading ? "验证中..." : "登录 / 注册"}
             </button>
