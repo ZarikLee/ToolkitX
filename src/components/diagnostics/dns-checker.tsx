@@ -12,7 +12,6 @@ interface DnsRecord {
   type: string;
   name: string;
   value: string;
-  ttl: number;
 }
 
 const STORAGE_KEY = "diagnostics_dns_checker";
@@ -29,6 +28,7 @@ export function DnsChecker() {
   const [records, setRecords] = useState<DnsRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ domain }));
@@ -39,10 +39,12 @@ export function DnsChecker() {
     setLoading(true);
     setRecords([]);
     setError("");
+    setProgress(0);
 
     try {
       const allRecords: DnsRecord[] = [];
-      for (const type of RECORD_TYPES) {
+      // 并行查询所有记录类型
+      const promises = RECORD_TYPES.map(async (type, index) => {
         try {
           const res = await fetch("/api/diagnostics", {
             method: "POST",
@@ -51,14 +53,28 @@ export function DnsChecker() {
             body: JSON.stringify({ type: "dns", target: domain, options: { recordType: type } }),
           });
           const data = await res.json();
+          setProgress((prev) => prev + 1);
           if (res.ok && data.result?.records) {
-            for (const value of data.result.records) {
-              allRecords.push({ type, name: domain, value, ttl: 0 });
-            }
+            return data.result.records.map((value: string) => ({
+              type,
+              name: domain,
+              value,
+            }));
           }
-        } catch {}
+        } catch {
+          setProgress((prev) => prev + 1);
+        }
+        return [];
+      });
+
+      const results = await Promise.all(promises);
+      for (const result of results) {
+        allRecords.push(...result);
       }
       setRecords(allRecords);
+      if (allRecords.length === 0) {
+        setError("未找到任何 DNS 记录");
+      }
     } catch (e: any) {
       setError(e.message || "查询失败");
     }
@@ -91,7 +107,7 @@ export function DnsChecker() {
           disabled={!domain || loading}
           className="btn-primary disabled:opacity-50"
         >
-          {loading ? "查询中..." : "查询 DNS"}
+          {loading ? `查询中... ${progress}/${RECORD_TYPES.length}` : "查询 DNS"}
         </button>
       </div>
 

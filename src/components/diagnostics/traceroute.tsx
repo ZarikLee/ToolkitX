@@ -9,12 +9,9 @@ const tracerouteHelp = [
 ];
 
 interface Hop {
-  hop: number;
-  ip: string;
+  hop: string;
   host: string;
-  time1: number;
-  time2: number;
-  time3: number;
+  times: string[];
 }
 
 const STORAGE_KEY = "diagnostics_traceroute";
@@ -102,8 +99,7 @@ export function Traceroute() {
               <thead className="bg-white/5">
                 <tr>
                   <th className="p-2 text-left">跳数</th>
-                  <th className="p-2 text-left">IP 地址</th>
-                  <th className="p-2 text-left">主机名</th>
+                  <th className="p-2 text-left">主机名/IP</th>
                   <th className="p-2 text-left">延迟 (ms)</th>
                 </tr>
               </thead>
@@ -111,10 +107,9 @@ export function Traceroute() {
                 {hops.map((hop) => (
                   <tr key={hop.hop} className="border-t border-white/5">
                     <td className="p-2 font-mono">{hop.hop}</td>
-                    <td className="p-2 font-mono">{hop.ip}</td>
-                    <td className="p-2 text-muted-foreground">{hop.host || "-"}</td>
-                    <td className="p-2">
-                      {hop.time1.toFixed(1)} / {hop.time2.toFixed(1)} / {hop.time3.toFixed(1)}
+                    <td className="p-2 font-mono text-xs break-all">{hop.host || "-"}</td>
+                    <td className="p-2 font-mono text-xs">
+                      {hop.times?.join(" / ") || "-"}
                     </td>
                   </tr>
                 ))}
@@ -122,7 +117,7 @@ export function Traceroute() {
             </table>
           </div>
           <p className="text-xs text-muted-foreground">
-            显示 {hops.length} 跳，平均延迟: {(hops.reduce((sum, h) => sum + h.time1, 0) / hops.length).toFixed(1)}ms
+            显示 {hops.length} 跳
           </p>
         </div>
       )}

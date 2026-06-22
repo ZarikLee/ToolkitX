@@ -12,8 +12,8 @@ interface HttpResult {
   status: number;
   statusText: string;
   headers: Record<string, string>;
-  time: number;
-  size: number;
+  latency: number;
+  error?: string;
 }
 
 const STORAGE_KEY = "diagnostics_http_checker";
@@ -57,6 +57,7 @@ export function HttpChecker() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "检测失败");
+      if (data.result?.error) throw new Error(data.result.error);
       setResult(data.result);
     } catch (err) {
       setError(err instanceof Error ? err.message : "检测失败");
@@ -134,7 +135,7 @@ export function HttpChecker() {
                 {result.status} {result.statusText}
               </p>
               <p className="text-sm text-muted-foreground">
-                响应时间: {result.time}ms | 大小: {(result.size / 1024).toFixed(2)} KB
+                响应时间: {result.latency}ms
               </p>
             </div>
           </div>
