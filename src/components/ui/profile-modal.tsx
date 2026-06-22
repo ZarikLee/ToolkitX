@@ -65,10 +65,6 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
   };
 
   const handleChangePassword = async () => {
-    if (!currentPassword) {
-      toast("请输入当前密码", "error");
-      return;
-    }
     if (!newPassword) {
       toast("请输入新密码", "error");
       return;
@@ -86,13 +82,13 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
       const res = await fetch("/api/auth/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ currentPassword, newPassword }),
+        body: JSON.stringify({ currentPassword: currentPassword || undefined, newPassword }),
       });
       const data = await res.json();
       if (!res.ok) {
         toast(data.error || "修改失败", "error");
       } else {
-        toast("密码修改成功");
+        toast("密码已设置");
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
@@ -195,9 +191,12 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
             </div>
           ) : (
             <div className="space-y-4">
+              <p className="text-[12px] text-muted-foreground/50">
+                设置密码后可使用手机号+密码登录
+              </p>
               <div>
                 <label className="text-[12px] text-muted-foreground/60 uppercase tracking-wider mb-1.5 block">
-                  当前密码
+                  当前密码 <span className="text-muted-foreground/30">(已有密码时填写)</span>
                 </label>
                 <div className="relative">
                   <input

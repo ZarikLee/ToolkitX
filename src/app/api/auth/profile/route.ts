@@ -31,9 +31,6 @@ export async function PUT(request: Request) {
   }
 
   if (newPassword) {
-    if (!currentPassword) {
-      return NextResponse.json({ error: "请输入当前密码" }, { status: 400 });
-    }
     if (newPassword.length < 6) {
       return NextResponse.json({ error: "新密码至少需要 6 个字符" }, { status: 400 });
     }
@@ -44,13 +41,17 @@ export async function PUT(request: Request) {
     if (!user) {
       return NextResponse.json({ error: "用户不存在" }, { status: 404 });
     }
-    if (!user.password) {
-      return NextResponse.json({ error: "该账号使用手机验证码登录，无法修改密码" }, { status: 400 });
+    // If user has an existing password, verify it first
+    if (user.password) {
+      if (!currentPassword) {
+        return NextResponse.json({ error: "请输入当前密码" }, { status: 400 });
+      }
+      const valid = await verifyPassword(currentPassword, user.password);
+      if (!valid) {
+        return NextResponse.json({ error: "当前密码错误" }, { status: 400 });
+      }
     }
-    const valid = await verifyPassword(currentPassword, user.password);
-    if (!valid) {
-      return NextResponse.json({ error: "当前密码错误" }, { status: 400 });
-    }
+    // Set new password (works for both first-time and change)
     const hashed = await hashPassword(newPassword);
     await prisma.user.update({
       where: { id: payload.userId },

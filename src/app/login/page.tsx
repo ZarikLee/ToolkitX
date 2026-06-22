@@ -67,6 +67,10 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     try {
+      // Clear old session cookies
+      document.cookie = "toolkitx_guest=; path=/; max-age=0";
+      localStorage.removeItem("toolkitx_guest");
+
       const res = await fetch("/api/auth/verify-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -77,8 +81,8 @@ export default function LoginPage() {
         setError(data.error || "验证失败");
         return;
       }
-      router.push("/");
-      router.refresh();
+      // Force full page reload to ensure new session is picked up
+      window.location.href = "/";
     } catch {
       setError("网络错误");
     } finally {
