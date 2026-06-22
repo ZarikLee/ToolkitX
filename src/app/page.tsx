@@ -480,6 +480,21 @@ export default function HomePage() {
     } catch {}
   }, []);
 
+  // Restore scroll position from sessionStorage
+  useEffect(() => {
+    const scrollContainer = document.querySelector("main");
+    if (!scrollContainer) return;
+    const saved = sessionStorage.getItem("home_scroll_pos");
+    if (saved) {
+      scrollContainer.scrollTop = parseInt(saved, 10);
+    }
+    const handleScroll = () => {
+      sessionStorage.setItem("home_scroll_pos", scrollContainer.scrollTop.toString());
+    };
+    scrollContainer.addEventListener("scroll", handleScroll, { passive: true });
+    return () => scrollContainer.removeEventListener("scroll", handleScroll);
+  }, []);
+
   // Increment visit count
   useEffect(() => {
     fetch("/api/stats", { method: "POST" })
