@@ -1,40 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyPassword, generateToken } from "@/lib/auth";
-import { setAuthCookie } from "@/lib/auth-server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json();
+    const { email, phone, password } = await req.json();
 
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: "请填写邮箱和密码" },
-        { status: 400 }
-      );
+    if (!password) {
+      return NextResponse.json({ error: "请输入密码" }, { status: 400 });
+    }
+    if (!email && !phone) {
+      return NextResponse.json({ error: "请输入邮箱或手机号" }, { status: 400 });
     }
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    // Find user by email or phone
+    let user;
+    if (email) {
+      user = await prisma.user.findUnique({ where: { email } });
+    } else {
+      user = await prisma.user.findUnique({ where: { phone } });
+    }
+
     if (!user) {
-      return NextResponse.json(
-        { error: "邮箱或密码错误" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "账号或密码错误" }, { status: 401 });
     }
 
     if (!user.password) {
       return NextResponse.json(
-        { error: "该账号使用手机验证码登录" },
+        { error: "该账号未设置密码，请使用验证码登录" },
         { status: 401 }
       );
     }
 
     const isValid = await verifyPassword(password, user.password);
     if (!isValid) {
-      return NextResponse.json(
-        { error: "邮箱或密码错误" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "账号或密码错误" }, { status: 401 });
     }
 
     const token = generateToken({
@@ -45,10 +45,17 @@ export async function POST(req: NextRequest) {
     });
 
     const response = NextResponse.json({
-      user: { id: user.id, email: user.email || null, name: user.name, role: user.role },
+      user: { id: user.id, phone: user.phone, email: user.email || null, name: user.name, role: user.role },
     });
-    const cookies = setAuthCookie(token);
-    response.headers.set("Set-Cookie", cookies["Set-Cookie"]);
+
+    response.cookies.set("toolkitx_token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60,
+      path: "/",
+    });
+
     return response;
   } catch (error) {
     console.error("Login error:", error);

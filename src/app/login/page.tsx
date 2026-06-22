@@ -1,16 +1,16 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [codeSent, setCodeSent] = useState(false);
   const [countdown, setCountdown] = useState(0);
+  const [loginMode, setLoginMode] = useState<"code" | "password">("code");
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -58,16 +58,15 @@ export default function LoginPage() {
     }
   };
 
-  const handleVerify = async (e: React.FormEvent) => {
+  const handleCodeLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!phone || !code) {
-      setError("请输入手机号和验证码");
+    if (!phone || !code || code.length !== 6) {
+      setError("请输入手机号和6位验证码");
       return;
     }
     setError("");
     setLoading(true);
     try {
-      // Clear old session cookies
       document.cookie = "toolkitx_guest=; path=/; max-age=0";
       localStorage.removeItem("toolkitx_guest");
 
@@ -81,7 +80,36 @@ export default function LoginPage() {
         setError(data.error || "验证失败");
         return;
       }
-      // Force full page reload to ensure new session is picked up
+      window.location.href = "/";
+    } catch {
+      setError("网络错误");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePasswordLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!phone || !password) {
+      setError("请输入手机号和密码");
+      return;
+    }
+    setError("");
+    setLoading(true);
+    try {
+      document.cookie = "toolkitx_guest=; path=/; max-age=0";
+      localStorage.removeItem("toolkitx_guest");
+
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "登录失败");
+        return;
+      }
       window.location.href = "/";
     } catch {
       setError("网络错误");
@@ -91,10 +119,10 @@ export default function LoginPage() {
   };
 
   const handleGuest = () => {
+    document.cookie = "toolkitx_token=; path=/; max-age=0";
     document.cookie = "toolkitx_guest=1; path=/; max-age=86400";
     localStorage.setItem("toolkitx_guest", "1");
-    router.push("/");
-    router.refresh();
+    window.location.href = "/";
   };
 
   return (
@@ -122,9 +150,33 @@ export default function LoginPage() {
         <div className="glass rounded-2xl p-6">
           <h2 className="text-[16px] font-semibold mb-5">登录 / 注册</h2>
 
-          <form onSubmit={handleVerify} className="space-y-4">
-            {/* Phone Input */}
-            <div className="flex gap-2">
+          {/* Login mode switch */}
+          <div className="flex gap-1 p-1 rounded-xl bg-white/[0.04] border border-white/[0.06] mb-5">
+            <button
+              onClick={() => { setLoginMode("code"); setError(""); }}
+              className={`flex-1 py-2 rounded-lg text-[13px] font-medium transition-all ${
+                loginMode === "code"
+                  ? "bg-white/[0.1] text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              验证码登录
+            </button>
+            <button
+              onClick={() => { setLoginMode("password"); setError(""); }}
+              className={`flex-1 py-2 rounded-lg text-[13px] font-medium transition-all ${
+                loginMode === "password"
+                  ? "bg-white/[0.1] text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              密码登录
+            </button>
+          </div>
+
+          {loginMode === "code" ? (
+            <form onSubmit={handleCodeLogin} className="space-y-4">
+              {/* Phone Input */}
               <input
                 type="tel"
                 value={phone}
@@ -136,46 +188,79 @@ export default function LoginPage() {
                 placeholder="手机号"
                 required
                 maxLength={11}
-                className="input-apple flex-1"
+                className="input-apple"
               />
-            </div>
 
-            {/* Code Input + Send Button */}
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={code}
-                onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                placeholder="验证码"
-                required
-                maxLength={6}
-                className="input-apple flex-1"
-                disabled={!codeSent}
-              />
-              <button
-                type="button"
-                onClick={handleSendCode}
-                disabled={countdown > 0 || loading || !/^1[3-9]\d{9}$/.test(phone)}
-                className="px-4 py-2 rounded-xl btn-secondary text-[13px] font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
-              >
-                {countdown > 0 ? `${countdown}s` : "获取验证码"}
-              </button>
-            </div>
-
-            {error && (
-              <div className="text-[12px] text-[#ff453a] bg-[#ff453a]/10 px-3 py-2 rounded-lg">
-                {error}
+              {/* Code Input + Send Button */}
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  placeholder={codeSent ? "验证码" : "请先发送验证码"}
+                  required
+                  maxLength={6}
+                  className="input-apple flex-1"
+                />
+                <button
+                  type="button"
+                  onClick={handleSendCode}
+                  disabled={countdown > 0 || loading || !/^1[3-9]\d{9}$/.test(phone)}
+                  className="px-4 py-2 rounded-xl btn-secondary text-[13px] font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
+                >
+                  {countdown > 0 ? `${countdown}s` : "获取验证码"}
+                </button>
               </div>
-            )}
 
-            <button
-              type="submit"
-              disabled={loading || !codeSent || code.length !== 6}
-              className="btn-primary w-full py-2.5"
-            >
-              {loading ? "验证中..." : "登录 / 注册"}
-            </button>
-          </form>
+              {error && (
+                <div className="text-[12px] text-[#ff453a] bg-[#ff453a]/10 px-3 py-2 rounded-lg">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading || !codeSent || code.length !== 6}
+                className="btn-primary w-full py-2.5"
+              >
+                {loading ? "验证中..." : "登录 / 注册"}
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handlePasswordLogin} className="space-y-4">
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 11))}
+                placeholder="手机号"
+                required
+                maxLength={11}
+                className="input-apple"
+              />
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="密码"
+                required
+                className="input-apple"
+              />
+
+              {error && (
+                <div className="text-[12px] text-[#ff453a] bg-[#ff453a]/10 px-3 py-2 rounded-lg">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading || !phone || !password}
+                className="btn-primary w-full py-2.5"
+              >
+                {loading ? "登录中..." : "登录"}
+              </button>
+            </form>
+          )}
 
           <div className="relative my-5">
             <div className="absolute inset-0 flex items-center">
@@ -194,7 +279,7 @@ export default function LoginPage() {
           </button>
 
           <p className="mt-4 text-center text-[11px] text-muted-foreground/40">
-            首次登录自动创建账号
+            首次登录自动创建账号，可在个人信息中设置密码
           </p>
         </div>
       </div>
