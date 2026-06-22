@@ -10,9 +10,9 @@ interface HelpSection {
 
 interface SubPageLayoutProps {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   helpContent?: HelpSection[];
-  tabs: React.ReactNode;
+  tabs?: React.ReactNode;
   children: React.ReactNode;
 }
 
@@ -25,7 +25,7 @@ export function SubPageLayout({
 }: SubPageLayoutProps) {
   return (
     <main className="flex-1 min-h-0 relative z-10">
-      <div className="max-w-7xl mx-auto px-8 py-8 h-full overflow-auto">
+      <div className="max-w-7xl mx-auto px-4 py-4 md:px-8 md:py-8 h-full overflow-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-2 animate-fade-in">
           <Link
@@ -49,14 +49,18 @@ export function SubPageLayout({
           <h1 className="text-[22px] font-bold tracking-tight">{title}</h1>
           {helpContent && <InlineHelp content={helpContent} />}
         </div>
-        <p className="text-muted-foreground text-[13px] mb-8 animate-fade-in">
-          {subtitle}
-        </p>
+        {subtitle && (
+          <p className="text-muted-foreground text-[13px] mb-8 animate-fade-in">
+            {subtitle}
+          </p>
+        )}
 
         {/* Tabs */}
-        <div className="flex gap-1 p-1 rounded-xl bg-white/[0.04] border border-white/[0.06] mb-6 w-fit animate-fade-in">
-          {tabs}
-        </div>
+        {tabs && (
+          <div className="flex gap-1 p-1 rounded-xl bg-white/[0.04] border border-white/[0.06] mb-6 w-fit animate-fade-in">
+            {tabs}
+          </div>
+        )}
 
         {/* Content */}
         <div className="animate-fade-in">{children}</div>
