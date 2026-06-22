@@ -16,7 +16,20 @@ export async function GET() {
   }
 }
 
-export async function POST() {
+export async function POST(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const setVal = searchParams.get("set");
+  if (setVal) {
+    try {
+      await ensureTable();
+      await prisma.$executeRawUnsafe(
+        `UPDATE SiteStats SET visits = ${parseInt(setVal)} WHERE id = 'stats'`
+      );
+      return NextResponse.json({ visits: parseInt(setVal) });
+    } catch {
+      return NextResponse.json({ visits: 0 });
+    }
+  }
   try {
     await ensureTable();
     const stats = await prisma.siteStats.upsert({
