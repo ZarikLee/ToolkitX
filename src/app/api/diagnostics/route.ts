@@ -37,11 +37,17 @@ export async function POST(request: Request) {
       }
       const portResults = [];
       for (const port of ports) {
-        const out = await runCommand(`nc -z -w 2 ${target} ${port} 2>&1 && echo "open" || echo "closed"`);
-        portResults.push({
-          port,
-          status: out.includes("open") ? "open" : "closed",
-        });
+        let status = "closed";
+        try {
+          const { stdout } = await execAsync(
+            `timeout 3 bash -c "echo > /dev/tcp/${target}/${port}" 2>&1 && echo "open" || echo "closed"`,
+            { timeout: 5000 }
+          );
+          status = stdout.includes("open") ? "open" : "closed";
+        } catch {
+          status = "closed";
+        }
+        portResults.push({ port, status });
       }
       result = { ports: portResults };
       break;
@@ -49,8 +55,25 @@ export async function POST(request: Request) {
 
     case "dns": {
       const recordType = options?.recordType || "A";
-      const out = await runCommand(`dig +short ${target} ${recordType} 2>&1`);
-      const records = out.split("\n").filter((r) => r.trim());
+      let out = "";
+      try {
+        const { stdout } = await execAsync(`dig +short ${target} ${recordType} 2>&1`, { timeout: 10000 });
+        out = stdout;
+      } catch {
+        // Fallback to nslookup or getent
+        try {
+          const { stdout } = await execAsync(`getent hosts ${target} 2>&1`, { timeout: 5000 });
+          out = stdout;
+        } catch {
+          try {
+            const { stdout } = await execAsync(`nslookup ${target} 2>&1`, { timeout: 5000 });
+            out = stdout;
+          } catch {
+            out = "DNS lookup failed";
+          }
+        }
+      }
+      const records = out.split("\n").filter((r) => r.trim() && !r.startsWith(";") && !r.startsWith(";;"));
       result = { records, type: recordType };
       break;
     }
@@ -90,7 +113,19 @@ export async function POST(request: Request) {
     }
 
     case "trace": {
-      const out = await runCommand(`traceroute -m 15 -w 2 ${target} 2>&1`, 20000);
+      let out = "";
+      try {
+        const result2 = await execAsync(`traceroute -m 15 -w 2 ${target} 2>&1`, { timeout: 20000 });
+        out = result2.stdout;
+      } catch {
+        try {
+          // Fallback: use ping to check reachability
+          const result2 = await execAsync(`ping -c 3 -W 2 ${target} 2>&1`, { timeout: 10000 });
+          out = result2.stdout;
+        } catch (e: any) {
+          out = e.stderr || e.message || "traceroute/ping not available on this server";
+        }
+      }
       const hops = out.split("\n").slice(1).map((line) => {
         const parts = line.trim().split(/\s+/);
         return {
@@ -99,7 +134,7 @@ export async function POST(request: Request) {
           times: parts.slice(2).filter((p) => p !== "*"),
         };
       });
-      result = { hops };
+      result = { hops, raw: out };
       break;
     }
 
@@ -108,7 +143,13 @@ export async function POST(request: Request) {
       if (!Number.isInteger(count) || count < 1 || count > 30) {
         return NextResponse.json({ error: "Invalid count" }, { status: 400 });
       }
-      const out = await runCommand(`ping -c ${count} ${target} 2>&1`, 15000);
+      let out = "";
+      try {
+        const { stdout } = await execAsync(`ping -c ${count} ${target} 2>&1`, { timeout: 15000 });
+        out = stdout;
+      } catch (e: any) {
+        out = e.stderr || e.message || "ping failed";
+      }
       const statsMatch = out.match(/rtt min\/avg\/max\/mdev = ([\d.]+)\/([\d.]+)\/([\d.]+)\/([\d.]+)/);
       const lossMatch = out.match(/(\d+)% packet loss/);
       result = {
