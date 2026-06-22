@@ -468,7 +468,6 @@ const allTools = [
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
-  const [visitCount, setVisitCount] = useState(0);
 
   // Load favorites from localStorage
   useEffect(() => {
@@ -493,14 +492,6 @@ export default function HomePage() {
     };
     scrollContainer.addEventListener("scroll", handleScroll, { passive: true });
     return () => scrollContainer.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Increment visit count
-  useEffect(() => {
-    fetch("/api/stats", { method: "POST" })
-      .then((r) => r.json())
-      .then((d) => setVisitCount(d.visits || 0))
-      .catch(() => {});
   }, []);
 
   const toggleFavorite = (toolName: string, e: React.MouseEvent) => {
@@ -643,15 +634,6 @@ export default function HomePage() {
             >
               清除搜索
             </button>
-          </div>
-        )}
-
-        {/* Visit Counter */}
-        {visitCount > 0 && (
-          <div className="text-center mt-8 mb-4">
-            <p className="text-[11px] text-muted-foreground/30">
-              累计访问 {visitCount.toLocaleString()} 次
-            </p>
           </div>
         )}
       </div>
