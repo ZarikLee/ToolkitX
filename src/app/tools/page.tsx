@@ -30,158 +30,59 @@ import { LoremIpsum } from "@/components/tools/lorem-ipsum";
 import { TextStatistics } from "@/components/tools/text-statistics";
 import { TextDiff } from "@/components/tools/text-diff";
 import { QRCode } from "@/components/tools/qr-code";
-import { SubPageLayout } from "@/components/layout/sub-page-layout";
-import { TabButton } from "@/components/ui/tab-button";
 
-const helpContent = [
-  {
-    title: "如何使用数据处理工具",
-    items: [
-      "点击上方标签页选择工具类型",
-      "在输入区域粘贴或输入数据",
-      "点击操作按钮（格式化、编码、计算等）",
-      "结果会显示在输出区域，点击「复制」即可使用",
-    ],
-  },
-];
-
-const categories = [
-  {
-    name: "数据格式",
-    tools: [
-      { id: "json", name: "JSON 格式化", icon: "{}", component: JsonTool },
-      { id: "yaml-json", name: "YAML ↔ JSON", icon: "📄", component: YamlJson },
-      { id: "sql", name: "SQL 美化", icon: "🗃️", component: SQLPrettify },
-      { id: "markdown", name: "Markdown → HTML", icon: "📝", component: MarkdownHtml },
-    ],
-  },
-  {
-    name: "编码加密",
-    tools: [
-      { id: "encoding", name: "编解码", icon: "🔄", component: EncodingTool },
-      { id: "hash", name: "哈希计算", icon: "#", component: HashCalculator },
-      { id: "hmac", name: "HMAC 生成", icon: "🔐", component: HMACGenerator },
-      { id: "jwt", name: "JWT 解码", icon: "🎫", component: JWTDecoder },
-      { id: "qr", name: "二维码生成", icon: "📱", component: QRCode },
-    ],
-  },
-  {
-    name: "生成器",
-    tools: [
-      { id: "uuid", name: "UUID 生成", icon: "🆔", component: UUIDGenerator },
-      { id: "password", name: "密码生成", icon: "🔑", component: PasswordGenerator },
-      { id: "strength", name: "密码强度", icon: "💪", component: PasswordStrength },
-      { id: "otp", name: "OTP 生成", icon: "🔢", component: OTPGenerator },
-      { id: "mac", name: "MAC 地址", icon: "🖥️", component: MACGenerator },
-      { id: "lorem", name: "Lorem Ipsum", icon: "📄", component: LoremIpsum },
-    ],
-  },
-  {
-    name: "转换器",
-    tools: [
-      { id: "timestamp", name: "时间戳转换", icon: "⏰", component: TimestampTool },
-      { id: "color", name: "颜色转换", icon: "🎨", component: ColorConverter },
-      { id: "case", name: "大小写转换", icon: "Aa", component: CaseConverter },
-      { id: "chmod", name: "chmod 计算", icon: "🔒", component: ChmodCalculator },
-      { id: "docker", name: "Docker 转换", icon: "🐳", component: DockerConverter },
-    ],
-  },
-  {
-    name: "Web 工具",
-    tools: [
-      { id: "url", name: "URL 解析", icon: "🔗", component: URLParser },
-      { id: "ua", name: "UA 解析", icon: "🌐", component: UAParser },
-      { id: "mime", name: "MIME 参考", icon: "📋", component: MimeReference },
-      { id: "json-diff", name: "JSON Diff", icon: "🔍", component: JsonDiff },
-    ],
-  },
-  {
-    name: "网络工具",
-    tools: [
-      { id: "subnet", name: "子网计算器", icon: "📡", component: SubnetCalculator },
-      { id: "regex", name: "正则测试", icon: "✏️", component: RegexTester },
-    ],
-  },
-  {
-    name: "文本工具",
-    tools: [
-      { id: "text-stat", name: "文本统计", icon: "📊", component: TextStatistics },
-      { id: "text-diff", name: "文本对比", icon: "📝", component: TextDiff },
-    ],
-  },
-];
-
-const allTools = categories.flatMap((c) => c.tools);
+const toolMap: Record<string, React.ComponentType> = {
+  json: JsonTool,
+  "yaml-json": YamlJson,
+  sql: SQLPrettify,
+  markdown: MarkdownHtml,
+  encoding: EncodingTool,
+  hash: HashCalculator,
+  hmac: HMACGenerator,
+  jwt: JWTDecoder,
+  qr: QRCode,
+  uuid: UUIDGenerator,
+  password: PasswordGenerator,
+  strength: PasswordStrength,
+  otp: OTPGenerator,
+  mac: MACGenerator,
+  lorem: LoremIpsum,
+  timestamp: TimestampTool,
+  color: ColorConverter,
+  case: CaseConverter,
+  chmod: ChmodCalculator,
+  docker: DockerConverter,
+  url: URLParser,
+  ua: UAParser,
+  mime: MimeReference,
+  "json-diff": JsonDiff,
+  subnet: SubnetCalculator,
+  regex: RegexTester,
+  "text-stat": TextStatistics,
+  "text-diff": TextDiff,
+};
 
 function ToolsContent() {
   const searchParams = useSearchParams();
   const toolParam = searchParams.get("tool");
+  const Component = toolParam ? toolMap[toolParam] : null;
 
-  const [activeTool, setActiveTool] = useState(toolParam || "json");
-  const [activeCategory, setActiveCategory] = useState("数据格式");
-
-  // Sync with URL query param
-  useEffect(() => {
-    if (toolParam) {
-      setActiveTool(toolParam);
-      // Find and set the correct category
-      for (const cat of categories) {
-        if (cat.tools.some((t) => t.id === toolParam)) {
-          setActiveCategory(cat.name);
-          break;
-        }
-      }
-    }
-  }, [toolParam]);
-
-  const ActiveComponent = allTools.find((t) => t.id === activeTool)?.component;
-  const currentCategory = categories.find((c) => c.name === activeCategory);
-
-  return (
-    <SubPageLayout
-      title="数据处理"
-      subtitle="常用数据处理工具集合"
-      helpContent={helpContent}
-      tabs={
-        <div className="flex flex-wrap gap-1">
-          {categories.map((cat) => (
-            <button
-              key={cat.name}
-              onClick={() => {
-                setActiveCategory(cat.name);
-                setActiveTool(cat.tools[0].id);
-              }}
-              className={`px-3 py-1.5 rounded-lg text-[12px] transition-all ${
-                activeCategory === cat.name
-                  ? "bg-[#0a84ff]/15 text-[#0a84ff]"
-                  : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04]"
-              }`}
-            >
-              {cat.name}
-            </button>
-          ))}
+  // Standalone tool mode — just render the tool, nothing else
+  if (Component) {
+    return (
+      <div className="flex-1 overflow-auto">
+        <div className="max-w-4xl mx-auto px-4 py-6 md:px-8 md:py-8">
+          <Component />
         </div>
-      }
-    >
-      {/* Sub tabs */}
-      <div className="flex flex-wrap gap-1 mb-4">
-        {currentCategory?.tools.map((tool) => (
-          <TabButton
-            key={tool.id}
-            active={activeTool === tool.id}
-            onClick={() => setActiveTool(tool.id)}
-            icon={<span className="text-sm font-mono">{tool.icon}</span>}
-          >
-            {tool.name}
-          </TabButton>
-        ))}
       </div>
+    );
+  }
 
-      {/* Tool Content */}
-      <div className="p-6 rounded-2xl border border-white/[0.06] bg-white/[0.02]">
-        {ActiveComponent && <ActiveComponent />}
-      </div>
-    </SubPageLayout>
+  // No tool param — shouldn't happen since homepage links all have ?tool=
+  return (
+    <div className="flex-1 flex items-center justify-center">
+      <div className="text-muted-foreground text-[14px]">请选择一个工具</div>
+    </div>
   );
 }
 
