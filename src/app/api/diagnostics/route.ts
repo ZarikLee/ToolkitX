@@ -1,9 +1,16 @@
 import { NextResponse } from "next/server";
 import { exec } from "child_process";
 import { promisify } from "util";
-import { getCurrentUser } from "@/lib/auth-server";
 
 const execAsync = promisify(exec);
+
+function cleanTarget(raw: string): string {
+  let t = raw.trim();
+  t = t.replace(/^https?:\/\//i, "");
+  t = t.replace(/\/+$/, "");
+  t = t.replace(/:\d+$/, "");
+  return t;
+}
 
 async function runCommand(cmd: string, timeout = 10000): Promise<string> {
   try {
@@ -14,12 +21,11 @@ async function runCommand(cmd: string, timeout = 10000): Promise<string> {
   }
 }
 
-// POST - Run a diagnostic
 export async function POST(request: Request) {
   const body = await request.json();
-  const { type, target, options } = body;
+  const { type, target: rawTarget, options } = body;
 
-  if (!target || /[;&|`$(){}<>!\\]/.test(target) || target.trim().length === 0) {
+  if (!rawTarget || /[;&|`$(){}<>!\\]/.test(rawTarget) || rawTarget.trim().length === 0) {
     return NextResponse.json({ error: "Invalid target" }, { status: 400 });
   }
 
@@ -27,6 +33,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing type" }, { status: 400 });
   }
 
+  const target = cleanTarget(rawTarget);
   let result: any = {};
 
   switch (type) {
@@ -60,7 +67,6 @@ export async function POST(request: Request) {
         const { stdout } = await execAsync(`dig +short ${target} ${recordType} 2>&1`, { timeout: 10000 });
         out = stdout;
       } catch {
-        // Fallback to nslookup or getent
         try {
           const { stdout } = await execAsync(`getent hosts ${target} 2>&1`, { timeout: 5000 });
           out = stdout;
@@ -95,16 +101,18 @@ export async function POST(request: Request) {
     }
 
     case "http": {
-      const url = target.startsWith("http") ? target : `https://${target}`;
+      const url = rawTarget.startsWith("http") ? rawTarget : `https://${target}`;
       const start = Date.now();
       try {
         const res = await fetch(url, { redirect: "follow", signal: AbortSignal.timeout(8000) });
         const latency = Date.now() - start;
+        const text = await res.text();
         result = {
           status: res.status,
           statusText: res.statusText,
           latency,
           headers: Object.fromEntries(res.headers.entries()),
+          size: text.length,
         };
       } catch (e: any) {
         result = { error: e.message, latency: Date.now() - start };
@@ -115,13 +123,12 @@ export async function POST(request: Request) {
     case "trace": {
       let out = "";
       try {
-        const result2 = await execAsync(`traceroute -m 15 -w 2 ${target} 2>&1`, { timeout: 20000 });
-        out = result2.stdout;
+        const r = await execAsync(`traceroute -m 15 -w 2 ${target} 2>&1`, { timeout: 20000 });
+        out = r.stdout;
       } catch {
         try {
-          // Fallback: use ping to check reachability
-          const result2 = await execAsync(`ping -c 3 -W 2 ${target} 2>&1`, { timeout: 10000 });
-          out = result2.stdout;
+          const r = await execAsync(`ping -c 3 -W 2 ${target} 2>&1`, { timeout: 10000 });
+          out = r.stdout;
         } catch (e: any) {
           out = e.stderr || e.message || "traceroute/ping not available on this server";
         }
