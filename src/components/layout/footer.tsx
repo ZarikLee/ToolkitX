@@ -6,8 +6,8 @@ export function Footer() {
   const [visits, setVisits] = useState(0);
 
   useEffect(() => {
-    // Increment visit count
-    fetch("/api/stats", { method: "POST", credentials: "same-origin" })
+    // Increment visit count with cache-busting
+    fetch(`/api/stats?t=${Date.now()}`, { method: "POST", credentials: "same-origin" })
       .then((r) => r.json())
       .then((d) => setVisits(d.visits || 0))
       .catch(() => {});
