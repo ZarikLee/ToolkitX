@@ -14,9 +14,9 @@ interface SSHServer {
 interface RunbookStep {
   id: string;
   type: string;
-  command: string;
+  content: string;
   description?: string;
-  order: number;
+  order?: number;
 }
 
 function executeCommand(
@@ -105,9 +105,10 @@ export async function POST(request: Request) {
   }
 
   const allSteps: RunbookStep[] = JSON.parse(runbook.steps);
-  const stepsToExecute = stepIds
+  const stepsToExecute = (stepIds
     ? allSteps.filter((s) => stepIds.includes(s.id))
-    : allSteps;
+    : allSteps
+  ).map((s, i) => ({ ...s, order: s.order ?? i }));
 
   stepsToExecute.sort((a, b) => a.order - b.order);
 
@@ -133,11 +134,11 @@ export async function POST(request: Request) {
       try {
         const { stdout, stderr, exitCode } = await executeCommand(
           server,
-          step.command
+          step.content
         );
         serverResult.steps.push({
           stepId: step.id,
-          command: step.command,
+          command: step.content,
           stdout,
           stderr,
           exitCode,
@@ -146,7 +147,7 @@ export async function POST(request: Request) {
       } catch (error: any) {
         serverResult.steps.push({
           stepId: step.id,
-          command: step.command,
+          command: step.content,
           stdout: "",
           stderr: error.message || "Execution failed",
           exitCode: -1,

@@ -115,6 +115,12 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "Missing id" }, { status: 400 });
   }
 
+  const existing = await prisma.alertRule.findFirst({
+    where: { id, userId: user.userId },
+  });
+  if (!existing) {
+    return NextResponse.json({ error: "Rule not found" }, { status: 404 });
+  }
   await prisma.alertRule.delete({ where: { id } });
 
   return NextResponse.json({ success: true });

@@ -210,7 +210,12 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  await prisma.message.delete({ where: { id } });
+  if (id.startsWith("fb-")) {
+    const feedbackId = id.replace("fb-", "");
+    await prisma.feedback.delete({ where: { id: feedbackId } });
+  } else {
+    await prisma.message.delete({ where: { id } });
+  }
 
   return NextResponse.json({ success: true });
 }

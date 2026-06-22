@@ -12,7 +12,7 @@ const helpContent = [
 interface AuditLog {
   id: string;
   createdAt: number;
-  user: string;
+  userId: string;
   action: string;
   resource: string;
   detail: string;
@@ -67,7 +67,7 @@ export default function AuditPage() {
     const headers = ["时间", "用户", "操作", "资源", "详情"];
     const rows = logs.map((log) => [
       new Date(log.createdAt).toLocaleString(),
-      log.resource,
+      log.userId || "-",
       log.action,
       log.resource,
       log.detail,
@@ -173,7 +173,7 @@ export default function AuditPage() {
                     <td className="px-4 py-2.5 text-muted-foreground whitespace-nowrap">
                       {new Date(log.createdAt).toLocaleString()}
                     </td>
-                    <td className="px-4 py-2.5 font-medium">{log.resource}</td>
+                    <td className="px-4 py-2.5 font-medium">{log.userId || "-"}</td>
                     <td className="px-4 py-2.5">
                       <span className="px-1.5 py-0.5 text-[11px] bg-white/[0.06] rounded-md">
                         {log.action}

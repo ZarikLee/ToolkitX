@@ -14,8 +14,12 @@ export default function LoginPage() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    document.documentElement.className = "light";
-    localStorage.setItem("theme", "light");
+    const saved = localStorage.getItem("theme");
+    if (saved) {
+      document.documentElement.className = saved;
+    } else {
+      document.documentElement.className = "light";
+    }
   }, []);
 
   useEffect(() => {

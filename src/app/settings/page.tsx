@@ -57,10 +57,11 @@ export default function SettingsPage() {
       const data = await apiPut<Settings>('/api/settings', settings);
       setSettings(data);
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(data));
+      toast('设置已保存');
     } catch {
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+      toast('设置已保存到本地');
     }
-    toast('设置已保存');
   };
 
   const updateSettings = (partial: Partial<Settings>) => {

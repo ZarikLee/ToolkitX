@@ -78,7 +78,7 @@ function parseUA(ua: string): UAResult {
 }
 
 export function UAParser() {
-  const [ua, setUA] = useState(navigator.userAgent);
+  const [ua, setUA] = useState(typeof navigator !== "undefined" ? navigator.userAgent : "");
   const [result, setResult] = useState<UAResult | null>(null);
 
   const parse = () => {

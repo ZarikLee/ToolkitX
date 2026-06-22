@@ -24,7 +24,15 @@ export function TimestampTool() {
   const timestampToDate = () => {
     try {
       const ts = parseInt(timestamp);
+      if (isNaN(ts) || ts < 0 || ts > 9999999999) {
+        setConvertedDateTime("无效的时间戳（应为10位数字）");
+        return;
+      }
       const date = new Date(ts * 1000);
+      if (isNaN(date.getTime())) {
+        setConvertedDateTime("无效的时间戳");
+        return;
+      }
       setConvertedDateTime(date.toLocaleString());
     } catch {
       setConvertedDateTime("无效的时间戳");
@@ -33,7 +41,15 @@ export function TimestampTool() {
 
   const dateToTimestamp = () => {
     try {
+      if (!dateTime) {
+        setConvertedDateTime("请选择日期时间");
+        return;
+      }
       const date = new Date(dateTime);
+      if (isNaN(date.getTime())) {
+        setConvertedDateTime("无效的日期时间");
+        return;
+      }
       setConvertedDateTime(Math.floor(date.getTime() / 1000).toString());
     } catch {
       setConvertedDateTime("无效的日期时间");

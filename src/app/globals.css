@@ -355,6 +355,17 @@ html {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* 亮色下低对比度颜色 → 加深 */
+.light .text-green-400 { color: #16a34a !important; }
+.light .text-red-400 { color: #dc2626 !important; }
+.light .text-yellow-400 { color: #ca8a04 !important; }
+.light .text-blue-400 { color: #2563eb !important; }
+.light .text-yellow-200 { color: #854d0e !important; }
+.light .text-green-500 { color: #16a34a !important; }
+.light .text-red-500 { color: #dc2626 !important; }
+.light .bg-green-400 { background-color: #16a34a !important; }
+.light .bg-yellow-500/30 { background-color: rgba(234, 179, 8, 0.4) !important; }
+
 /* 亮色下减轻弹窗/下拉框阴影 */
 .light [class*="shadow-[0_16px_48px"] {
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12) !important;

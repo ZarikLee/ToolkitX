@@ -44,6 +44,7 @@ export async function GET(request: Request) {
   return NextResponse.json(
     logs.map((l) => ({
       id: l.id,
+      userId: l.userId,
       action: l.action,
       resource: l.resource,
       detail: l.detail || null,
