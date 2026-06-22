@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { InlineHelp } from "@/components/ui/inline-help";
 
 const qrHelp = [
@@ -8,140 +8,143 @@ const qrHelp = [
   { title: "使用方法", items: ["输入文本或 URL", "点击「生成 QR 码」", "点击「下载 SVG」保存"] },
 ];
 
-function generateQR(text: string, size = 256): string {
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d")!;
-  canvas.width = size;
-  canvas.height = size;
-
-  const len = text.length;
-  const modules: boolean[][] = [];
-  const gridSize = len < 25 ? 21 : len < 100 ? 25 : len < 250 ? 29 : 33;
-
-  for (let y = 0; y < gridSize; y++) {
-    modules[y] = [];
-    for (let x = 0; x < gridSize; x++) {
-      modules[y][x] = false;
-    }
-  }
-
-  // Draw finder patterns (top-left, top-right, bottom-left)
-  function drawFinder(ox: number, oy: number) {
-    for (let y = 0; y < 7; y++) {
-      for (let x = 0; x < 7; x++) {
-        const ring = Math.max(Math.abs(3 - x), Math.abs(3 - y));
-        modules[oy + y][ox + x] = ring === 0 || ring === 2;
-      }
-    }
-    // Separator
-    for (let i = 0; i < 8; i++) {
-      if (oy - 1 >= 0) modules[oy - 1][ox + i] = false;
-      if (ox - 1 >= 0) modules[oy + i][ox - 1] = false;
-      if (oy + 7 < gridSize) modules[oy + 7][ox + i] = false;
-      if (ox + 7 < gridSize) modules[oy + i][ox + 7] = false;
-    }
-  }
-
-  drawFinder(0, 0);
-  drawFinder(gridSize - 7, 0);
-  drawFinder(0, gridSize - 7);
-
-  // Timing patterns
-  for (let i = 8; i < gridSize - 8; i++) {
-    modules[6][i] = i % 2 === 0;
-    modules[i][6] = i % 2 === 0;
-  }
-
-  // Alignment pattern for version >= 2
-  if (gridSize >= 25) {
-    const pos = gridSize - 7;
-    for (let y = -2; y <= 2; y++) {
-      for (let x = -2; x <= 2; x++) {
-        const ring = Math.max(Math.abs(x), Math.abs(y));
-        modules[pos + y][pos + x] = ring !== 1;
-      }
-    }
-  }
-
-  // Reserve format info areas
-  const reserved = Array.from({ length: gridSize }, () => Array(gridSize).fill(false));
-  for (let i = 0; i < gridSize; i++) {
-    reserved[6][i] = true;
-    reserved[i][6] = true;
-    reserved[8][i] = true;
-    reserved[i][8] = true;
-  }
-  // Finder separator areas
-  for (let i = 0; i < 9; i++) {
-    reserved[0][i] = true;
-    reserved[i][0] = true;
-    reserved[0][gridSize - 1 - i] = true;
-    reserved[i][gridSize - 1] = true;
-    reserved[gridSize - 1][i] = true;
-    reserved[gridSize - 1 - i][0] = true;
-  }
-
-  // Encode text as bit stream
+function textToBinary(text: string): number[] {
   const bytes = new TextEncoder().encode(text);
   const bits: number[] = [];
   for (const b of bytes) {
     for (let i = 7; i >= 0; i--) bits.push((b >> i) & 1);
   }
-  // Terminator
-  for (let i = 0; i < Math.min(4, gridSize * gridSize) && bits.length < gridSize * gridSize; i++) {
-    bits.push(0);
-  }
+  return bits;
+}
 
-  // Place data in zigzag pattern
-  let bitIdx = 0;
-  let right = gridSize - 1;
-  let upward = true;
+function createModules(size: number): boolean[][] {
+  return Array.from({ length: size }, () => Array(size).fill(false));
+}
 
-  while (right >= 0) {
-    const col1 = right;
-    const col2 = right - 1;
-    if (col2 < 0) break;
-
-    for (let pass = 0; pass < 2; pass++) {
-      const col = pass === 0 ? col1 : col2;
-      for (let i = 0; i < gridSize; i++) {
-        const row = upward ? gridSize - 1 - i : i;
-        if (reserved[row]?.[col]) continue;
-        if (row >= 0 && row < gridSize && col >= 0 && col < gridSize) {
-          modules[row][col] = bitIdx < bits.length ? bits[bitIdx] === 1 : false;
-          bitIdx++;
-        }
+function placeFinder(modules: boolean[][], row: number, col: number) {
+  const s = modules.length;
+  for (let r = -1; r <= 7; r++) {
+    for (let c = -1; c <= 7; c++) {
+      const rr = row + r, cc = col + c;
+      if (rr < 0 || rr >= s || cc < 0 || cc >= s) continue;
+      if (r === -1 || r === 7 || c === -1 || c === 7) {
+        modules[rr][cc] = false;
+      } else {
+        const d = Math.max(Math.abs(3 - r), Math.abs(3 - c));
+        modules[rr][cc] = d === 1 || d === 3;
       }
     }
-
-    right -= 2;
-    upward = !upward;
   }
+}
 
-  // Apply mask pattern 0
-  for (let r = 0; r < gridSize; r++) {
-    for (let c = 0; c < gridSize; c++) {
-      if (!reserved[r][c] && (r + c) % 2 === 0) {
+function placeAlignment(modules: boolean[][], row: number, col: number) {
+  for (let r = -2; r <= 2; r++) {
+    for (let c = -2; c <= 2; c++) {
+      const d = Math.max(Math.abs(r), Math.abs(c));
+      modules[row + r][col + c] = d !== 1;
+    }
+  }
+}
+
+function placeTiming(modules: boolean[][]) {
+  const s = modules.length;
+  for (let i = 8; i < s - 8; i++) {
+    modules[6][i] = i % 2 === 0;
+    modules[i][6] = i % 2 === 0;
+  }
+}
+
+function reserveFormat(modules: boolean[][]) {
+  const s = modules.length;
+  for (let i = 0; i <= 8; i++) {
+    modules[8][i] = false;
+    modules[i][8] = false;
+    modules[8][s - 1 - i] = false;
+    modules[s - 1 - i][8] = false;
+  }
+}
+
+function placeData(modules: boolean[][], bits: number[]) {
+  const s = modules.length;
+  let idx = 0;
+  let col = s - 1;
+  let up = true;
+
+  while (col >= 0) {
+    if (col === 6) col--;
+    for (let i = 0; i < s; i++) {
+      const row = up ? s - 1 - i : i;
+      for (let dc = 0; dc < 2; dc++) {
+        const c = col - dc;
+        if (c < 0 || c >= s) continue;
+        if (modules[row][c]) continue;
+        modules[row][c] = idx < bits.length ? bits[idx] === 1 : false;
+        idx++;
+      }
+    }
+    col -= 2;
+    up = !up;
+  }
+}
+
+function applyMask(modules: boolean[][]) {
+  const s = modules.length;
+  for (let r = 0; r < s; r++) {
+    for (let c = 0; c < s; c++) {
+      if ((r + c) % 2 === 0 && !modules[6][c] && !modules[r][6] &&
+          !(r < 9 && c < 9) && !(r < 9 && c >= s - 8) && !(r >= s - 8 && c < 9)) {
         modules[r][c] = !modules[r][c];
       }
     }
   }
+}
 
-  // Render to canvas
-  const cellSize = size / gridSize;
-  ctx.fillStyle = "white";
-  ctx.fillRect(0, 0, size, size);
-  ctx.fillStyle = "black";
-  for (let r = 0; r < gridSize; r++) {
-    for (let c = 0; c < gridSize; c++) {
+function modulesToSVG(modules: boolean[][], pixelSize: number): string {
+  const s = modules.length;
+  const cellSize = pixelSize / (s + 8);
+  const pad = cellSize * 4;
+  const total = pixelSize + pad * 2;
+
+  const rects: string[] = [];
+  for (let r = 0; r < s; r++) {
+    for (let c = 0; c < s; c++) {
       if (modules[r][c]) {
-        ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
+        rects.push(`<rect x="${(c + 4) * cellSize}" y="${(r + 4) * cellSize}" width="${cellSize + 0.5}" height="${cellSize + 0.5}" fill="black"/>`);
       }
     }
   }
 
-  // Convert to SVG
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}"><image href="${canvas.toDataURL("image/png")}" width="${size}" height="${size}"/></svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${total} ${total}" width="${total}" height="${total}"><rect width="${total}" height="${total}" fill="white"/>${rects.join("")}</svg>`;
+}
+
+function generateQRSVG(text: string): string {
+  if (!text) return "";
+
+  const dataBits = textToBinary(text);
+  const gridSize = 21;
+  const modules = createModules(gridSize);
+
+  // Finder patterns
+  placeFinder(modules, 0, 0);
+  placeFinder(modules, 0, gridSize - 7);
+  placeFinder(modules, gridSize - 7, 0);
+
+  // Timing
+  placeTiming(modules);
+
+  // Format info (reserved)
+  reserveFormat(modules);
+
+  // Dark module
+  modules[gridSize - 8][8] = true;
+
+  // Data
+  placeData(modules, dataBits);
+
+  // Mask
+  applyMask(modules);
+
+  return modulesToSVG(modules, 256);
 }
 
 export function QRCode() {
@@ -149,13 +152,10 @@ export function QRCode() {
   const [qrSvg, setQrSvg] = useState("");
   const svgRef = useRef<HTMLDivElement>(null);
 
-  const generate = () => {
-    try {
-      setQrSvg(generateQR(input));
-    } catch {
-      setQrSvg("");
-    }
-  };
+  const generate = useCallback(() => {
+    const svg = generateQRSVG(input);
+    setQrSvg(svg);
+  }, [input]);
 
   const downloadSVG = () => {
     if (!qrSvg) return;
@@ -190,6 +190,7 @@ export function QRCode() {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && generate()}
           className="input-apple mt-1 font-mono"
           placeholder="https://example.com"
         />
