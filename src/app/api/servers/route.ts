@@ -22,6 +22,11 @@ export async function GET() {
       username: s.username,
       password: s.password || undefined,
       privateKey: s.privateKey || undefined,
+      jumpHost: s.jumpHost || undefined,
+      jumpPort: s.jumpPort || undefined,
+      jumpUsername: s.jumpUsername || undefined,
+      jumpPassword: s.jumpPassword || undefined,
+      jumpPrivateKey: s.jumpPrivateKey || undefined,
     }))
   );
 }
@@ -33,7 +38,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { name, host, port, username, password, privateKey } = body;
+  const { name, host, port, username, password, privateKey, jumpHost, jumpPort, jumpUsername, jumpPassword, jumpPrivateKey } = body;
 
   if (!name || !host || !username) {
     return NextResponse.json(
@@ -51,6 +56,11 @@ export async function POST(request: Request) {
       username,
       password: password || null,
       privateKey: privateKey || null,
+      jumpHost: jumpHost || null,
+      jumpPort: jumpPort || null,
+      jumpUsername: jumpUsername || null,
+      jumpPassword: jumpPassword || null,
+      jumpPrivateKey: jumpPrivateKey || null,
     },
   });
 
@@ -62,6 +72,11 @@ export async function POST(request: Request) {
     username: server.username,
     password: server.password || undefined,
     privateKey: server.privateKey || undefined,
+    jumpHost: server.jumpHost || undefined,
+    jumpPort: server.jumpPort || undefined,
+    jumpUsername: server.jumpUsername || undefined,
+    jumpPassword: server.jumpPassword || undefined,
+    jumpPrivateKey: server.jumpPrivateKey || undefined,
   });
 }
 

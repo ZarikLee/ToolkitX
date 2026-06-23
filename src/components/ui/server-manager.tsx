@@ -12,6 +12,11 @@ export interface SavedServer {
   username: string;
   password?: string;
   privateKey?: string;
+  jumpHost?: string;
+  jumpPort?: number;
+  jumpUsername?: string;
+  jumpPassword?: string;
+  jumpPrivateKey?: string;
 }
 
 interface ServerManagerProps {
@@ -315,9 +320,18 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
     username: server?.username || "root",
     password: server?.password || "",
     privateKey: server?.privateKey || "",
+    jumpHost: server?.jumpHost || "",
+    jumpPort: server?.jumpPort || 22,
+    jumpUsername: server?.jumpUsername || "",
+    jumpPassword: server?.jumpPassword || "",
+    jumpPrivateKey: server?.jumpPrivateKey || "",
   });
   const [authType, setAuthType] = useState<"password" | "key">(
     server?.privateKey ? "key" : "password"
+  );
+  const [useJumpHost, setUseJumpHost] = useState(!!server?.jumpHost);
+  const [jumpAuthType, setJumpAuthType] = useState<"password" | "key">(
+    server?.jumpPrivateKey ? "key" : "password"
   );
 
   useEffect(() => {
@@ -335,6 +349,11 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
       ...form,
       password: authType === "password" ? form.password : undefined,
       privateKey: authType === "key" ? form.privateKey : undefined,
+      jumpHost: useJumpHost ? form.jumpHost : undefined,
+      jumpPort: useJumpHost ? form.jumpPort : undefined,
+      jumpUsername: useJumpHost ? form.jumpUsername : undefined,
+      jumpPassword: useJumpHost && jumpAuthType === "password" ? form.jumpPassword : undefined,
+      jumpPrivateKey: useJumpHost && jumpAuthType === "key" ? form.jumpPrivateKey : undefined,
     });
   };
 
@@ -461,6 +480,99 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
                 className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[12px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors resize-none h-24"
                 placeholder="-----BEGIN RSA PRIVATE KEY-----"
               />
+            )}
+          </div>
+
+          {/* Jump Host Section */}
+          <div className="border-t border-white/[0.06] pt-4">
+            <label className="flex items-center gap-2 cursor-pointer mb-3">
+              <input
+                type="checkbox"
+                checked={useJumpHost}
+                onChange={(e) => setUseJumpHost(e.target.checked)}
+                className="w-4 h-4 rounded border-white/[0.1] bg-white/[0.04] accent-[#0a84ff]"
+              />
+              <span className="text-[13px] text-foreground/80">使用跳板机 / 堡垒机</span>
+            </label>
+
+            {useJumpHost && (
+              <div className="space-y-3 pl-6 border-l-2 border-[#0a84ff]/20">
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="col-span-2">
+                    <label className="text-[11px] text-muted-foreground/50 mb-1 block">跳板机地址</label>
+                    <input
+                      type="text"
+                      value={form.jumpHost}
+                      onChange={(e) => setForm({ ...form, jumpHost: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
+                      placeholder="bastion.company.com"
+                      required={useJumpHost}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] text-muted-foreground/50 mb-1 block">端口</label>
+                    <input
+                      type="number"
+                      value={form.jumpPort}
+                      onChange={(e) => setForm({ ...form, jumpPort: parseInt(e.target.value) || 22 })}
+                      className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] font-mono text-foreground outline-none focus:border-[#0a84ff]/50 transition-colors"
+                      required={useJumpHost}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[11px] text-muted-foreground/50 mb-1 block">用户名</label>
+                  <input
+                    type="text"
+                    value={form.jumpUsername}
+                    onChange={(e) => setForm({ ...form, jumpUsername: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
+                    placeholder="jumpuser"
+                    required={useJumpHost}
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] text-muted-foreground/50 mb-1 block">认证方式</label>
+                  <div className="flex gap-1 p-1 rounded-lg bg-white/[0.04] border border-white/[0.06] mb-2">
+                    <button
+                      type="button"
+                      onClick={() => setJumpAuthType("password")}
+                      className={`flex-1 px-3 py-1.5 rounded-md text-[11px] font-medium transition-all duration-200 ${
+                        jumpAuthType === "password" ? "bg-white/[0.1] text-foreground" : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      密码
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setJumpAuthType("key")}
+                      className={`flex-1 px-3 py-1.5 rounded-md text-[11px] font-medium transition-all duration-200 ${
+                        jumpAuthType === "key" ? "bg-white/[0.1] text-foreground" : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      私钥
+                    </button>
+                  </div>
+                  {jumpAuthType === "password" ? (
+                    <input
+                      type="password"
+                      value={form.jumpPassword}
+                      onChange={(e) => setForm({ ...form, jumpPassword: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
+                      placeholder="跳板机密码"
+                      required={useJumpHost}
+                    />
+                  ) : (
+                    <textarea
+                      value={form.jumpPrivateKey}
+                      onChange={(e) => setForm({ ...form, jumpPrivateKey: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[11px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors resize-none h-20"
+                      placeholder="-----BEGIN RSA PRIVATE KEY-----"
+                      required={useJumpHost}
+                    />
+                  )}
+                </div>
+              </div>
             )}
           </div>
 

@@ -12,6 +12,13 @@ interface SSHTerminalProps {
   username: string;
   password?: string;
   privateKey?: string;
+  jumpHost?: {
+    host: string;
+    port?: number;
+    username: string;
+    password?: string;
+    privateKey?: string;
+  };
   onConnect?: () => void;
   onDisconnect?: () => void;
   onError?: (error: string) => void;
@@ -23,6 +30,7 @@ export function SSHTerminal({
   username,
   password,
   privateKey,
+  jumpHost,
   onConnect,
   onDisconnect,
   onError,
@@ -90,6 +98,7 @@ export function SSHTerminal({
           username,
           password,
           privateKey,
+          jumpHost,
         }));
       };
 

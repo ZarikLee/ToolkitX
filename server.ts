@@ -101,6 +101,20 @@ async function runMigration() {
       console.log('[migration] Made password nullable');
     }
 
+    // Add jump host columns to Server table
+    const addJumpCol = async (col: string, type: string) => {
+      const [cols] = await conn.execute(`SHOW COLUMNS FROM \`Server\` LIKE '${col}'`);
+      if ((cols as any[]).length === 0) {
+        await conn.execute(`ALTER TABLE \`Server\` ADD COLUMN \`${col}\` ${type}`);
+        console.log(`[migration] Added ${col} column to Server`);
+      }
+    };
+    await addJumpCol('jumpHost', 'VARCHAR(191)');
+    await addJumpCol('jumpPort', 'INT');
+    await addJumpCol('jumpUsername', 'VARCHAR(191)');
+    await addJumpCol('jumpPassword', 'VARCHAR(191)');
+    await addJumpCol('jumpPrivateKey', 'TEXT');
+
     await conn.end();
     console.log('[migration] Done');
 
@@ -162,6 +176,13 @@ app.prepare().then(async () => {
                 username: data.username,
                 password: data.password,
                 privateKey: data.privateKey,
+                jumpHost: data.jumpHost ? {
+                  host: data.jumpHost.host,
+                  port: data.jumpHost.port,
+                  username: data.jumpHost.username,
+                  password: data.jumpHost.password,
+                  privateKey: data.jumpHost.privateKey,
+                } : undefined,
               });
 
               connectionId = id;

@@ -12,6 +12,13 @@ interface TerminalTab {
   port: number;
   username: string;
   isConnected: boolean;
+  jumpHost?: {
+    host: string;
+    port?: number;
+    username: string;
+    password?: string;
+    privateKey?: string;
+  };
 }
 
 export function TerminalTabs() {
@@ -19,7 +26,7 @@ export function TerminalTabs() {
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const [showConnectDialog, setShowConnectDialog] = useState(false);
 
-  const addTab = useCallback((config: { host: string; port: number; username: string }) => {
+  const addTab = useCallback((config: { host: string; port: number; username: string; jumpHost?: { host: string; port?: number; username: string; password?: string; privateKey?: string } }) => {
     const newTab: TerminalTab = {
       id: `tab_${Date.now()}`,
       title: `${config.username}@${config.host}`,
@@ -27,6 +34,7 @@ export function TerminalTabs() {
       port: config.port,
       username: config.username,
       isConnected: false,
+      jumpHost: config.jumpHost,
     };
     setTabs((prev) => [...prev, newTab]);
     setActiveTabId(newTab.id);
@@ -49,10 +57,18 @@ export function TerminalTabs() {
   }, []);
 
   const handleQuickConnect = (server: SavedServer) => {
+    const jumpHost = server.jumpHost ? {
+      host: server.jumpHost,
+      port: server.jumpPort,
+      username: server.jumpUsername || "",
+      password: server.jumpPassword,
+      privateKey: server.jumpPrivateKey,
+    } : undefined;
     addTab({
       host: server.host,
       port: server.port,
       username: server.username,
+      jumpHost,
     });
     setShowConnectDialog(false);
   };
@@ -140,6 +156,7 @@ export function TerminalTabs() {
                 host={tab.host}
                 port={tab.port}
                 username={tab.username}
+                jumpHost={tab.jumpHost}
                 onConnect={() => updateTabStatus(tab.id, true)}
                 onDisconnect={() => updateTabStatus(tab.id, false)}
               />
@@ -163,7 +180,7 @@ export function TerminalTabs() {
 }
 
 interface ConnectDialogProps {
-  onConnect: (config: { host: string; port: number; username: string; password?: string; privateKey?: string }) => void;
+  onConnect: (config: { host: string; port: number; username: string; password?: string; privateKey?: string; jumpHost?: { host: string; port?: number; username: string; password?: string; privateKey?: string } }) => void;
   onClose: () => void;
 }
 
@@ -173,6 +190,12 @@ function ConnectDialog({ onConnect, onClose }: ConnectDialogProps) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [authType, setAuthType] = useState<'password' | 'key'>('password');
+  const [useJumpHost, setUseJumpHost] = useState(false);
+  const [jumpHost, setJumpHost] = useState('');
+  const [jumpPort, setJumpPort] = useState('22');
+  const [jumpUsername, setJumpUsername] = useState('');
+  const [jumpPassword, setJumpPassword] = useState('');
+  const [jumpAuthType, setJumpAuthType] = useState<'password' | 'key'>('password');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -181,6 +204,12 @@ function ConnectDialog({ onConnect, onClose }: ConnectDialogProps) {
       port: parseInt(port, 10),
       username,
       password: authType === 'password' ? password : undefined,
+      jumpHost: useJumpHost ? {
+        host: jumpHost,
+        port: parseInt(jumpPort, 10),
+        username: jumpUsername,
+        password: jumpAuthType === 'password' ? jumpPassword : undefined,
+      } : undefined,
     });
   };
 
@@ -222,6 +251,28 @@ function ConnectDialog({ onConnect, onClose }: ConnectDialogProps) {
               <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50" placeholder="SSH 密码（可选）" />
             ) : (
               <textarea className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[12px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 resize-none h-24" placeholder="-----BEGIN RSA PRIVATE KEY-----" />
+            )}
+          </div>
+
+          {/* Jump Host */}
+          <div className="border-t border-white/[0.06] pt-3">
+            <label className="flex items-center gap-2 cursor-pointer mb-2">
+              <input type="checkbox" checked={useJumpHost} onChange={(e) => setUseJumpHost(e.target.checked)} className="w-4 h-4 rounded border-white/[0.1] bg-white/[0.04] accent-[#0a84ff]" />
+              <span className="text-[12px] text-foreground/70">使用跳板机 / 堡垒机</span>
+            </label>
+            {useJumpHost && (
+              <div className="space-y-2 pl-5 border-l-2 border-[#0a84ff]/20">
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="col-span-2">
+                    <input type="text" value={jumpHost} onChange={(e) => setJumpHost(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50" placeholder="bastion.company.com" required={useJumpHost} />
+                  </div>
+                  <div>
+                    <input type="number" value={jumpPort} onChange={(e) => setJumpPort(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] font-mono text-foreground outline-none focus:border-[#0a84ff]/50" required={useJumpHost} />
+                  </div>
+                </div>
+                <input type="text" value={jumpUsername} onChange={(e) => setJumpUsername(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50" placeholder="跳板机用户名" required={useJumpHost} />
+                <input type="password" value={jumpPassword} onChange={(e) => setJumpPassword(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50" placeholder="跳板机密码" required={useJumpHost} />
+              </div>
             )}
           </div>
           <div className="flex gap-2 pt-2">
