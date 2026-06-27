@@ -37,6 +37,7 @@ import {
   FileSearch,
   FileCode2,
   Star,
+  BookOpen,
 } from "lucide-react";
 
 const allTools = [
@@ -61,6 +62,16 @@ const allTools = [
     category: "运维",
     tags: ["端口", "dns", "ssl", "诊断"],
     hot: true,
+  },
+  {
+    name: "知识库",
+    description: "Linux / SQL / 故障排查",
+    href: "/knowledge",
+    icon: BookOpen,
+    gradient: "from-[#30d158] to-[#0a84ff]",
+    glow: "rgba(48, 209, 88, 0.15)",
+    category: "运维",
+    tags: ["知识", "linux", "sql", "排查"],
   },
   {
     name: "JSON 格式化",
