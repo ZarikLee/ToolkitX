@@ -1493,6 +1493,1195 @@ ZRANGE leaderboard 0 -1 WITHSCORES`,
       ],
     },
   },
+  // ============ Frontend ============
+  frontend: {
+    "html-basics": {
+      slug: "html-basics",
+      sections: [
+        {
+          title: "HTML 文档结构",
+          content: `HTML（HyperText Markup Language）是构建网页的标准语言。每个 HTML 文档都遵循基本的结构框架。
+
+一个标准的 HTML5 文档包含以下基本元素：
+
+- DOCTYPE 声明：告诉浏览器使用 HTML5 标准
+- html 根元素：包含整个页面内容
+- head 头部：包含元数据、标题、样式引用
+- body 主体：包含页面可见内容`,
+          code: `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的第一个网页</title>
+</head>
+<body>
+    <h1>欢迎来到 HTML 世界</h1>
+    <p>这是一个段落元素。</p>
+</body>
+</html>`,
+          language: "html",
+        },
+        {
+          title: "常用 HTML 标签",
+          content: `HTML 标签是构建网页内容的基本单元。常用标签分为以下几类：
+
+标题标签：h1 到 h6，h1 最大，h6 最小。
+段落标签：p 用于包裹文本段落。
+链接标签：a 用于创建超链接，href 属性指定目标地址。
+图片标签：img 用于插入图片，src 指定图片路径，alt 提供替代文本。
+列表标签：ul（无序列表）、ol（有序列表）、li（列表项）。
+容器标签：div 用于分组块级内容，span 用于行内内容。`,
+          code: `<h1>一级标题</h1>
+<h2>二级标题</h2>
+
+<p>这是一个<strong>加粗</strong>和<em>斜体</em>的段落。</p>
+
+<a href="https://example.com" target="_blank">访问示例网站</a>
+
+<img src="photo.jpg" alt="风景照片" width="600">
+
+<ul>
+    <li>苹果</li>
+    <li>香蕉</li>
+    <li>橘子</li>
+</ul>
+
+<ol>
+    <li>第一步：安装</li>
+    <li>第二步：配置</li>
+    <li>第三步：运行</li>
+</ol>`,
+          language: "html",
+          tip: "使用语义化标签（header、nav、main、article、footer）可以提高网页的可访问性和 SEO 友好性。",
+        },
+        {
+          title: "表格与表单",
+          content: `表格和表单是 HTML 中重要的交互元素。
+
+表格用于展示结构化数据，由 table、tr（行）、th（表头）、td（数据单元格）组成。
+
+表单用于收集用户输入，常用元素包括 input、textarea、select、button。input 的 type 属性决定了输入类型（text、password、email、number 等）。`,
+          code: `<table border="1">
+    <thead>
+        <tr>
+            <th>姓名</th>
+            <th>年龄</th>
+            <th>城市</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>张三</td>
+            <td>25</td>
+            <td>北京</td>
+        </tr>
+        <tr>
+            <td>李四</td>
+            <td>30</td>
+            <td>上海</td>
+        </tr>
+    </tbody>
+</table>
+
+<form action="/submit" method="POST">
+    <label for="username">用户名：</label>
+    <input type="text" id="username" name="username" required>
+
+    <label for="email">邮箱：</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="role">角色：</label>
+    <select id="role" name="role">
+        <option value="user">普通用户</option>
+        <option value="admin">管理员</option>
+    </select>
+
+    <button type="submit">提交</button>
+</form>`,
+          language: "html",
+        },
+      ],
+      quiz: [
+        { question: "HTML5 的 DOCTYPE 声明是什么？", options: ["<!DOCTYPE HTML PUBLIC>", "<!DOCTYPE html>", "<DOCTYPE HTML>", "<html DOCTYPE>"], answer: 1, explanation: "HTML5 的 DOCTYPE 声明非常简洁，只需 <!DOCTYPE html>。" },
+        { question: "哪个标签用于创建超链接？", options: ["<link>", "<a>", "<href>", "<url>"], answer: 1, explanation: "a 标签（anchor）用于创建超链接，href 属性指定链接目标。" },
+        { question: "img 标签的 alt 属性有什么作用？", options: ["设置图片大小", "指定图片路径", "提供图片替代文本", "设置图片边框"], answer: 2, explanation: "alt 属性在图片无法显示时提供替代文本，也有助于屏幕阅读器理解图片内容。" },
+      ],
+    },
+    "css-basics": {
+      slug: "css-basics",
+      sections: [
+        {
+          title: "CSS 选择器",
+          content: `CSS 选择器用于选择要样式的 HTML 元素。常用选择器类型包括：
+
+元素选择器：直接使用标签名，如 p、h1。
+类选择器：使用点号加类名，如 .container。
+ID 选择器：使用井号加 ID，如 #header。
+后代选择器：空格分隔，选择嵌套元素。
+子元素选择器：使用 > 号，只选择直接子元素。
+伪类选择器：如 :hover、:focus、:nth-child()。`,
+          code: `/* 元素选择器 */
+p {
+    color: #333;
+    line-height: 1.6;
+}
+
+/* 类选择器 */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* ID 选择器 */
+#header {
+    background: #1a1a1a;
+    color: white;
+}
+
+/* 后代选择器 */
+.nav a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* 伪类 */
+.button:hover {
+    background: #0066cc;
+    transform: translateY(-1px);
+}
+
+input:focus {
+    outline: 2px solid #0066cc;
+}`,
+          language: "css",
+        },
+        {
+          title: "盒模型",
+          content: `CSS 盒模型是理解布局的基础。每个 HTML 元素都被看作一个矩形盒子，由以下部分组成：
+
+content：实际内容区域，由 width 和 height 控制。
+padding：内边距，内容与边框之间的间距。
+border：边框，包围 padding 的线条。
+margin：外边距，元素与其他元素之间的间距。
+
+box-sizing: border-box 可以让 width/height 包含 padding 和 border，使布局计算更直观。`,
+          code: `/* 默认盒模型 */
+.box {
+    width: 200px;
+    padding: 20px;
+    border: 2px solid #333;
+    margin: 10px;
+    /* 实际占用宽度：200 + 20*2 + 2*2 = 244px */
+}
+
+/* border-box 盒模型（推荐） */
+.box-border {
+    box-sizing: border-box;
+    width: 200px;
+    padding: 20px;
+    border: 2px solid #333;
+    margin: 10px;
+    /* 实际占用宽度：200px（包含 padding 和 border） */
+}
+
+/* 全局设置 border-box */
+* {
+    box-sizing: border-box;
+}`,
+          language: "css",
+          tip: "在项目开头使用 * { box-sizing: border-box; } 可以避免很多布局问题。",
+        },
+      ],
+      quiz: [
+        { question: "类选择器使用什么符号前缀？", options: ["#", ".", "!", "@"], answer: 1, explanation: "类选择器使用点号（.）作为前缀，如 .my-class。" },
+        { question: "box-sizing: border-box 的作用是什么？", options: ["添加边框", "width/height 包含 padding 和 border", "移除边框", "设置外边距"], answer: 1, explanation: "border-box 让元素的 width/height 包含 padding 和 border，使布局计算更直观。" },
+      ],
+    },
+    "react-basics": {
+      slug: "react-basics",
+      sections: [
+        {
+          title: "React 组件基础",
+          content: `React 是 Facebook 开发的用于构建用户界面的 JavaScript 库。React 的核心思想是将 UI 拆分为独立的、可复用的组件。
+
+组件是 React 的基本构建块。每个组件都可以接收数据（props）并返回描述 UI 的 JSX。组件名必须以大写字母开头。
+
+JSX 是 JavaScript 的语法扩展，允许在 JS 中编写类似 HTML 的标记。JSX 最终会被编译为 React.createElement() 调用。`,
+          code: `// 函数组件（推荐）
+function Welcome({ name }) {
+    return (
+        <div className="welcome">
+            <h1>你好，{name}！</h1>
+            <p>欢迎使用 React</p>
+        </div>
+    );
+}
+
+// 使用组件
+function App() {
+    return (
+        <div>
+            <Welcome name="张三" />
+            <Welcome name="李四" />
+        </div>
+    );
+}
+
+export default App;`,
+          language: "jsx",
+        },
+        {
+          title: "Props 与 State",
+          content: `Props（属性）是组件之间传递数据的方式。Props 是只读的，组件不能修改自己的 Props。
+
+State（状态）是组件内部管理的数据。当 State 改变时，组件会重新渲染。使用 useState Hook 管理函数组件的 State。
+
+useState 返回一个数组：当前状态值和更新函数。调用更新函数会触发组件重新渲染。`,
+          code: `import { useState } from 'react';
+
+function Counter() {
+    // 声明状态，初始值为 0
+    const [count, setCount] = useState(0);
+
+    return (
+        <div>
+            <p>当前计数：{count}</p>
+            <button onClick={() => setCount(count + 1)}>
+                加 1
+            </button>
+            <button onClick={() => setCount(count - 1)}>
+                减 1
+            </button>
+            <button onClick={() => setCount(0)}>
+                重置
+            </button>
+        </div>
+    );
+}`,
+          language: "jsx",
+          tip: "State 更新是异步的。如果新状态依赖旧状态，应使用函数式更新：setCount(prev => prev + 1)。",
+        },
+      ],
+      quiz: [
+        { question: "React 组件名必须以什么开头？", options: ["小写字母", "大写字母", "下划线", "美元符号"], answer: 1, explanation: "React 约定组件名必须以大写字母开头，以便区分组件和普通 HTML 标签。" },
+        { question: "useState 返回什么？", options: ["一个对象", "一个值", "一个数组", "一个函数"], answer: 2, explanation: "useState 返回一个数组，包含当前状态值和更新状态的函数。" },
+      ],
+    },
+    "vue-basics": {
+      slug: "vue-basics",
+      sections: [
+        {
+          title: "Vue.js 模板语法",
+          content: `Vue.js 是一个渐进式 JavaScript 框架，核心思想是数据驱动视图。
+
+模板语法使用双大括号进行数据绑定（插值表达式）。v-bind 指令用于绑定 HTML 属性。v-on 指令用于绑定事件。
+
+Vue 实例通过 data 函数返回响应式数据对象。当数据改变时，视图自动更新。`,
+          code: `<div id="app">
+    <!-- 文本插值 -->
+    <h1>{{ message }}</h1>
+
+    <!-- 绑定属性 -->
+    <a v-bind:href="url">链接</a>
+    <img :src="imageUrl" :alt="imageAlt">
+
+    <!-- 事件绑定 -->
+    <button v-on:click="handleClick">点击</button>
+    <button @click="handleClick">简写形式</button>
+
+    <!-- 双向绑定 -->
+    <input v-model="inputValue">
+    <p>输入内容：{{ inputValue }}</p>
+</div>
+
+<script>
+const app = Vue.createApp({
+    data() {
+        return {
+            message: 'Hello Vue!',
+            url: 'https://vuejs.org',
+            imageUrl: 'logo.png',
+            imageAlt: 'Vue Logo',
+            inputValue: ''
+        };
+    },
+    methods: {
+        handleClick() {
+            alert('按钮被点击了！');
+        }
+    }
+});
+
+app.mount('#app');
+</script>`,
+          language: "html",
+        },
+      ],
+      quiz: [
+        { question: "Vue 中 v-model 的作用是什么？", options: ["绑定事件", "双向数据绑定", "条件渲染", "列表渲染"], answer: 1, explanation: "v-model 实现表单元素与 Vue 数据的双向绑定。" },
+      ],
+    },
+  },
+  // ============ Backend ============
+  backend: {
+    "go-basics": {
+      slug: "go-basics",
+      sections: [
+        {
+          title: "Go 语言基础",
+          content: `Go（Golang）是 Google 开发的静态类型编译语言，以简洁、高效和并发支持著称。
+
+Go 的特点：
+- 静态类型，编译型语言
+- 内置并发支持（goroutine 和 channel）
+- 垃圾回收
+- 强大的标准库
+- 快速编译`,
+          code: `package main
+
+import "fmt"
+
+// 函数定义
+func greet(name string) string {
+    return "你好，" + name + "！"
+}
+
+// 多返回值
+func divide(a, b float64) (float64, error) {
+    if b == 0 {
+        return 0, fmt.Errorf("除数不能为零")
+    }
+    return a / b, nil
+}
+
+func main() {
+    fmt.Println(greet("Go 开发者"))
+
+    result, err := divide(10, 3)
+    if err != nil {
+        fmt.Println("错误:", err)
+    } else {
+        fmt.Printf("结果: %.2f\\n", result)
+    }
+}`,
+          language: "go",
+        },
+        {
+          title: "Goroutine 并发",
+          content: `Goroutine 是 Go 的轻量级线程，由 Go 运行时管理。创建 goroutine 只需在函数调用前加 go 关键字。
+
+Channel 是 goroutine 之间通信的管道。使用 <- 操作符发送和接收数据。带缓冲的 channel 可以在满之前非阻塞地发送数据。`,
+          code: `package main
+
+import (
+    "fmt"
+    "time"
+)
+
+func worker(id int, jobs <-chan int, results chan<- int) {
+    for j := range jobs {
+        fmt.Printf("工人 %d 开始处理任务 %d\\n", id, j)
+        time.Sleep(time.Second)
+        results <- j * 2
+    }
+}
+
+func main() {
+    jobs := make(chan int, 5)
+    results := make(chan int, 5)
+
+    // 启动 3 个工人
+    for w := 1; w <= 3; w++ {
+        go worker(w, jobs, results)
+    }
+
+    // 发送任务
+    for j := 1; j <= 5; j++ {
+        jobs <- j
+    }
+    close(jobs)
+
+    // 收集结果
+    for r := 1; r <= 5; r++ {
+        fmt.Println("结果:", <-results)
+    }
+}`,
+          language: "go",
+          tip: "Goroutine 非常轻量，初始栈只有几 KB，可以轻松创建成千上万个 goroutine。",
+        },
+      ],
+      quiz: [
+        { question: "如何在 Go 中创建 goroutine？", options: ["thread.Start()", "go 关键字", "async 关键字", "spawn 关键字"], answer: 1, explanation: "在 Go 中，使用 go 关键字加函数调用即可创建 goroutine。" },
+      ],
+    },
+    "rust-ownership": {
+      slug: "rust-ownership",
+      sections: [
+        {
+          title: "所有权系统",
+          content: `Rust 的所有权系统是其内存安全的核心机制，无需垃圾回收即可保证内存安全。
+
+所有权规则：
+- 每个值都有一个所有者（owner）
+- 同一时刻只能有一个所有者
+- 当所有者离开作用域时，值被自动释放
+
+移动（Move）：将值从一个变量赋给另一个变量时，所有权转移，原变量不再可用。
+克隆（Clone）：使用 .clone() 方法可以深拷贝数据，两个变量都拥有独立的数据。`,
+          code: `fn main() {
+    // 所有权转移
+    let s1 = String::from("hello");
+    let s2 = s1;  // s1 的所有权移动到 s2
+    // println!("{}", s1);  // 编译错误！s1 已失效
+    println!("{}", s2);  // 正常
+
+    // 克隆
+    let s3 = String::from("world");
+    let s4 = s3.clone();  // 深拷贝
+    println!("s3 = {}, s4 = {}", s3, s4);  // 两个都有效
+
+    // 函数也会转移所有权
+    let s5 = String::from("rust");
+    let s6 = takes_ownership(s5);
+    // s5 已失效
+    println!("s6 = {}", s6);
+}
+
+fn takes_ownership(s: String) -> String {
+    println!("获得了: {}", s);
+    s  // 返回所有权
+}`,
+          language: "rust",
+        },
+        {
+          title: "借用与引用",
+          content: `借用（Borrowing）允许你使用值但不获取所有权。通过引用（&）来借用。
+
+借用规则：
+- 可以有任意多个不可变引用（&T）
+- 或者只能有一个可变引用（&mut T）
+- 不能同时存在可变引用和不可变引用
+
+这些规则在编译时检查，确保数据竞争不会发生。`,
+          code: `fn main() {
+    let mut s = String::from("hello");
+
+    // 不可变借用
+    let r1 = &s;
+    let r2 = &s;
+    println!("r1 = {}, r2 = {}", r1, r2);
+    // r1 和 r2 在此之后不再使用
+
+    // 可变借用
+    let r3 = &mut s;
+    r3.push_str(", world");
+    println!("r3 = {}", r3);
+}
+
+// 计算字符串长度，借用但不获取所有权
+fn calculate_length(s: &String) -> usize {
+    s.len()
+}
+
+// 修改借用的值
+fn add_world(s: &mut String) {
+    s.push_str(", world");
+}`,
+          language: "rust",
+          tip: "Rust 的所有权系统在编译时检查内存安全，零运行时开销。",
+        },
+      ],
+      quiz: [
+        { question: "Rust 所有权规则是什么？", options: ["可以有多个所有者", "每个值只能有一个所有者", "所有值都是全局的", "手动管理内存"], answer: 1, explanation: "Rust 的核心规则是每个值在同一时刻只能有一个所有者。" },
+      ],
+    },
+  },
+  // ============ AI ============
+  ai: {
+    "ai-intro": {
+      slug: "ai-intro",
+      sections: [
+        {
+          title: "人工智能概述",
+          content: `人工智能（Artificial Intelligence）是计算机科学的一个分支，致力于创建能够模拟人类智能的系统。
+
+AI 的主要分支：
+- 机器学习（Machine Learning）：从数据中学习模式
+- 深度学习（Deep Learning）：使用神经网络的机器学习
+- 自然语言处理（NLP）：理解和生成人类语言
+- 计算机视觉（Computer Vision）：理解和分析图像
+- 强化学习（Reinforcement Learning）：通过试错学习策略`,
+        },
+        {
+          title: "AI 应用领域",
+          content: `AI 已经深入到各个行业和日常生活中：
+
+科技领域：搜索引擎、推荐系统、语音助手（Siri、Alexa）。
+医疗领域：医学影像诊断、药物研发、基因组分析。
+金融领域：风险评估、欺诈检测、量化交易。
+交通领域：自动驾驶、交通优化、路径规划。
+制造业：质量检测、预测性维护、供应链优化。
+教育领域：个性化学习、智能辅导、自动评分。`,
+        },
+      ],
+      quiz: [
+        { question: "机器学习的核心思想是什么？", options: ["手动编写规则", "从数据中学习模式", "使用固定算法", "人工输入所有知识"], answer: 1, explanation: "机器学习的核心是让计算机从数据中自动发现模式和规律，而不是手动编写规则。" },
+      ],
+    },
+    "machine-learning-basics": {
+      slug: "machine-learning-basics",
+      sections: [
+        {
+          title: "监督学习",
+          content: `监督学习是最常见的机器学习类型。训练数据包含输入特征和对应的标签（目标值）。
+
+主要任务：
+- 分类（Classification）：预测离散类别，如垃圾邮件检测、图像分类
+- 回归（Regression）：预测连续数值，如房价预测、气温预测
+
+常用算法：
+- 线性回归（Linear Regression）
+- 逻辑回归（Logistic Regression）
+- 决策树（Decision Tree）
+- 随机森林（Random Forest）
+- 支持向量机（SVM）
+- K 近邻（KNN）`,
+          code: `from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.datasets import load_iris
+
+# 加载数据
+data = load_iris()
+X, y = data.data, data.target
+
+# 划分训练集和测试集
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# 创建模型
+model = RandomForestClassifier(n_estimators=100)
+
+# 训练模型
+model.fit(X_train, y_train)
+
+# 预测
+predictions = model.predict(X_test)
+
+# 评估
+accuracy = accuracy_score(y_test, predictions)
+print(f"准确率: {accuracy:.2%}")`,
+          language: "python",
+        },
+      ],
+      quiz: [
+        { question: "分类和回归的主要区别是什么？", options: ["数据量不同", "分类预测离散值，回归预测连续值", "算法不同", "速度不同"], answer: 1, explanation: "分类任务预测的是离散类别（如是/否），回归任务预测的是连续数值（如价格）。" },
+      ],
+    },
+  },
+  // ============ Mobile ============
+  mobile: {
+    "flutter-basics": {
+      slug: "flutter-basics",
+      sections: [
+        {
+          title: "Flutter Widget 基础",
+          content: `Flutter 是 Google 开发的跨平台 UI 框架，使用 Dart 语言，一套代码可以同时运行在 iOS、Android、Web 和桌面平台。
+
+Flutter 的核心概念是 Widget（组件）。一切都是 Widget，包括布局、间距、动画等。Widget 分为 StatelessWidget（无状态）和 StatefulWidget（有状态）两种。
+
+MaterialApp 是 Material Design 风格应用的根组件，提供主题、路由等基础功能。`,
+          code: `import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const MyHomePage(),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  int _counter = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Flutter 入门'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('你点击了按钮：'),
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            _counter++;
+          });
+        },
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}`,
+          language: "dart",
+        },
+      ],
+      quiz: [
+        { question: "Flutter 中 StatelessWidget 和 StatefulWidget 的区别是什么？", options: ["没有区别", "StatelessWidget 无状态，StatefulWidget 有状态", "StatelessWidget 更快", "StatefulWidget 更好看"], answer: 1, explanation: "StatelessWidget 是不可变的，一旦创建状态不会改变；StatefulWidget 可以在生命周期内改变状态。" },
+      ],
+    },
+    "kotlin-basics": {
+      slug: "kotlin-basics",
+      sections: [
+        {
+          title: "Kotlin 基础语法",
+          content: `Kotlin 是 JetBrains 开发的现代编程语言，是 Android 官方开发语言。它完全兼容 Java，同时提供了更简洁的语法和更安全的特性。
+
+Kotlin 的特点：
+- 空安全：类型系统在编译时检查空值
+- 扩展函数：可以为现有类添加新函数
+- 协程：轻量级异步编程
+- 数据类：自动生成 equals、hashCode、toString
+- 智能类型转换`,
+          code: `// 变量声明
+val immutable = "不可变"  // val 类似 final
+var mutable = "可变"     // var 可重新赋值
+
+// 空安全
+var name: String = "Kotlin"
+// name = null  // 编译错误
+var nullable: String? = "可以为 null"
+println(nullable?.length)  // 安全调用
+
+// 扩展函数
+fun String.removeSpaces(): String {
+    return this.replace(" ", "")
+}
+
+println("Hello World".removeSpaces())  // HelloWorld
+
+// 数据类
+data class User(
+    val name: String,
+    val age: Int,
+    val email: String
+)
+
+val user = User("张三", 25, "zhangsan@example.com")
+println(user)  // User(name=张三, age=25, email=zhangsan@example.com)`,
+          language: "kotlin",
+        },
+      ],
+      quiz: [
+        { question: "Kotlin 中 val 和 var 的区别是什么？", options: ["没有区别", "val 不可变，var 可变", "val 是全局变量", "var 是常量"], answer: 1, explanation: "val 声明的变量不可重新赋值（类似 Java 的 final），var 声明的变量可以重新赋值。" },
+      ],
+    },
+  },
+  // ============ Languages ============
+  languages: {
+    "c-basics": {
+      slug: "c-basics",
+      sections: [
+        {
+          title: "C 语言基础",
+          content: `C 语言是计算机科学的基石，许多现代操作系统和编程语言都建立在 C 语言之上。
+
+C 语言的特点：
+- 接近硬件的底层操作能力
+- 高效的执行性能
+- 丰富的运算符和数据类型
+- 结构化编程
+- 可移植性强`,
+          code: `#include <stdio.h>
+#include <stdlib.h>
+
+// 结构体定义
+struct Student {
+    char name[50];
+    int age;
+    float score;
+};
+
+// 函数定义
+void printStudent(struct Student *s) {
+    printf("姓名: %s, 年龄: %d, 成绩: %.1f\\n",
+           s->name, s->age, s->score);
+}
+
+int main() {
+    // 数组
+    int numbers[] = {1, 2, 3, 4, 5};
+    int sum = 0;
+
+    for (int i = 0; i < 5; i++) {
+        sum += numbers[i];
+    }
+    printf("数组总和: %d\\n", sum);
+
+    // 指针
+    int x = 42;
+    int *ptr = &x;
+    printf("x 的地址: %p, 值: %d\\n", (void*)ptr, *ptr);
+
+    // 结构体
+    struct Student stu = {"张三", 20, 95.5};
+    printStudent(&stu);
+
+    return 0;
+}`,
+          language: "c",
+          tip: "C 语言中指针是最强大也最危险的特性，务必确保指针指向有效的内存地址。",
+        },
+      ],
+      quiz: [
+        { question: "C 语言中 * 运算符的作用是什么？", options: ["乘法", "解引用（获取指针指向的值）", "取地址", "声明指针"], answer: 1, explanation: "* 运算符用于解引用指针，获取指针指向的内存地址中的值。" },
+      ],
+    },
+    "cpp-basics": {
+      slug: "cpp-basics",
+      sections: [
+        {
+          title: "C++ 面向对象",
+          content: `C++ 在 C 的基础上增加了面向对象编程（OOP）特性。类是 C++ 中封装数据和函数的基本单元。
+
+C++ 的三大特性：
+- 封装：将数据和操作数据的函数绑定在一起
+- 继承：子类可以继承父类的属性和方法
+- 多态：同一接口可以有不同的实现
+
+RAII（资源获取即初始化）是 C++ 的核心编程范式，通过对象的生命周期管理资源。`,
+          code: `#include <iostream>
+#include <string>
+#include <vector>
+
+class Animal {
+protected:
+    std::string name;
+    int age;
+
+public:
+    Animal(const std::string& n, int a) : name(n), age(a) {}
+    virtual void speak() const {
+        std::cout << name << " 发出声音" << std::endl;
+    }
+    virtual ~Animal() {}
+};
+
+class Dog : public Animal {
+public:
+    Dog(const std::string& n, int a) : Animal(n, a) {}
+    void speak() const override {
+        std::cout << name << ": 汪汪！" << std::endl;
+    }
+};
+
+int main() {
+    std::vector<std::unique_ptr<Animal>> animals;
+    animals.push_back(std::make_unique<Dog>("旺财", 3));
+    animals.push_back(std::make_unique<Dog>("小黑", 5));
+
+    for (const auto& animal : animals) {
+        animal->speak();
+    }
+
+    return 0;
+}`,
+          language: "cpp",
+        },
+      ],
+      quiz: [
+        { question: "C++ 中 virtual 关键字的作用是什么？", options: ["声明虚函数，支持多态", "声明静态函数", "声明常量", "声明友元"], answer: 0, explanation: "virtual 关键字用于声明虚函数，使子类可以重写父类方法，实现运行时多态。" },
+      ],
+    },
+  },
+  // ============ Fundamentals ============
+  fundamentals: {
+    "data-structures": {
+      slug: "data-structures",
+      sections: [
+        {
+          title: "数组与链表",
+          content: `数组是最基础的数据结构，使用连续内存存储相同类型的元素。支持 O(1) 随机访问，但插入和删除需要移动元素，时间复杂度为 O(n)。
+
+链表使用节点存储数据，每个节点包含数据和指向下一个节点的指针。插入和删除只需修改指针，时间复杂度为 O(1)，但不支持随机访问。
+
+选择建议：
+- 需要频繁随机访问：选择数组
+- 需要频繁插入删除：选择链表
+- 需要两端操作：选择双端队列`,
+          code: `# 数组（Python 列表）
+arr = [1, 2, 3, 4, 5]
+arr.append(6)        # O(1) 均摊
+arr.insert(0, 0)     # O(n)
+arr.pop()            # O(1)
+print(arr[2])        # O(1) 随机访问
+
+# 链表节点定义
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+# 创建链表: 1 -> 2 -> 3
+head = ListNode(1)
+head.next = ListNode(2)
+head.next.next = ListNode(3)
+
+# 遍历链表
+current = head
+while current:
+    print(current.val, end=" -> ")
+    current = current.next
+print("None")`,
+          language: "python",
+        },
+        {
+          title: "栈与队列",
+          content: `栈（Stack）是后进先出（LIFO）的数据结构。只能在栈顶进行插入和删除操作。应用：函数调用栈、表达式求值、括号匹配。
+
+队列（Queue）是先进先出（FIFO）的数据结构。从队尾插入，从队头删除。应用：任务调度、广度优先搜索、消息队列。
+
+双端队列（Deque）两端都可以进行插入和删除操作。`,
+          code: `# 栈的实现
+class Stack:
+    def __init__(self):
+        self.items = []
+
+    def push(self, item):
+        self.items.append(item)
+
+    def pop(self):
+        if not self.is_empty():
+            return self.items.pop()
+
+    def peek(self):
+        if not self.is_empty():
+            return self.items[-1]
+
+    def is_empty(self):
+        return len(self.items) == 0
+
+# 使用栈判断括号匹配
+def is_valid_parentheses(s):
+    stack = Stack()
+    mapping = {')': '(', ']': '[', '}': '{'}
+
+    for char in s:
+        if char in mapping:
+            if stack.is_empty() or stack.pop() != mapping[char]:
+                return False
+        else:
+            stack.push(char)
+
+    return stack.is_empty()
+
+print(is_valid_parentheses("()[]{}"))  # True
+print(is_valid_parentheses("(]"))      # False`,
+          language: "python",
+          tip: "Python 的 list 可以直接当栈使用：append() 入栈，pop() 出栈。",
+        },
+        {
+          title: "哈希表",
+          content: `哈希表（Hash Table）通过哈希函数将键映射到数组索引，实现近乎 O(1) 的查找、插入和删除。
+
+哈希冲突的解决方法：
+- 链地址法：冲突的元素存储在链表中
+- 开放寻址法：冲突时探测下一个空位
+
+哈希表广泛应用于：缓存、字典、数据库索引、去重。`,
+          code: `# Python 字典就是哈希表的实现
+hash_map = {}
+
+# 插入 O(1)
+hash_map["name"] = "张三"
+hash_map["age"] = 25
+hash_map["city"] = "北京"
+
+# 查找 O(1)
+print(hash_map["name"])  # 张三
+
+# 判断键是否存在
+if "age" in hash_map:
+    print("存在年龄字段")
+
+# 遍历
+for key, value in hash_map.items():
+    print(f"{key}: {value}")
+
+# 简单哈希函数实现
+def simple_hash(key, table_size):
+    hash_value = 0
+    for char in str(key):
+        hash_value += ord(char)
+    return hash_value % table_size
+
+print(simple_hash("hello", 10))  # 哈希值`,
+          language: "python",
+        },
+      ],
+      quiz: [
+        { question: "数组和链表的主要区别是什么？", options: ["数组更大", "数组支持 O(1) 随机访问，链表支持 O(1) 插入删除", "没有区别", "链表更安全"], answer: 1, explanation: "数组使用连续内存支持快速随机访问，链表通过指针连接支持快速插入删除。" },
+        { question: "栈是什么数据结构？", options: ["先进先出", "后进先出", "随机访问", "排序"], answer: 1, explanation: "栈是后进先出（LIFO）的数据结构，最后入栈的元素最先出栈。" },
+        { question: "哈希表的平均查找时间复杂度是？", options: ["O(n)", "O(log n)", "O(1)", "O(n²)"], answer: 2, explanation: "哈希表通过哈希函数直接计算索引，平均情况下查找时间复杂度为 O(1)。" },
+      ],
+    },
+    "algorithms": {
+      slug: "algorithms",
+      sections: [
+        {
+          title: "排序算法",
+          content: `排序是将数据按特定顺序排列的过程。常见排序算法的时间复杂度和特点：
+
+冒泡排序：O(n²)，简单但效率低，稳定排序。
+选择排序：O(n²)，不稳定，交换次数少。
+插入排序：O(n²)，对几乎有序的数据效率高。
+快速排序：O(n log n) 平均，不稳定，实际应用最广泛。
+归并排序：O(n log n)，稳定，需要额外空间。
+堆排序：O(n log n)，不稳定，原地排序。`,
+          code: `# 快速排序
+def quick_sort(arr):
+    if len(arr) <= 1:
+        return arr
+
+    pivot = arr[len(arr) // 2]
+    left = [x for x in arr if x < pivot]
+    middle = [x for x in arr if x == pivot]
+    right = [x for x in arr if x > pivot]
+
+    return quick_sort(left) + middle + quick_sort(right)
+
+# 归并排序
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr
+
+    mid = len(arr) // 2
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+
+    return merge(left, right)
+
+def merge(left, right):
+    result = []
+    i = j = 0
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+    result.extend(left[i:])
+    result.extend(right[j:])
+    return result
+
+print(quick_sort([3, 6, 8, 10, 1, 2, 1]))
+# [1, 1, 2, 3, 6, 8, 10]`,
+          language: "python",
+        },
+        {
+          title: "搜索算法",
+          content: `搜索是在数据集合中查找特定元素的过程。
+
+线性搜索：逐个检查元素，时间复杂度 O(n)。适用于无序数据。
+二分搜索：在有序数据中反复折半查找，时间复杂度 O(log n)。效率极高。
+
+二分搜索的前提是数据必须有序。每次比较排除一半的搜索空间。`,
+          code: `# 二分搜索（迭代版）
+def binary_search(arr, target):
+    left, right = 0, len(arr) - 1
+
+    while left <= right:
+        mid = (left + right) // 2
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+
+    return -1
+
+# 二分搜索（递归版）
+def binary_search_recursive(arr, target, left, right):
+    if left > right:
+        return -1
+
+    mid = (left + right) // 2
+    if arr[mid] == target:
+        return mid
+    elif arr[mid] < target:
+        return binary_search_recursive(arr, target, mid + 1, right)
+    else:
+        return binary_search_recursive(arr, target, left, mid - 1)
+
+# 测试
+sorted_arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+print(binary_search(sorted_arr, 7))  # 6
+print(binary_search(sorted_arr, 11)) # -1`,
+          language: "python",
+        },
+      ],
+      quiz: [
+        { question: "快速排序的平均时间复杂度是？", options: ["O(n)", "O(n log n)", "O(n²)", "O(log n)"], answer: 1, explanation: "快速排序的平均时间复杂度是 O(n log n)，是实际应用中最常用的排序算法。" },
+        { question: "二分搜索的前提条件是什么？", options: ["数据无序", "数据必须有序", "数据量小", "数据是整数"], answer: 1, explanation: "二分搜索要求数据必须有序，每次比较可以排除一半的搜索空间。" },
+      ],
+    },
+    "design-patterns": {
+      slug: "design-patterns",
+      sections: [
+        {
+          title: "创建型模式",
+          content: `创建型模式关注对象的创建机制，试图以适合情况的方式创建对象。
+
+单例模式（Singleton）：确保一个类只有一个实例，并提供全局访问点。应用场景：数据库连接池、日志记录器、配置管理器。
+
+工厂模式（Factory）：定义创建对象的接口，让子类决定实例化哪个类。应用场景：根据配置创建不同类型的对象。`,
+          code: `# 单例模式
+class Singleton:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._initialized = False
+        return cls._instance
+
+    def __init__(self):
+        if self._initialized:
+            return
+        self._initialized = True
+        self.connection = "数据库连接已建立"
+
+# 工厂模式
+class Animal:
+    def speak(self):
+        pass
+
+class Dog(Animal):
+    def speak(self):
+        return "汪汪！"
+
+class Cat(Animal):
+    def speak(self):
+        return "喵喵！"
+
+class AnimalFactory:
+    @staticmethod
+    def create_animal(animal_type):
+        if animal_type == "dog":
+            return Dog()
+        elif animal_type == "cat":
+            return Cat()
+        raise ValueError(f"未知动物类型: {animal_type}")
+
+# 使用
+dog = AnimalFactory.create_animal("dog")
+print(dog.speak())  # 汪汪！`,
+          language: "python",
+        },
+        {
+          title: "行为型模式",
+          content: `行为型模式关注对象之间的通信和职责分配。
+
+观察者模式（Observer）：定义对象间的一对多依赖关系，当一个对象状态改变时，所有依赖它的对象都会收到通知。应用场景：事件系统、消息订阅、数据绑定。
+
+策略模式（Strategy）：定义一系列算法，将每个算法封装起来，使它们可以互换。应用场景：排序算法切换、支付方式选择、验证规则。`,
+          code: `# 观察者模式
+class EventEmitter:
+    def __init__(self):
+        self._listeners = {}
+
+    def on(self, event, callback):
+        if event not in self._listeners:
+            self._listeners[event] = []
+        self._listeners[event].append(callback)
+
+    def emit(self, event, *args):
+        if event in self._listeners:
+            for callback in self._listeners[event]:
+                callback(*args)
+
+# 使用
+emitter = EventEmitter()
+emitter.on("data", lambda data: print(f"收到数据: {data}"))
+emitter.on("data", lambda data: print(f"处理数据: {data.upper()}"))
+emitter.emit("data", "hello world")
+
+# 策略模式
+class SortStrategy:
+    def sort(self, data):
+        pass
+
+class BubbleSort(SortStrategy):
+    def sort(self, data):
+        arr = data.copy()
+        n = len(arr)
+        for i in range(n):
+            for j in range(0, n-i-1):
+                if arr[j] > arr[j+1]:
+                    arr[j], arr[j+1] = arr[j+1], arr[j]
+        return arr
+
+class QuickSort(SortStrategy):
+    def sort(self, data):
+        if len(data) <= 1:
+            return data
+        pivot = data[len(data) // 2]
+        left = [x for x in data if x < pivot]
+        middle = [x for x in data if x == pivot]
+        right = [x for x in data if x > pivot]
+        return self.sort(left) + middle + self.sort(right)
+
+class Sorter:
+    def __init__(self, strategy: SortStrategy):
+        self._strategy = strategy
+
+    def sort(self, data):
+        return self._strategy.sort(data)
+
+sorter = Sorter(BubbleSort())
+print(sorter.sort([3, 1, 4, 1, 5, 9, 2, 6]))`,
+          language: "python",
+        },
+      ],
+      quiz: [
+        { question: "单例模式的目的是什么？", options: ["创建多个实例", "确保一个类只有一个实例", "加速创建过程", "减少内存使用"], answer: 1, explanation: "单例模式确保一个类在整个应用程序中只有一个实例，并提供全局访问点。" },
+        { question: "观察者模式适用于什么场景？", options: ["排序算法", "事件通知系统", "数据库连接", "文件操作"], answer: 1, explanation: "观察者模式适用于一个对象状态改变需要通知多个其他对象的场景，如事件系统。" },
+      ],
+    },
+  },
 };
 
 export function getTutorialContent(categoryId: string, slug: string): TutorialContent | undefined {
