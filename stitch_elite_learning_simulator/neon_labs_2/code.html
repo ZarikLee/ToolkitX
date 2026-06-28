@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NEON_LABS // 技术归档</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-lowest": "#0e0e13",
+                    "on-primary-container": "#006970",
+                    "on-secondary-fixed-variant": "#74009f",
+                    "outline": "#849495",
+                    "tertiary-container": "#a2ef00",
+                    "on-error": "#690005",
+                    "on-surface-variant": "#b9cacb",
+                    "primary": "#dbfcff",
+                    "surface-container": "#1f1f25",
+                    "outline-variant": "#3b494b",
+                    "surface": "#131318",
+                    "secondary-fixed": "#f8d8ff",
+                    "on-secondary": "#520071",
+                    "tertiary-fixed": "#a9f900",
+                    "tertiary": "#e5ffba",
+                    "on-surface": "#e4e1e9",
+                    "danger-neon": "#FF0055",
+                    "on-tertiary-fixed": "#121f00",
+                    "primary-fixed": "#7df4ff",
+                    "secondary-container": "#cf5cff",
+                    "inverse-primary": "#006970",
+                    "text-muted": "#888891",
+                    "surface-container-low": "#1b1b20",
+                    "tertiary-fixed-dim": "#94db00",
+                    "on-primary": "#00363a",
+                    "on-secondary-container": "#480063",
+                    "secondary-fixed-dim": "#ecb2ff",
+                    "secondary": "#ecb2ff",
+                    "surface-variant": "#35343a",
+                    "on-background": "#e4e1e9",
+                    "on-tertiary-container": "#456900",
+                    "error-container": "#93000a",
+                    "on-primary-fixed-variant": "#004f54",
+                    "on-error-container": "#ffdad6",
+                    "surface-glass": "rgba(18, 18, 26, 0.75)",
+                    "surface-bright": "#39383e",
+                    "surface-container-highest": "#35343a",
+                    "error": "#ffb4ab",
+                    "surface-container-high": "#2a292f",
+                    "on-secondary-fixed": "#320047",
+                    "primary-fixed-dim": "#00dbe9",
+                    "on-primary-fixed": "#002022",
+                    "inverse-on-surface": "#303036",
+                    "on-tertiary": "#223600",
+                    "on-tertiary-fixed-variant": "#334f00",
+                    "border-glow": "rgba(0, 240, 255, 0.3)",
+                    "surface-dim": "#131318",
+                    "terminal-black": "#050508",
+                    "inverse-surface": "#e4e1e9",
+                    "surface-tint": "#00dbe9",
+                    "primary-container": "#00f0ff",
+                    "background": "#131318"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "stack-lg": "32px",
+                    "stack-md": "16px",
+                    "gutter": "24px",
+                    "stack-sm": "8px",
+                    "container-max": "1440px",
+                    "margin-mobile": "16px",
+                    "section-gap": "80px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-xl": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "label-mono": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "headline-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "label-mono": ["14px", {"lineHeight": "1.4", "letterSpacing": "0.05em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #050508;
+            color: #e4e1e9;
+            overflow-x: hidden;
+        }
+
+        .neon-grid {
+            background-image: 
+                linear-gradient(to right, rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .glass-card {
+            backdrop-filter: blur(20px);
+            background: rgba(18, 18, 26, 0.75);
+            border: 1px solid rgba(132, 148, 149, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(0, 240, 255, 0.4);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .scanline::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: rgba(0, 240, 255, 0.2);
+            opacity: 0;
+            z-index: 10;
+        }
+
+        .scanline:hover::before {
+            animation: scan 2s linear infinite;
+            opacity: 1;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+
+        .active-indicator {
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #050508; }
+        ::-webkit-scrollbar-thumb { background: #3b494b; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00f0ff; }
+    </style>
+</head>
+<body class="font-body-md text-body-md antialiased">
+<!-- Atmospheric Backgrounds -->
+<div class="fixed inset-0 neon-grid pointer-events-none z-0"></div>
+<!-- SideNavBar (Shared Component Anchor) -->
+<aside class="h-screen w-64 fixed left-0 top-0 hidden lg:flex flex-col bg-terminal-black border-r border-outline-variant z-50">
+<div class="p-gutter">
+<h1 class="font-headline-md text-headline-md text-primary tracking-tighter">NEON_LABS</h1>
+<p class="font-label-mono text-label-mono text-text-muted mt-1 uppercase tracking-widest text-[10px]">Library_Access_v2.4</p>
+</div>
+<div class="flex-1 overflow-y-auto py-stack-md">
+<!-- Active Tab: Library (Implicitly selected as it's the core view) -->
+<nav class="space-y-1">
+<div class="px-gutter mb-2">
+<span class="font-label-mono text-label-mono text-text-muted text-[11px] uppercase opacity-50">目录检索</span>
+</div>
+<a class="flex items-center gap-3 text-on-surface-variant py-3 px-gutter hover:bg-surface-variant/50 transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary">terminal</span>
+<span class="font-label-mono">Python</span>
+</a>
+<a class="flex items-center gap-3 bg-primary-container/10 text-primary border-l-4 border-primary-container py-3 px-gutter" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">psychology</span>
+<span class="font-label-mono">AI/智能开发</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant py-3 px-gutter hover:bg-surface-variant/50 transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary">code</span>
+<span class="font-label-mono">前端</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant py-3 px-gutter hover:bg-surface-variant/50 transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary">database</span>
+<span class="font-label-mono">后端</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant py-3 px-gutter hover:bg-surface-variant/50 transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary">shield</span>
+<span class="font-label-mono">网络安全</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant py-3 px-gutter hover:bg-surface-variant/50 transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary">smartphone</span>
+<span class="font-label-mono">移动端</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant py-3 px-gutter hover:bg-surface-variant/50 transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary">memory</span>
+<span class="font-label-mono">运维开发</span>
+</a>
+</nav>
+</div>
+<div class="p-gutter border-t border-outline-variant bg-surface-container-lowest/50">
+<div class="flex items-center gap-3 mb-stack-md">
+<div class="w-10 h-10 rounded-full border border-primary-container/30 overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A futuristic digital portrait of a high-tech software architect with glowing neon visor, set against a backdrop of flowing data streams and terminal screens. Cyberpunk aesthetics with a palette of deep blacks, electric blues, and vibrant teals, emphasizing a focused and professional yet edgy vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtalAvhtmQfLc_zE1DGTv4GMUGHjDEdIQWyoNpRAQ2K2T2BZWuuHqovCFEHFPRjvHsH8nvIrJYRPH9gctYuaIrgkrUaO_5HXt9wqhQ6hY3-EN-NXc9sXGkBhRaCDFY6qKJ629M7YA5lpnlyewYrW82zMDURVgXtpqWBL1POMn9YJW4nE6jObxpNzDH4zzmzx3adsHZlMhs_uIMF0s3Q5gsd5CB7YZNqvDqGAjnwvEAUHmwsfvJX_avqwavVMU_hyk7w8_x8O32h-g"/>
+</div>
+<div>
+<p class="font-label-mono text-[12px] text-on-surface leading-tight">ROOT_USER</p>
+<p class="font-label-mono text-[10px] text-primary/70">Lvl 42 架构师</p>
+</div>
+</div>
+<button class="w-full py-2 bg-primary text-on-primary font-label-mono text-[12px] font-bold hover:shadow-[0_0_15px_rgba(0,240,255,0.4)] transition-all active:scale-95 scanline relative overflow-hidden">
+                升级方案
+            </button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="lg:ml-64 relative min-h-screen flex flex-col">
+<!-- TopNavBar (Shared Component Anchor) -->
+<header class="sticky top-0 z-40 w-full bg-surface-glass backdrop-blur-xl border-b border-outline-variant shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
+<div class="flex justify-between items-center w-full px-gutter h-16 max-w-container-max mx-auto">
+<div class="flex items-center gap-stack-lg">
+<span class="lg:hidden font-headline-md text-headline-md font-black tracking-tighter text-primary-container">NEON_LABS</span>
+<nav class="hidden md:flex items-center gap-stack-md">
+<a class="text-primary font-bold border-b-2 border-primary-container pb-1 font-label-mono text-label-mono" href="#">归档库</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200 font-label-mono text-label-mono" href="#">模拟器</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200 font-label-mono text-label-mono" href="#">EXP 面板</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200 font-label-mono text-label-mono" href="#">社区</a>
+</nav>
+</div>
+<div class="flex items-center gap-stack-md">
+<div class="relative group hidden sm:block">
+<input class="bg-surface-container-high border-outline-variant text-on-surface font-label-mono text-label-mono rounded-lg pl-10 pr-4 py-1.5 w-64 focus:ring-1 focus:ring-primary-container focus:border-primary-container transition-all" placeholder="搜索系统文档..." type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined">notifications</span></button>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined">account_circle</span></button>
+</div>
+<button class="hidden lg:block bg-primary-container text-on-primary-container px-4 py-1.5 font-label-mono text-label-mono font-bold rounded hover:shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all">进入实验室</button>
+</div>
+</div>
+</header>
+<!-- Library Dashboard Content -->
+<div class="p-gutter max-w-container-max mx-auto w-full flex-1">
+<!-- Page Header -->
+<section class="mb-section-gap pt-stack-lg">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-stack-md border-l-4 border-primary-container pl-6 py-2 bg-gradient-to-right from-primary-container/10 to-transparent">
+<div>
+<h2 class="font-headline-xl text-headline-xl text-on-surface tracking-tighter">技术归档</h2>
+<p class="font-body-lg text-body-lg text-text-muted max-w-2xl mt-2">深入探索我们的模块化神经路径。从核心逻辑到云端编排，掌握每一个技术栈。</p>
+</div>
+<div class="flex items-center gap-stack-md font-label-mono text-label-mono text-primary">
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-primary active-indicator"></span> 2.4k 模块</span>
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-tertiary shadow-[0_0_8px_#a2ef00]"></span> 实时会话</span>
+</div>
+</div>
+</section>
+<!-- Library Grid: Bento Style -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-gutter mb-section-gap">
+<!-- Category: AI & ML (Featured Large Card) -->
+<div class="glass-card p-stack-lg rounded-xl flex flex-col justify-between md:col-span-2 md:row-span-2 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[120px]" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</div>
+<div>
+<div class="flex items-center gap-2 mb-stack-md">
+<span class="px-2 py-1 bg-tertiary text-on-tertiary font-label-mono text-[10px] font-bold rounded">级别：高级</span>
+<span class="font-label-mono text-primary text-[10px]">AI_SYSTEMS</span>
+</div>
+<h3 class="font-headline-lg text-headline-lg mb-stack-md group-hover:text-primary transition-colors">神经架构与 LLM 编排</h3>
+<p class="text-on-surface-variant max-w-md">掌握私有 LLM 的部署、向量数据库集成，以及使用 LangChain 和 AutoGPT 的智能体工作流。</p>
+</div>
+<div class="mt-stack-lg">
+<div class="flex flex-wrap gap-2 mb-stack-md">
+<span class="px-3 py-1 border border-outline-variant rounded-full text-[12px] font-label-mono text-text-muted">PyTorch</span>
+<span class="px-3 py-1 border border-outline-variant rounded-full text-[12px] font-label-mono text-text-muted">Vector DB</span>
+<span class="px-3 py-1 border border-outline-variant rounded-full text-[12px] font-label-mono text-text-muted">RAG</span>
+</div>
+<button class="px-6 py-2 bg-white/5 border border-primary text-primary font-label-mono text-[14px] hover:bg-primary hover:text-on-primary transition-all">启动序列</button>
+</div>
+</div>
+<!-- Python 3 Card -->
+<div class="glass-card p-stack-md rounded-xl group relative">
+<div class="flex items-start justify-between mb-stack-md">
+<div class="w-12 h-12 flex items-center justify-center bg-surface-container rounded-lg border border-outline-variant group-hover:border-primary-container transition-colors">
+<span class="material-symbols-outlined text-primary">terminal</span>
+</div>
+<span class="font-label-mono text-[10px] text-text-muted">12 课时</span>
+</div>
+<h4 class="font-headline-md text-headline-md mb-2">Python 3 核心</h4>
+<p class="text-on-surface-variant text-[14px] mb-stack-md">实验室的基石。异步逻辑、装饰器和高性能多线程。</p>
+<div class="h-1 bg-surface-container overflow-hidden rounded-full mt-auto">
+<div class="h-full bg-primary-container w-2/3 shadow-[0_0_8px_#00f0ff]"></div>
+</div>
+</div>
+<!-- FastAPI Card -->
+<div class="glass-card p-stack-md rounded-xl group">
+<div class="flex items-start justify-between mb-stack-md">
+<div class="w-12 h-12 flex items-center justify-center bg-surface-container rounded-lg border border-outline-variant group-hover:border-primary-container transition-colors">
+<span class="material-symbols-outlined text-primary">bolt</span>
+</div>
+<span class="font-label-mono text-[10px] text-text-muted">8 课时</span>
+</div>
+<h4 class="font-headline-md text-headline-md mb-2">FastAPI</h4>
+<p class="text-on-surface-variant text-[14px] mb-stack-md">适用于现代微服务时代的高性能异步 Web 框架。</p>
+<div class="h-1 bg-surface-container overflow-hidden rounded-full mt-auto">
+<div class="h-full bg-primary-container w-1/4"></div>
+</div>
+</div>
+<!-- Vue3 Card -->
+<div class="glass-card p-stack-md rounded-xl group">
+<div class="flex items-start justify-between mb-stack-md">
+<div class="w-12 h-12 flex items-center justify-center bg-surface-container rounded-lg border border-outline-variant group-hover:border-primary-container transition-colors">
+<span class="material-symbols-outlined text-primary">layers</span>
+</div>
+<span class="font-label-mono text-[10px] text-text-muted">15 课时</span>
+</div>
+<h4 class="font-headline-md text-headline-md mb-2">Vue3 + Vite 开发</h4>
+<p class="text-on-surface-variant text-[14px] mb-stack-md">利用 Composition API 和原子化状态管理进行响应式 UI 工程开发。</p>
+<div class="h-1 bg-surface-container overflow-hidden rounded-full mt-auto">
+<div class="h-full bg-primary-container w-0"></div>
+</div>
+</div>
+<!-- Postgres Card -->
+<div class="glass-card p-stack-md rounded-xl group">
+<div class="flex items-start justify-between mb-stack-md">
+<div class="w-12 h-12 flex items-center justify-center bg-surface-container rounded-lg border border-outline-variant group-hover:border-primary-container transition-colors">
+<span class="material-symbols-outlined text-primary">storage</span>
+</div>
+<span class="font-label-mono text-[10px] text-text-muted">20 课时</span>
+</div>
+<h4 class="font-headline-md text-headline-md mb-2">PostgreSQL 数据库</h4>
+<p class="text-on-surface-variant text-[14px] mb-stack-md">大规模下的关系完整性。优化、索引和复杂查询掌握。</p>
+<div class="h-1 bg-surface-container overflow-hidden rounded-full mt-auto">
+<div class="h-full bg-primary-container w-full shadow-[0_0_8px_#00f0ff]"></div>
+</div>
+</div>
+<!-- Flutter Card -->
+<div class="glass-card p-stack-md rounded-xl group">
+<div class="flex items-start justify-between mb-stack-md">
+<div class="w-12 h-12 flex items-center justify-center bg-surface-container rounded-lg border border-outline-variant group-hover:border-primary-container transition-colors">
+<span class="material-symbols-outlined text-primary">smartphone</span>
+</div>
+<span class="font-label-mono text-[10px] text-text-muted">18 课时</span>
+</div>
+<h4 class="font-headline-md text-headline-md mb-2">Flutter 移动开发</h4>
+<p class="text-on-surface-variant text-[14px] mb-stack-md">跨平台精通。通过单一响应式代码库实现原生性能。</p>
+<div class="h-1 bg-surface-container overflow-hidden rounded-full mt-auto">
+<div class="h-full bg-primary-container w-1/2"></div>
+</div>
+</div>
+<!-- Kubernetes Card -->
+<div class="glass-card p-stack-md rounded-xl group">
+<div class="flex items-start justify-between mb-stack-md">
+<div class="w-12 h-12 flex items-center justify-center bg-surface-container rounded-lg border border-outline-variant group-hover:border-primary-container transition-colors">
+<span class="material-symbols-outlined text-primary">cloud</span>
+</div>
+<span class="font-label-mono text-[10px] text-text-muted">24 课时</span>
+</div>
+<h4 class="font-headline-md text-headline-md mb-2">K8s 容器编排</h4>
+<p class="text-on-surface-variant text-[14px] mb-stack-md">容器部署、服务网格以及零停机扩缩容。</p>
+<div class="h-1 bg-surface-container overflow-hidden rounded-full mt-auto">
+<div class="h-full bg-primary-container w-1/5"></div>
+</div>
+</div>
+</section>
+<!-- Secondary Documentation Section (List View) -->
+<section class="mb-section-gap">
+<div class="flex items-center justify-between mb-stack-lg">
+<h3 class="font-headline-md text-headline-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">list</span>
+                        系统协议 (附加模块)
+                    </h3>
+<button class="text-primary font-label-mono text-[12px] flex items-center gap-1 hover:underline">
+                        查看全部 <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+<div class="space-y-2">
+<!-- Documentation List Items (IDE style) -->
+<div class="flex items-center justify-between p-4 bg-surface-container/30 border border-outline-variant/50 hover:bg-surface-container/60 hover:border-primary/30 transition-all cursor-pointer group">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-text-muted group-hover:text-primary transition-colors">description</span>
+<div>
+<p class="font-label-mono text-on-surface">GO_CONCURRENCY_MODELS.md</p>
+<p class="text-[12px] text-text-muted">掌握通道、协程与互斥锁同步。</p>
+</div>
+</div>
+<div class="hidden md:flex items-center gap-stack-md">
+<span class="font-label-mono text-[10px] text-tertiary-fixed border border-tertiary-fixed/30 px-2 py-0.5 rounded">后端</span>
+<span class="material-symbols-outlined text-text-muted">chevron_right</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container/30 border border-outline-variant/50 hover:bg-surface-container/60 hover:border-primary/30 transition-all cursor-pointer group">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-text-muted group-hover:text-primary transition-colors">description</span>
+<div>
+<p class="font-label-mono text-on-surface">REACT_SERVER_COMPONENTS.guide</p>
+<p class="text-[12px] text-text-muted">利用 Next.js 14 范式实现极致性能。</p>
+</div>
+</div>
+<div class="hidden md:flex items-center gap-stack-md">
+<span class="font-label-mono text-[10px] text-primary/70 border border-primary/30 px-2 py-0.5 rounded">前端</span>
+<span class="material-symbols-outlined text-text-muted">chevron_right</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container/30 border border-outline-variant/50 hover:bg-surface-container/60 hover:border-primary/30 transition-all cursor-pointer group">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-text-muted group-hover:text-primary transition-colors">description</span>
+<div>
+<p class="font-label-mono text-on-surface">RUST_MEMORY_SAFETY.bin</p>
+<p class="text-[12px] text-text-muted">理解所有权检查器 (Borrow Checker) 与零成本抽象。</p>
+</div>
+</div>
+<div class="hidden md:flex items-center gap-stack-md">
+<span class="font-label-mono text-[10px] text-danger-neon/70 border border-danger-neon/30 px-2 py-0.5 rounded">系统</span>
+<span class="material-symbols-outlined text-text-muted">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer (Shared Component Anchor) -->
+<footer class="w-full py-stack-lg border-t border-outline-variant bg-terminal-black mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center px-gutter max-w-container-max mx-auto gap-stack-md">
+<div class="flex flex-col md:flex-row items-center gap-stack-md">
+<span class="font-label-mono text-primary font-bold">NEON_LABS</span>
+<span class="font-label-mono text-label-mono text-text-muted">© 2024 NEON_LABS // 未发现停机序列</span>
+</div>
+<div class="flex flex-wrap justify-center gap-stack-md">
+<a class="font-label-mono text-label-mono text-text-muted hover:text-tertiary transition-colors" href="#">系统状态</a>
+<a class="font-label-mono text-label-mono text-text-muted hover:text-tertiary transition-colors" href="#">API 文档</a>
+<a class="font-label-mono text-label-mono text-text-muted hover:text-tertiary transition-colors" href="#">隐私协议</a>
+<a class="font-label-mono text-label-mono text-text-muted hover:text-tertiary transition-colors" href="#">终端帮助</a>
+</div>
+</div>
+</footer>
+</main>
+<!-- FAB (Suppressed based on context: Details/Library pages usually suppress primary action FAB) -->
+<script>
+        // Micro-interactions
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        // Simulating loading state for the library
+        window.addEventListener('load', () => {
+            console.log("NEON_LABS System Initialized...");
+        });
+    </script>
+</body></html>

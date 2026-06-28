@@ -3,12 +3,8 @@
 import { use, useState } from "react";
 import Link from "next/link";
 import {
-  ChevronRight,
   ChevronLeft,
-  Clock,
-  Copy,
-  Check,
-  Play,
+  ChevronRight,
   Lightbulb,
   AlertTriangle,
   CheckCircle,
@@ -18,12 +14,11 @@ import LearnLayout, { TutorialSidebar, RightSidebar } from "@/components/learn/l
 import { getCategoryById } from "@/data/tutorials";
 import { getTutorialContent } from "@/data/tutorials/content";
 
-const difficultyColors = {
-  beginner: "bg-green-100 text-green-700",
-  intermediate: "bg-yellow-100 text-yellow-700",
-  advanced: "bg-red-100 text-red-700",
+const difficultyConfig = {
+  beginner: { label: "入门", color: "var(--neon-tertiary)", bg: "rgba(162,239,0,0.1)" },
+  intermediate: { label: "进阶", color: "var(--neon-primary)", bg: "rgba(0,240,255,0.1)" },
+  advanced: { label: "高级", color: "var(--neon-danger)", bg: "rgba(255,0,85,0.1)" },
 };
-const difficultyLabels = { beginner: "入门", intermediate: "进阶", advanced: "高级" };
 
 export default function TutorialPage({
   params,
@@ -44,81 +39,106 @@ export default function TutorialPage({
 
   return (
     <LearnLayout>
-      <div className="flex">
+      <div className="learn-neon flex">
         {/* Left Sidebar */}
         <TutorialSidebar category={category} currentSlug={slug} />
 
         {/* Main Content */}
-        <main className="flex-1 min-w-0 overflow-y-auto">
-          <div className="max-w-[780px] mx-auto px-6 py-8">
-            {/* Breadcrumb */}
-            <div className="flex items-center gap-2 mb-4 text-[12px]">
-              <Link href="/learn" className="text-blue-600 hover:text-blue-800">知识库</Link>
-              <ChevronRight className="h-3 w-3 text-gray-400" />
-              <Link href={`/learn/${categoryId}`} className="text-blue-600 hover:text-blue-800">{category.name}</Link>
-              <ChevronRight className="h-3 w-3 text-gray-400" />
-              <span className="text-gray-700">{tutorial.title}</span>
-            </div>
+        <main className="flex-1 min-w-0 overflow-y-auto px-6 py-8 max-w-4xl mx-auto">
+          {/* Breadcrumbs */}
+          <div className="flex items-center gap-2 mb-8 font-['JetBrains_Mono'] text-[14px]" style={{ color: "var(--text-muted)" }}>
+            <Link href="/learn" className="hover:text-[var(--neon-primary)] transition-colors">文库</Link>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
+            <Link href={`/learn/${categoryId}`} className="hover:text-[var(--neon-primary)] transition-colors">{category.name}</Link>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
+            <span className="text-[var(--neon-primary)]">{tutorial.title}</span>
+          </div>
 
-            {/* Title */}
-            <h1 className="text-[24px] font-bold text-gray-800 mb-2">{tutorial.title}</h1>
-            <p className="text-gray-500 text-[13px] mb-4">{tutorial.description}</p>
-
-            <div className="flex items-center gap-3 mb-6 pb-6 border-b border-gray-200">
-              <span className={`px-2 py-0.5 text-[10px] rounded ${difficultyColors[tutorial.difficulty]}`}>
-                {difficultyLabels[tutorial.difficulty]}
+          {/* Header */}
+          <section className="mb-16">
+            <h1 className="text-[32px] font-bold mb-4" style={{ color: "var(--neon-primary)" }}>{tutorial.title}</h1>
+            <p className="text-[18px] max-w-2xl mb-8" style={{ color: "var(--on-surface-variant)" }}>
+              {tutorial.description}
+            </p>
+            <div className="flex gap-4">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded border border-[var(--outline-variant)]" style={{ background: "var(--surface-container-high)" }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--neon-primary)" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                <span className="font-['JetBrains_Mono'] text-[12px]" style={{ color: "var(--text-muted)" }}>{tutorial.readTime}</span>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded border border-[var(--outline-variant)]" style={{ background: "var(--surface-container-high)" }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--neon-tertiary)" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span className="font-['JetBrains_Mono'] text-[12px]" style={{ color: "var(--text-muted)" }}>EXP: +450</span>
+              </div>
+              <span className="tag-neon" style={{ color: difficultyConfig[tutorial.difficulty].color, borderColor: `${difficultyConfig[tutorial.difficulty].color}40`, background: difficultyConfig[tutorial.difficulty].bg }}>
+                {difficultyConfig[tutorial.difficulty].label}
               </span>
-              <div className="flex items-center gap-1 text-gray-400">
-                <Clock className="h-3 w-3" />
-                <span className="text-[11px]">{tutorial.readTime}</span>
-              </div>
             </div>
+            <div className="progress-beam w-full mt-6" />
+          </section>
 
-            {/* Content */}
-            {content ? (
-              <div className="space-y-8">
-                {content.sections.map((section, i) => (
-                  <Section key={i} section={section} index={i} />
-                ))}
+          {/* Content */}
+          {content ? (
+            <article className="space-y-12">
+              {content.sections.map((section, i) => (
+                <Section key={i} section={section} index={i} />
+              ))}
 
-                {/* Quiz */}
-                {content.quiz && content.quiz.length > 0 && (
-                  <QuizSection quiz={content.quiz} />
-                )}
-              </div>
-            ) : (
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-10 text-center">
-                <p className="text-gray-400 text-[13px]">本教程内容正在编写中...</p>
-              </div>
-            )}
+              {/* Quiz */}
+              {content.quiz && content.quiz.length > 0 && (
+                <QuizSection quiz={content.quiz} />
+              )}
 
-            {/* Navigation */}
-            <div className="flex items-center justify-between mt-10 pt-6 border-t border-gray-200">
-              {prevTutorial ? (
-                <Link
-                  href={`/learn/${categoryId}/${prevTutorial.slug}`}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all text-[12px]"
-                >
-                  <ChevronLeft className="h-4 w-4 text-gray-400" />
-                  <div className="text-left">
-                    <div className="text-[10px] text-gray-400">上一篇</div>
-                    <div className="text-gray-700 font-medium">{prevTutorial.title}</div>
+              {/* Next Lesson CTA */}
+              {nextTutorial && (
+                <div className="pt-8 border-t border-[var(--outline-variant)]">
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-['JetBrains_Mono'] tracking-[0.15em] uppercase" style={{ color: "var(--text-muted)" }}>下一节</span>
+                      <span className="font-['JetBrains_Mono'] text-[var(--neon-primary)]">{nextTutorial.title}</span>
+                    </div>
+                    <Link
+                      href={`/learn/${categoryId}/${nextTutorial.slug}`}
+                      className="flex items-center gap-3 px-8 py-4 border-2 border-[var(--neon-primary)] text-[var(--neon-primary)] font-semibold hover:bg-[var(--neon-primary)] hover:text-[var(--terminal-black)] transition-all group"
+                    >
+                      下一节: {nextTutorial.title}
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="group-hover:translate-x-1 transition-transform"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                    </Link>
                   </div>
-                </Link>
-              ) : <div />}
-              {nextTutorial ? (
-                <Link
-                  href={`/learn/${categoryId}/${nextTutorial.slug}`}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all text-[12px]"
-                >
-                  <div className="text-right">
-                    <div className="text-[10px] text-gray-400">下一篇</div>
-                    <div className="text-gray-700 font-medium">{nextTutorial.title}</div>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-gray-400" />
-                </Link>
-              ) : <div />}
+                </div>
+              )}
+            </article>
+          ) : (
+            <div className="glass-card p-16 text-center">
+              <p className="font-['JetBrains_Mono'] text-[14px]" style={{ color: "var(--text-muted)" }}>本教程内容正在编写中...</p>
             </div>
+          )}
+
+          {/* Navigation */}
+          <div className="flex items-center justify-between mt-12 pt-8 border-t border-[var(--outline-variant)]">
+            {prevTutorial ? (
+              <Link
+                href={`/learn/${categoryId}/${prevTutorial.slug}`}
+                className="flex items-center gap-3 px-5 py-3 glass-card group"
+              >
+                <ChevronLeft className="h-5 w-5 text-[var(--outline)] group-hover:text-[var(--neon-primary)] transition-colors" />
+                <div className="text-left">
+                  <div className="text-[10px] font-['JetBrains_Mono'] tracking-widest uppercase" style={{ color: "var(--text-muted)" }}>上一篇</div>
+                  <div className="text-[14px] font-medium group-hover:text-[var(--neon-primary)] transition-colors" style={{ color: "var(--neon-primary)" }}>{prevTutorial.title}</div>
+                </div>
+              </Link>
+            ) : <div />}
+            {nextTutorial ? (
+              <Link
+                href={`/learn/${categoryId}/${nextTutorial.slug}`}
+                className="flex items-center gap-3 px-5 py-3 glass-card group"
+              >
+                <div className="text-right">
+                  <div className="text-[10px] font-['JetBrains_Mono'] tracking-widest uppercase" style={{ color: "var(--text-muted)" }}>下一篇</div>
+                  <div className="text-[14px] font-medium group-hover:text-[var(--neon-primary)] transition-colors" style={{ color: "var(--neon-primary)" }}>{nextTutorial.title}</div>
+                </div>
+                <ChevronRight className="h-5 w-5 text-[var(--outline)] group-hover:text-[var(--neon-primary)] transition-colors" />
+              </Link>
+            ) : <div />}
           </div>
         </main>
 
@@ -148,48 +168,72 @@ function Section({
 
   return (
     <div>
-      <h2 className="text-[18px] font-bold text-gray-800 mb-3 flex items-center gap-2">
-        <span className="w-6 h-6 rounded bg-blue-100 flex items-center justify-center text-[11px] text-blue-600 font-bold">
-          {index + 1}
-        </span>
-        {section.title}
+      {/* Section Heading */}
+      <h2 className="text-[24px] font-semibold mb-4 section-heading" style={{ color: "var(--neon-primary)" }}>
+        {String(index + 1).padStart(2, "0")}. {section.title}
       </h2>
 
-      <div className="text-[14px] leading-[1.8] text-gray-600 whitespace-pre-wrap mb-4">
+      {/* Content Text */}
+      <div className="text-[16px] leading-[1.8] whitespace-pre-wrap mb-6" style={{ color: "var(--on-surface-variant)" }}>
         {section.content}
       </div>
 
+      {/* Code Block - Terminal Style */}
       {section.code && (
-        <div className="mb-4">
-          <div className="flex items-center justify-between px-4 py-2 bg-gray-800 rounded-t-lg">
-            <span className="text-[10px] text-gray-400 uppercase tracking-wider">{section.language || "code"}</span>
-            <button
-              onClick={copyCode}
-              className="flex items-center gap-1 text-[10px] text-gray-400 hover:text-white transition-colors"
-            >
-              {copied ? <Check className="h-3 w-3 text-green-400" /> : <Copy className="h-3 w-3" />}
-              {copied ? "已复制" : "复制"}
-            </button>
+        <div className="relative group mb-6">
+          <div className="absolute -inset-0.5 rounded-xl blur opacity-30 group-hover:opacity-100 transition duration-1000" style={{ background: "linear-gradient(90deg, rgba(0,240,255,0.2), transparent)" }} />
+          <div className="relative rounded-xl border border-[var(--outline-variant)] overflow-hidden code-glow code-block" style={{ background: "var(--surface-container-lowest)" }}>
+            {/* Terminal Header Bar */}
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-[var(--outline-variant)]" style={{ background: "var(--surface-container-highest)" }}>
+              <div className="flex gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full" style={{ background: "rgba(255,0,85,0.5)" }} />
+                <div className="w-2.5 h-2.5 rounded-full" style={{ background: "rgba(162,239,0,0.5)" }} />
+                <div className="w-2.5 h-2.5 rounded-full" style={{ background: "rgba(0,240,255,0.5)" }} />
+              </div>
+              <span className="font-['JetBrains_Mono'] text-[12px] uppercase tracking-[0.15em]" style={{ color: "var(--text-muted)" }}>
+                {section.language || "code"}
+              </span>
+              <button
+                onClick={copyCode}
+                className="font-['JetBrains_Mono'] text-[12px] flex items-center gap-1 transition-colors"
+                style={{ color: copied ? "var(--neon-tertiary)" : "var(--text-muted)" }}
+              >
+                {copied ? (
+                  <>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 6L9 17l-5-5"/></svg>
+                    已复制
+                  </>
+                ) : (
+                  <>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    复制
+                  </>
+                )}
+              </button>
+            </div>
+            {/* Code Content */}
+            <pre className="p-6 font-['JetBrains_Mono'] text-[14px] leading-relaxed overflow-x-auto" style={{ color: "var(--on-surface)" }}>
+              <code className="whitespace-pre">{section.code}</code>
+            </pre>
+            {/* Scanline overlay on hover */}
+            <div className="code-block-scanline" />
           </div>
-          <pre className="p-4 bg-gray-900 rounded-b-lg overflow-x-auto">
-            <code className="text-[13px] font-mono text-gray-200 leading-relaxed whitespace-pre">
-              {section.code}
-            </code>
-          </pre>
         </div>
       )}
 
+      {/* Tip Box */}
       {section.tip && (
-        <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 text-[13px] text-blue-700 flex gap-2 mb-4">
-          <Lightbulb className="h-4 w-4 shrink-0 mt-0.5 text-blue-500" />
-          <span>{section.tip}</span>
+        <div className="flex gap-3 mb-6 tip-box">
+          <Lightbulb className="h-5 w-5 shrink-0 mt-0.5" style={{ color: "var(--neon-tertiary)" }} />
+          <span className="text-[14px]" style={{ color: "var(--neon-tertiary)" }}>{section.tip}</span>
         </div>
       )}
 
+      {/* Warning Box */}
       {section.warning && (
-        <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-[13px] text-red-700 flex gap-2 mb-4">
-          <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5 text-red-500" />
-          <span>{section.warning}</span>
+        <div className="flex gap-3 mb-6 warning-box">
+          <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5" style={{ color: "var(--neon-danger)" }} />
+          <span className="text-[14px]" style={{ color: "var(--neon-danger)" }}>{section.warning}</span>
         </div>
       )}
     </div>
@@ -229,70 +273,68 @@ function QuizSection({
   };
 
   return (
-    <div className="mt-8">
-      <h2 className="text-[18px] font-bold text-gray-800 mb-4 flex items-center gap-2">
-        <Play className="h-5 w-5 text-blue-600" />
+    <div className="mt-12 pt-8 border-t border-[var(--outline-variant)]">
+      <h2 className="text-[24px] font-semibold mb-6 section-heading flex items-center gap-3" style={{ color: "var(--neon-primary)" }}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         知识测验
       </h2>
 
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
+      <div className="glass-card p-6">
         {/* Score */}
-        <div className="flex items-center gap-4 mb-4 text-[12px]">
-          <span className="text-gray-500">第 {current + 1}/{quiz.length} 题</span>
-          <span className="text-green-600">正确 {score.correct}</span>
-          <span className="text-gray-400">总题 {score.total}</span>
+        <div className="flex items-center gap-4 mb-6 font-['JetBrains_Mono'] text-[12px]">
+          <span style={{ color: "var(--text-muted)" }}>第 {current + 1}/{quiz.length} 题</span>
+          <span style={{ color: "var(--neon-tertiary)" }}>正确 {score.correct}</span>
+          <span style={{ color: "var(--text-muted)" }}>总题 {score.total}</span>
         </div>
 
-        <p className="text-[14px] font-medium text-gray-800 mb-4">{q.question}</p>
+        <p className="text-[16px] font-medium mb-6" style={{ color: "var(--neon-primary)" }}>{q.question}</p>
 
-        <div className="space-y-2 mb-4">
+        <div className="space-y-3 mb-6">
           {q.options.map((opt, i) => (
             <button
               key={i}
               onClick={() => handleSelect(i)}
-              className={`w-full text-left px-4 py-3 rounded-lg text-[13px] transition-all border ${
+              className={`quiz-option w-full font-['JetBrains_Mono'] text-[14px] ${
                 showResult && i === q.answer
-                  ? "bg-green-50 border-green-300 text-green-700"
+                  ? "correct"
                   : showResult && i === selected && i !== q.answer
-                    ? "bg-red-50 border-red-300 text-red-700"
+                    ? "wrong"
                     : selected === i
-                      ? "bg-blue-50 border-blue-300 text-blue-700"
-                      : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+                      ? "selected"
+                      : ""
               }`}
             >
-              <span className="font-medium mr-2">{String.fromCharCode(65 + i)}.</span>
+              <span className="font-bold mr-3" style={{ color: showResult && i === q.answer ? "var(--neon-tertiary)" : showResult && i === selected ? "var(--neon-danger)" : selected === i ? "var(--neon-primary)" : "var(--text-muted)" }}>
+                {String.fromCharCode(65 + i)}.
+              </span>
               {opt}
             </button>
           ))}
         </div>
 
         {showResult && (
-          <div className={`p-3 rounded-lg mb-4 text-[13px] ${
-            selected === q.answer
-              ? "bg-green-50 border border-green-200 text-green-700"
-              : "bg-red-50 border border-red-200 text-red-700"
-          }`}>
-            <div className="flex items-center gap-1.5 mb-1">
-              {selected === q.answer ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
-              <span className="font-medium">{selected === q.answer ? "正确！" : "回答错误"}</span>
+          <div className={`p-4 mb-6 text-[14px] ${selected === q.answer ? "tip-box" : "warning-box"}`}>
+            <div className="flex items-center gap-2 mb-1 font-bold">
+              {selected === q.answer ? <CheckCircle className="h-5 w-5" /> : <XCircle className="h-5 w-5" />}
+              {selected === q.answer ? "正确！" : "回答错误"}
             </div>
-            <p className="text-gray-600">{q.explanation}</p>
+            <p style={{ color: "var(--on-surface-variant)" }}>{q.explanation}</p>
           </div>
         )}
 
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-3">
           {!showResult ? (
             <button
               onClick={handleSubmit}
               disabled={selected === null}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-[12px] font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="neon-btn disabled:opacity-40 disabled:cursor-not-allowed"
             >
               提交答案
             </button>
           ) : (
             <button
               onClick={handleNext}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-[12px] font-medium hover:bg-blue-700 transition-colors"
+              className="neon-btn"
             >
               下一题
             </button>

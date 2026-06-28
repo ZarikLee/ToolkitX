@@ -1,0 +1,339 @@
+/* ============ NEON_LABS Cyberpunk Theme ============ */
+
+.learn-neon {
+  --neon-primary: #00f0ff;
+  --neon-secondary: #ecb2ff;
+  --neon-tertiary: #a2ef00;
+  --neon-danger: #FF0055;
+  --terminal-black: #050508;
+  --surface: #131318;
+  --surface-glass: rgba(18, 18, 26, 0.75);
+  --surface-container: #1f1f25;
+  --surface-container-high: #2a292f;
+  --surface-container-highest: #35343a;
+  --surface-container-low: #1b1b20;
+  --surface-variant: #35343a;
+  --outline: #849495;
+  --outline-variant: #3b494b;
+  --on-surface: #e4e1e9;
+  --on-surface-variant: #b9cacb;
+  --text-muted: #888891;
+  --border-glow: rgba(0, 240, 255, 0.3);
+
+  background: var(--terminal-black);
+  color: var(--on-surface);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.learn-neon .neon-surface {
+  background: var(--surface);
+}
+
+/* ============ Glass Card ============ */
+.learn-neon .glass-card {
+  background: var(--surface-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--outline-variant);
+  transition: all 0.3s ease-in-out;
+}
+
+.learn-neon .glass-card:hover {
+  border-color: rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+/* ============ Neon Text Glow ============ */
+.learn-neon .neon-text-glow {
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+}
+
+.learn-neon .neon-text-green {
+  text-shadow: 0 0 8px rgba(162, 239, 0, 0.6);
+}
+
+/* ============ Scanline ============ */
+.learn-neon .scanline {
+  width: 100%;
+  height: 2px;
+  background: rgba(0, 240, 255, 0.1);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  animation: neon-scan 3s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes neon-scan {
+  0% { bottom: 100%; }
+  100% { bottom: 0%; }
+}
+
+/* ============ Progress Beam ============ */
+.learn-neon .progress-beam {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--neon-primary), transparent);
+  position: relative;
+  overflow: hidden;
+}
+
+.learn-neon .progress-beam::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, #fff, transparent);
+  animation: beam-move 2s infinite;
+}
+
+@keyframes beam-move {
+  100% { left: 100%; }
+}
+
+/* ============ Code Glow ============ */
+.learn-neon .code-glow {
+  box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.05);
+}
+
+/* ============ Code Block Scanline (vertical, on hover) ============ */
+.learn-neon .code-block-scanline {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, transparent, rgba(0, 240, 255, 0.05), transparent);
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.learn-neon .code-block:hover .code-block-scanline {
+  opacity: 1;
+  animation: code-scan 4s linear infinite;
+}
+
+@keyframes code-scan {
+  0% { top: -100%; }
+  100% { top: 100%; }
+}
+
+/* ============ Neon Button ============ */
+.learn-neon .neon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 24px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  background: var(--neon-primary);
+  color: var(--terminal-black);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: none;
+}
+
+.learn-neon .neon-btn:hover {
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.6);
+  transform: scale(1.02);
+}
+
+.learn-neon .neon-btn:active {
+  transform: scale(0.97);
+}
+
+.learn-neon .neon-btn-outline {
+  background: transparent;
+  color: var(--on-surface-variant);
+  border: 1px solid var(--outline-variant);
+}
+
+.learn-neon .neon-btn-outline:hover {
+  border-color: var(--neon-primary);
+  color: var(--neon-primary);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+}
+
+.learn-neon .neon-btn-outline:active {
+  transform: scale(0.97);
+}
+
+/* ============ Neon Input ============ */
+.learn-neon .neon-input {
+  background: var(--surface-container-low);
+  border: 1px solid var(--outline-variant);
+  color: var(--neon-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  padding: 10px 14px;
+  outline: none;
+  width: 100%;
+  transition: all 0.3s;
+}
+
+.learn-neon .neon-input:focus {
+  border-color: var(--neon-primary);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+.learn-neon .neon-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ============ Neon Scrollbar ============ */
+.learn-neon ::-webkit-scrollbar {
+  width: 6px;
+}
+
+.learn-neon ::-webkit-scrollbar-track {
+  background: var(--terminal-black);
+}
+
+.learn-neon ::-webkit-scrollbar-thumb {
+  background: var(--outline-variant);
+  border-radius: 3px;
+}
+
+.learn-neon ::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-primary);
+}
+
+/* ============ Sidebar Active Item ============ */
+.learn-neon .sidebar-active {
+  background: rgba(0, 240, 255, 0.1);
+  color: var(--neon-primary);
+  border-left: 4px solid var(--neon-primary);
+}
+
+.learn-neon .sidebar-item {
+  border-left: 4px solid transparent;
+  transition: all 0.2s;
+}
+
+.learn-neon .sidebar-item:hover {
+  background: rgba(53, 52, 58, 0.5);
+}
+
+/* ============ Category Tag ============ */
+.learn-neon .tag-neon {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  border: 1px solid;
+  border-radius: 2px;
+}
+
+/* ============ Stats Counter ============ */
+.learn-neon .stat-value {
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--neon-primary);
+  text-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+}
+
+.learn-neon .stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ============ Hero Search Glow ============ */
+.learn-neon .search-glow {
+  transition: all 0.3s;
+}
+
+.learn-neon .search-glow:focus-within {
+  border-color: var(--neon-primary);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+}
+
+/* ============ Pulse Dot ============ */
+.learn-neon .pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: neon-pulse 2s ease-in-out infinite;
+}
+
+@keyframes neon-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ============ Quiz Neon ============ */
+.learn-neon .quiz-option {
+  background: var(--surface-glass);
+  border: 1px solid var(--outline-variant);
+  padding: 14px 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.learn-neon .quiz-option:hover {
+  border-color: rgba(0, 240, 255, 0.4);
+  background: rgba(0, 240, 255, 0.05);
+}
+
+.learn-neon .quiz-option.selected {
+  border-color: var(--neon-primary);
+  background: rgba(0, 240, 255, 0.1);
+  color: var(--neon-primary);
+}
+
+.learn-neon .quiz-option.correct {
+  border-color: var(--neon-tertiary);
+  background: rgba(162, 239, 0, 0.1);
+  color: var(--neon-tertiary);
+}
+
+.learn-neon .quiz-option.wrong {
+  border-color: var(--neon-danger);
+  background: rgba(255, 0, 85, 0.1);
+  color: var(--neon-danger);
+}
+
+/* ============ Section Heading ============ */
+.learn-neon .section-heading {
+  border-left: 4px solid var(--neon-primary);
+  padding-left: 16px;
+}
+
+/* ============ Tip / Warning Boxes ============ */
+.learn-neon .tip-box {
+  background: rgba(162, 239, 0, 0.05);
+  border: 1px solid rgba(162, 239, 0, 0.3);
+  color: var(--neon-tertiary);
+  padding: 12px 16px;
+}
+
+.learn-neon .warning-box {
+  background: rgba(255, 0, 85, 0.05);
+  border: 1px solid rgba(255, 0, 85, 0.3);
+  color: var(--neon-danger);
+  padding: 12px 16px;
+}
+
+/* ============ Footer Neon ============ */
+.learn-neon .neon-footer {
+  border-top: 1px solid var(--outline-variant);
+  background: var(--terminal-black);
+}
