@@ -1,86 +1,310 @@
-/* ============ NEON_LABS Cyberpunk Theme ============ */
+/* ============ NEON_LABS Aurelian Dark Theme ============ */
+/* Global dark theme for entire ToolkitX site */
 
-.learn-neon {
-  --neon-primary: #00f0ff;
-  --neon-secondary: #ecb2ff;
-  --neon-tertiary: #a2ef00;
-  --neon-danger: #FF0055;
-  --terminal-black: #050508;
-  --surface: #131318;
-  --surface-glass: rgba(18, 18, 26, 0.75);
-  --surface-container: #1f1f25;
-  --surface-container-high: #2a292f;
-  --surface-container-highest: #35343a;
-  --surface-container-low: #1b1b20;
-  --surface-variant: #35343a;
-  --outline: #849495;
-  --outline-variant: #3b494b;
-  --on-surface: #e4e1e9;
-  --on-surface-variant: #b9cacb;
-  --text-muted: #888891;
-  --border-glow: rgba(0, 240, 255, 0.3);
-
-  background: var(--terminal-black);
-  color: var(--on-surface);
-  font-family: 'Inter', sans-serif;
-  min-height: 100vh;
-  overflow-x: hidden;
+:root {
+  --neon-bg: #131313;
+  --neon-surface: #131313;
+  --neon-surface-container: #1f2020;
+  --neon-surface-container-high: #2a2a2a;
+  --neon-surface-container-highest: #353535;
+  --neon-surface-container-low: #1b1c1c;
+  --neon-surface-container-lowest: #0e0e0e;
+  --neon-on-surface: #e4e2e1;
+  --neon-on-surface-variant: #c4c7c7;
+  --neon-primary: #c8c6c5;
+  --neon-secondary: #e9c349;
+  --neon-secondary-container: #af8d11;
+  --neon-tertiary: #c5c7c8;
+  --neon-outline: #8e9192;
+  --neon-outline-variant: #444748;
+  --neon-error: #ffb4ab;
+  --neon-text-muted: #8e9192;
+  --neon-border-glow: rgba(233, 195, 73, 0.2);
 }
 
-.learn-neon .neon-surface {
-  background: var(--surface);
+/* ============ Global Overrides ============ */
+.learn-neon,
+.neon-global {
+  background: var(--neon-bg);
+  color: var(--neon-on-surface);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+}
+
+/* Scrollbar */
+.learn-neon ::-webkit-scrollbar,
+.neon-global ::-webkit-scrollbar {
+  width: 4px;
+}
+.learn-neon ::-webkit-scrollbar-track,
+.neon-global ::-webkit-scrollbar-track {
+  background: var(--neon-bg);
+}
+.learn-neon ::-webkit-scrollbar-thumb,
+.neon-global ::-webkit-scrollbar-thumb {
+  background: var(--neon-surface-container-high);
+  border-radius: 2px;
+}
+.learn-neon ::-webkit-scrollbar-thumb:hover,
+.neon-global ::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-secondary);
+}
+
+/* Selection */
+.learn-neon ::selection,
+.neon-global ::selection {
+  background: rgba(233, 195, 73, 0.3);
+  color: var(--neon-on-surface);
 }
 
 /* ============ Glass Card ============ */
-.learn-neon .glass-card {
-  background: var(--surface-glass);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--outline-variant);
-  transition: all 0.3s ease-in-out;
+.neon-glass {
+  background: rgba(31, 32, 32, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--neon-outline-variant);
+  transition: all 0.3s ease;
 }
 
-.learn-neon .glass-card:hover {
-  border-color: rgba(0, 240, 255, 0.4);
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
-  transform: translateY(-2px);
+.neon-glass:hover {
+  border-color: rgba(233, 195, 73, 0.4);
+  box-shadow: 0 0 20px rgba(233, 195, 73, 0.08);
 }
 
-/* ============ Neon Text Glow ============ */
-.learn-neon .neon-text-glow {
-  text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+/* ============ Code Block (Aurelian Style) ============ */
+.neon-code {
+  background: var(--neon-surface-container-lowest);
+  border-left: 2px solid var(--neon-secondary);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
-.learn-neon .neon-text-green {
-  text-shadow: 0 0 8px rgba(162, 239, 0, 0.6);
-}
-
-/* ============ Scanline ============ */
-.learn-neon .scanline {
-  width: 100%;
-  height: 2px;
-  background: rgba(0, 240, 255, 0.1);
-  position: absolute;
-  bottom: 0;
+/* ============ Noise Overlay ============ */
+.neon-noise {
+  position: fixed;
+  top: 0;
   left: 0;
-  animation: neon-scan 3s linear infinite;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
+  opacity: 0.03;
+  z-index: 50;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-@keyframes neon-scan {
-  0% { bottom: 100%; }
-  100% { bottom: 0%; }
+/* ============ Gold Glow ============ */
+.neon-gold-glow {
+  box-shadow: 0 0 20px rgba(233, 195, 73, 0.1);
+}
+
+/* ============ Neon Text ============ */
+.neon-text-gold {
+  color: var(--neon-secondary);
+}
+
+.neon-text-primary {
+  color: var(--neon-primary);
+}
+
+/* ============ Button Styles ============ */
+.neon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 24px;
+  font-family: 'Geist', 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: var(--neon-secondary);
+  color: var(--neon-surface-container-lowest);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.neon-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.neon-btn:active {
+  transform: translateY(0);
+}
+
+.neon-btn-outline {
+  background: transparent;
+  color: var(--neon-on-surface);
+  border: 1px solid var(--neon-outline-variant);
+  font-family: 'Geist', 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 10px 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.neon-btn-outline:hover {
+  background: var(--neon-surface-container-high);
+}
+
+/* ============ Obsidian Button ============ */
+.obsidian-btn {
+  background: #121212;
+  color: white;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.obsidian-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* ============ Input Styles ============ */
+.neon-input {
+  background: var(--neon-surface-container-low);
+  border: 1px solid var(--neon-outline-variant);
+  color: var(--neon-on-surface);
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  padding: 10px 14px;
+  outline: none;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.neon-input:focus {
+  border-color: var(--neon-secondary);
+}
+
+.neon-input::placeholder {
+  color: var(--neon-text-muted);
+}
+
+/* ============ Tag/Chip ============ */
+.neon-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  font-family: 'Geist', 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: var(--neon-surface-container-high);
+  color: var(--neon-on-surface);
+  border: 1px solid var(--neon-outline-variant);
+}
+
+/* ============ Sidebar ============ */
+.neon-sidebar {
+  background: var(--neon-surface-container-lowest);
+  border-right: 1px solid var(--neon-outline-variant);
+}
+
+.neon-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: var(--neon-on-surface-variant);
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.neon-sidebar-item:hover {
+  background: var(--neon-surface-container-high);
+  color: var(--neon-on-surface);
+}
+
+.neon-sidebar-item.active {
+  background: var(--neon-secondary);
+  color: var(--neon-surface-container-lowest);
+  border-left-color: var(--neon-secondary);
+  font-weight: 600;
+}
+
+/* ============ Card ============ */
+.neon-card {
+  background: var(--neon-surface-container-lowest);
+  border: 1px solid var(--neon-outline-variant);
+  transition: all 0.3s ease;
+}
+
+.neon-card:hover {
+  border-color: rgba(233, 195, 73, 0.4);
+}
+
+/* ============ Section Heading ============ */
+.neon-section-heading {
+  border-left: 4px solid var(--neon-secondary);
+  padding-left: 16px;
+}
+
+/* ============ Quiz ============ */
+.neon-quiz-option {
+  background: var(--neon-surface-container);
+  border: 1px solid var(--neon-outline-variant);
+  padding: 14px 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.neon-quiz-option:hover {
+  border-color: rgba(233, 195, 73, 0.4);
+  background: rgba(233, 195, 73, 0.05);
+}
+
+.neon-quiz-option.selected {
+  border-color: var(--neon-secondary);
+  background: rgba(233, 195, 73, 0.1);
+  color: var(--neon-secondary);
+}
+
+.neon-quiz-option.correct {
+  border-color: #30d158;
+  background: rgba(48, 209, 88, 0.1);
+  color: #30d158;
+}
+
+.neon-quiz-option.wrong {
+  border-color: var(--neon-error);
+  background: rgba(255, 180, 171, 0.1);
+  color: var(--neon-error);
+}
+
+/* ============ Tip/Warning ============ */
+.neon-tip {
+  background: rgba(233, 195, 73, 0.05);
+  border: 1px solid rgba(233, 195, 73, 0.3);
+  padding: 12px 16px;
+}
+
+.neon-warning {
+  background: rgba(255, 180, 171, 0.05);
+  border: 1px solid rgba(255, 180, 171, 0.3);
+  padding: 12px 16px;
+}
+
+/* ============ Divider ============ */
+.neon-divider {
+  border-top: 1px solid var(--neon-outline-variant);
 }
 
 /* ============ Progress Beam ============ */
-.learn-neon .progress-beam {
+.neon-progress {
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--neon-primary), transparent);
+  background: linear-gradient(90deg, transparent, var(--neon-secondary), transparent);
   position: relative;
   overflow: hidden;
 }
 
-.learn-neon .progress-beam::after {
+.neon-progress::after {
   content: '';
   position: absolute;
   top: 0;
@@ -88,252 +312,50 @@
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent, #fff, transparent);
-  animation: beam-move 2s infinite;
+  animation: neon-beam-move 2s infinite;
 }
 
-@keyframes beam-move {
+@keyframes neon-beam-move {
   100% { left: 100%; }
 }
 
-/* ============ Code Glow ============ */
-.learn-neon .code-glow {
-  box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.05);
+/* ============ Toggle Switch ============ */
+.mode-toggle {
+  display: flex;
+  background: var(--neon-surface-container);
+  border: 1px solid var(--neon-outline-variant);
+  border-radius: 4px;
+  overflow: hidden;
 }
 
-/* ============ Code Block Scanline (vertical, on hover) ============ */
-.learn-neon .code-block-scanline {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(180deg, transparent, rgba(0, 240, 255, 0.05), transparent);
-  position: absolute;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.learn-neon .code-block:hover .code-block-scanline {
-  opacity: 1;
-  animation: code-scan 4s linear infinite;
-}
-
-@keyframes code-scan {
-  0% { top: -100%; }
-  100% { top: 100%; }
-}
-
-/* ============ Neon Button ============ */
-.learn-neon .neon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px 24px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 14px;
-  font-weight: 700;
+.mode-toggle button {
+  padding: 6px 16px;
+  font-family: 'Geist', 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
   letter-spacing: 0.05em;
-  background: var(--neon-primary);
-  color: var(--terminal-black);
+  color: var(--neon-on-surface-variant);
+  background: transparent;
   border: none;
   cursor: pointer;
   transition: all 0.2s;
-  text-transform: none;
 }
 
-.learn-neon .neon-btn:hover {
-  box-shadow: 0 0 25px rgba(0, 240, 255, 0.6);
-  transform: scale(1.02);
+.mode-toggle button.active {
+  background: var(--neon-secondary);
+  color: var(--neon-surface-container-lowest);
 }
 
-.learn-neon .neon-btn:active {
-  transform: scale(0.97);
+.mode-toggle button:hover:not(.active) {
+  background: var(--neon-surface-container-high);
 }
 
-.learn-neon .neon-btn-outline {
-  background: transparent;
-  color: var(--on-surface-variant);
-  border: 1px solid var(--outline-variant);
-}
-
-.learn-neon .neon-btn-outline:hover {
-  border-color: var(--neon-primary);
-  color: var(--neon-primary);
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
-}
-
-.learn-neon .neon-btn-outline:active {
-  transform: scale(0.97);
-}
-
-/* ============ Neon Input ============ */
-.learn-neon .neon-input {
-  background: var(--surface-container-low);
-  border: 1px solid var(--outline-variant);
-  color: var(--neon-primary);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 14px;
-  padding: 10px 14px;
-  outline: none;
-  width: 100%;
-  transition: all 0.3s;
-}
-
-.learn-neon .neon-input:focus {
-  border-color: var(--neon-primary);
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
-}
-
-.learn-neon .neon-input::placeholder {
-  color: var(--text-muted);
-}
-
-/* ============ Neon Scrollbar ============ */
-.learn-neon ::-webkit-scrollbar {
-  width: 6px;
-}
-
-.learn-neon ::-webkit-scrollbar-track {
-  background: var(--terminal-black);
-}
-
-.learn-neon ::-webkit-scrollbar-thumb {
-  background: var(--outline-variant);
-  border-radius: 3px;
-}
-
-.learn-neon ::-webkit-scrollbar-thumb:hover {
-  background: var(--neon-primary);
-}
-
-/* ============ Sidebar Active Item ============ */
-.learn-neon .sidebar-active {
-  background: rgba(0, 240, 255, 0.1);
-  color: var(--neon-primary);
-  border-left: 4px solid var(--neon-primary);
-}
-
-.learn-neon .sidebar-item {
-  border-left: 4px solid transparent;
-  transition: all 0.2s;
-}
-
-.learn-neon .sidebar-item:hover {
-  background: rgba(53, 52, 58, 0.5);
-}
-
-/* ============ Category Tag ============ */
-.learn-neon .tag-neon {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  border: 1px solid;
-  border-radius: 2px;
-}
-
-/* ============ Stats Counter ============ */
-.learn-neon .stat-value {
-  font-size: 48px;
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  color: var(--neon-primary);
-  text-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
-}
-
-.learn-neon .stat-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-/* ============ Hero Search Glow ============ */
-.learn-neon .search-glow {
-  transition: all 0.3s;
-}
-
-.learn-neon .search-glow:focus-within {
-  border-color: var(--neon-primary);
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
-}
-
-/* ============ Pulse Dot ============ */
-.learn-neon .pulse-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  animation: neon-pulse 2s ease-in-out infinite;
-}
-
-@keyframes neon-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-
-/* ============ Quiz Neon ============ */
-.learn-neon .quiz-option {
-  background: var(--surface-glass);
-  border: 1px solid var(--outline-variant);
-  padding: 14px 18px;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: left;
-}
-
-.learn-neon .quiz-option:hover {
-  border-color: rgba(0, 240, 255, 0.4);
-  background: rgba(0, 240, 255, 0.05);
-}
-
-.learn-neon .quiz-option.selected {
-  border-color: var(--neon-primary);
-  background: rgba(0, 240, 255, 0.1);
-  color: var(--neon-primary);
-}
-
-.learn-neon .quiz-option.correct {
-  border-color: var(--neon-tertiary);
-  background: rgba(162, 239, 0, 0.1);
-  color: var(--neon-tertiary);
-}
-
-.learn-neon .quiz-option.wrong {
-  border-color: var(--neon-danger);
-  background: rgba(255, 0, 85, 0.1);
-  color: var(--neon-danger);
-}
-
-/* ============ Section Heading ============ */
-.learn-neon .section-heading {
-  border-left: 4px solid var(--neon-primary);
-  padding-left: 16px;
-}
-
-/* ============ Tip / Warning Boxes ============ */
-.learn-neon .tip-box {
-  background: rgba(162, 239, 0, 0.05);
-  border: 1px solid rgba(162, 239, 0, 0.3);
-  color: var(--neon-tertiary);
-  padding: 12px 16px;
-}
-
-.learn-neon .warning-box {
-  background: rgba(255, 0, 85, 0.05);
-  border: 1px solid rgba(255, 0, 85, 0.3);
-  color: var(--neon-danger);
-  padding: 12px 16px;
-}
-
-/* ============ Footer Neon ============ */
-.learn-neon .neon-footer {
-  border-top: 1px solid var(--outline-variant);
-  background: var(--terminal-black);
+/* ============ Grain Overlay ============ */
+.grain-overlay {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
 }

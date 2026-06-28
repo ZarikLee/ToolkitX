@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NEON_LABS | Simulation Center</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Geist:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error-container": "#93000a",
+                    "primary": "#c8c6c5",
+                    "on-background": "#e4e2e1",
+                    "on-tertiary-fixed-variant": "#454748",
+                    "on-tertiary-container": "#7c7e7f",
+                    "primary-fixed": "#e5e2e1",
+                    "outline-variant": "#444748",
+                    "on-surface": "#e4e2e1",
+                    "on-tertiary-fixed": "#191c1d",
+                    "tertiary": "#c5c7c8",
+                    "on-secondary-container": "#342800",
+                    "surface-container-highest": "#353535",
+                    "secondary-fixed": "#ffe088",
+                    "surface-container": "#1f2020",
+                    "background": "#131313",
+                    "inverse-primary": "#5f5e5e",
+                    "on-secondary-fixed-variant": "#574500",
+                    "primary-container": "#121212",
+                    "on-error": "#690005",
+                    "on-primary-fixed": "#1c1b1b",
+                    "surface-container-lowest": "#0e0e0e",
+                    "on-error-container": "#ffdad6",
+                    "tertiary-fixed": "#e1e3e4",
+                    "on-surface-variant": "#c4c7c7",
+                    "secondary": "#e9c349",
+                    "primary-fixed-dim": "#c8c6c5",
+                    "surface-container-high": "#2a2a2a",
+                    "inverse-surface": "#e4e2e1",
+                    "tertiary-container": "#101314",
+                    "secondary-container": "#af8d11",
+                    "surface-tint": "#c8c6c5",
+                    "surface-bright": "#393939",
+                    "outline": "#8e9192",
+                    "tertiary-fixed-dim": "#c5c7c8",
+                    "on-primary-container": "#7e7d7d",
+                    "on-primary": "#313030",
+                    "on-tertiary": "#2e3132",
+                    "surface": "#131313",
+                    "on-secondary-fixed": "#241a00",
+                    "surface-dim": "#131313",
+                    "secondary-fixed-dim": "#e9c349",
+                    "surface-variant": "#353535",
+                    "on-secondary": "#3c2f00",
+                    "inverse-on-surface": "#303030",
+                    "error": "#ffb4ab",
+                    "on-primary-fixed-variant": "#474646",
+                    "surface-container-low": "#1b1c1c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "container-max": "1280px",
+                    "gutter": "24px",
+                    "margin-desktop": "64px",
+                    "margin-mobile": "20px",
+                    "unit": "8px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-sm": ["Geist"],
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            font-size: 20px;
+        }
+        .code-syntax-keyword { color: #e9c349; }
+        .code-syntax-string { color: #8e9192; }
+        .code-syntax-comment { color: #454748; font-style: italic; }
+        .code-syntax-function { color: #c8c6c5; font-weight: 500; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Subtle grain texture */
+        .bg-grain {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md selection:bg-secondary selection:text-on-secondary min-h-screen flex flex-col overflow-hidden">
+<div class="fixed inset-0 bg-grain z-50"></div>
+<!-- TopNavBar Implementation -->
+<header class="bg-background border-b border-outline-variant docked full-width top-0 z-40 transition-all duration-200 ease-in-out">
+<nav class="flex justify-between items-center h-20 px-margin-desktop w-full max-w-container-max mx-auto">
+<div class="flex items-center gap-12">
+<a class="font-display-lg text-display-lg font-bold tracking-tighter text-primary" href="#">NEON_LABS</a>
+<div class="hidden md:flex items-center gap-8 font-body-md text-body-md">
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Library</a>
+<a class="text-secondary font-bold border-b-2 border-secondary pb-1" href="#">Simulations</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Tutorials</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Resources</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative group hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="bg-surface-container-low border-none rounded-none text-label-sm font-label-sm py-2 pl-10 pr-4 w-64 focus:ring-1 focus:ring-secondary transition-all" placeholder="Search experiments..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-all">notifications</button>
+<button class="bg-secondary text-on-secondary px-6 py-2 text-label-sm font-label-sm uppercase tracking-widest hover:brightness-110 transition-all active:scale-95">Sign In</button>
+</div>
+</div>
+</nav>
+</header>
+<!-- Simulation Workspace -->
+<main class="flex-1 flex overflow-hidden">
+<!-- Left Panel: Goals & Constraints -->
+<aside class="w-80 lg:w-96 border-r border-outline-variant bg-surface-container-lowest flex flex-col overflow-y-auto no-scrollbar">
+<div class="p-8 space-y-10">
+<!-- Header -->
+<section>
+<div class="flex items-center gap-2 mb-2">
+<span class="w-2 h-2 bg-secondary block"></span>
+<h2 class="font-label-sm text-label-sm uppercase tracking-widest text-secondary">实验编号: S-402</h2>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-4">Memory Buffer Overflow</h1>
+<p class="text-on-surface-variant text-sm leading-relaxed">
+                        在本模拟中，你将探索内存管理的基本漏洞。目标是通过注入超长字符串触发缓冲区溢出，从而覆盖指令指针寄存器（EIP）。
+                    </p>
+</section>
+<!-- Goals -->
+<section class="space-y-4">
+<h3 class="text-on-surface font-semibold flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">target</span>
+                        实验目标
+                    </h3>
+<ul class="space-y-3">
+<li class="flex gap-3 text-sm items-start text-on-surface-variant">
+<span class="mt-1 material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span>识别目标函数 `vulnerable_service()` 中的输入点。</span>
+</li>
+<li class="flex gap-3 text-sm items-start text-on-surface-variant">
+<span class="mt-1 material-symbols-outlined text-xs">radio_button_unchecked</span>
+<span>计算达到返回地址所需的偏移量。</span>
+</li>
+<li class="flex gap-3 text-sm items-start text-on-surface-variant">
+<span class="mt-1 material-symbols-outlined text-xs">radio_button_unchecked</span>
+<span>成功重定向执行流至 `secret_callback()`。</span>
+</li>
+</ul>
+</section>
+<!-- Constraints -->
+<section class="space-y-4">
+<h3 class="text-on-surface font-semibold flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">warning</span>
+                        系统约束
+                    </h3>
+<div class="bg-surface-container-low p-4 space-y-3">
+<div class="flex justify-between items-center text-xs">
+<span class="text-on-surface-variant uppercase tracking-wider">缓冲区大小</span>
+<span class="text-secondary font-mono">64 Bytes</span>
+</div>
+<div class="flex justify-between items-center text-xs">
+<span class="text-on-surface-variant uppercase tracking-wider">堆栈保护</span>
+<span class="text-on-surface-variant font-mono">Disabled</span>
+</div>
+<div class="flex justify-between items-center text-xs">
+<span class="text-on-surface-variant uppercase tracking-wider">OS 架构</span>
+<span class="text-on-surface-variant font-mono">x86_64</span>
+</div>
+</div>
+</section>
+<!-- Tips/Notes -->
+<section class="p-6 border border-outline-variant bg-surface-container-high">
+<p class="text-xs italic text-on-surface-variant">
+                        "在受控环境中理解破坏性，是构建防御体系的第一步。" — NEON_LABS 安全准则
+                    </p>
+</section>
+</div>
+<div class="mt-auto p-8">
+<button class="w-full border border-secondary text-secondary py-3 text-label-sm font-label-sm uppercase tracking-widest hover:bg-secondary hover:text-on-secondary transition-all">
+                    重置实验环境
+                </button>
+</div>
+</aside>
+<!-- Main Workspace (Editor + Console) -->
+<section class="flex-1 flex flex-col overflow-hidden relative">
+<!-- Code Editor Header -->
+<div class="h-12 flex items-center justify-between px-6 bg-surface-container border-b border-outline-variant">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant">description</span>
+<span class="text-label-sm text-on-surface-variant">exploit_payload.py</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 text-label-sm text-secondary hover:text-primary transition-all">
+<span class="material-symbols-outlined">play_arrow</span>
+<span>运行模拟</span>
+</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary">settings</button>
+</div>
+</div>
+<!-- Code Editor Body -->
+<div class="flex-1 bg-surface-container-lowest overflow-y-auto font-mono text-sm p-6 relative">
+<!-- Visual Background Glow -->
+<div class="absolute top-0 right-0 w-96 h-96 bg-secondary/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+<div class="flex">
+<div class="w-12 text-on-tertiary-container text-right pr-6 select-none leading-7">
+                        1<br/>2<br/>3<br/>4<br/>5<br/>6<br/>7<br/>8<br/>9<br/>10<br/>11<br/>12<br/>13<br/>14<br/>15<br/>16
+                    </div>
+<div class="flex-1 leading-7">
+<span class="code-syntax-comment"># NEON_LABS Simulation Environment v2.4</span><br/>
+<span class="code-syntax-keyword">import</span> socket, struct<br/><br/>
+<span class="code-syntax-comment"># 目标地址与端口</span><br/>
+                        HOST = <span class="code-syntax-string">"127.0.0.1"</span><br/>
+                        PORT = <span class="code-syntax-string">1337</span><br/><br/>
+<span class="code-syntax-keyword">def</span> <span class="code-syntax-function">craft_payload</span>():<br/>
+                            <span class="code-syntax-comment"># TODO: 计算溢出所需的填充长度</span><br/>
+                            padding = <span class="code-syntax-string">"A"</span> * <span class="code-syntax-string">72</span> <span class="code-syntax-comment"># 缓冲区大小 + EBP</span><br/>
+                            return_address = struct.pack(<span class="code-syntax-string">"<i"< span="">, <span class="code-syntax-string">0x080484b6</span>)<br/><br/>
+                            payload = padding + return_address<br/>
+                            <span class="code-syntax-keyword">return</span> payload<br/><br/>
+<span class="code-syntax-function">print</span>(<span class="code-syntax-string">"[+] 正在连接至实验室防火墙..."</span>)<br/>
+<span class="code-syntax-comment"># 实验逻辑在此处执行</span>
+</i"<></span></div>
+</div>
+</div>
+<!-- Console Output -->
+<div class="h-64 bg-surface-container border-t border-outline-variant flex flex-col">
+<div class="px-6 py-3 flex items-center justify-between border-b border-outline-variant bg-surface-container-high">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-xs text-secondary">terminal</span>
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface">控制台输出</span>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary">delete_sweep</button>
+</div>
+<div class="flex-1 overflow-y-auto p-6 font-mono text-xs space-y-2">
+<div class="text-on-surface-variant">[14:20:05] 系统初始化已完成。</div>
+<div class="text-on-surface-variant">[14:20:06] 等待用户输入载荷...</div>
+<div class="text-secondary">[14:20:10] 输入流捕获: 76 bytes received.</div>
+<div class="text-error font-bold">[14:20:10] CRITICAL ERROR: Segmentation Fault (core dumped)</div>
+<div class="text-on-surface-variant">[14:20:10] EIP Register: 0x41414141</div>
+<div class="text-on-surface-variant flex items-center gap-2">
+<span class="animate-pulse w-1.5 h-3 bg-primary block"></span>
+<span class="text-primary italic">等待指令重新运行...</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Side Nav (Categories) -->
+<nav class="hidden xl:flex w-20 flex-col py-8 border-l border-outline-variant bg-surface-container-lowest items-center gap-8">
+<button class="p-3 text-secondary bg-surface-container-high rounded-none transition-all" title="Core Concepts">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+</button>
+<button class="p-3 text-on-surface-variant hover:bg-surface-container-high transition-all" title="Architecture">
+<span class="material-symbols-outlined">architecture</span>
+</button>
+<button class="p-3 text-on-surface-variant hover:bg-surface-container-high transition-all" title="Security">
+<span class="material-symbols-outlined">security</span>
+</button>
+<button class="p-3 text-on-surface-variant hover:bg-surface-container-high transition-all" title="DevOps">
+<span class="material-symbols-outlined">terminal</span>
+</button>
+<button class="p-3 text-on-surface-variant hover:bg-surface-container-high transition-all" title="Data Science">
+<span class="material-symbols-outlined">database</span>
+</button>
+<div class="mt-auto group cursor-pointer" title="Upgrade to Pro">
+<div class="w-10 h-10 bg-secondary flex items-center justify-center transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined text-on-secondary">workspace_premium</span>
+</div>
+</div>
+</nav>
+</main>
+<!-- Footer -->
+<footer class="bg-background border-t border-outline-variant z-40 transition-colors duration-300">
+<div class="flex flex-col md:flex-row justify-between items-center py-6 px-margin-desktop w-full max-w-container-max mx-auto">
+<p class="font-label-sm text-label-sm text-on-surface-variant">© 2024 NEON_LABS. Engineered for Excellence.</p>
+<div class="flex gap-8 mt-4 md:mt-0 font-label-sm text-label-sm">
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">API Documentation</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Support</a>
+</div>
+</div>
+</footer>
+<!-- Interactive Layer: WebGL Shader Background Overlay (Subtle) -->
+<div class="fixed inset-0 pointer-events-none opacity-20 mix-blend-screen z-0">
+
+</div>
+<script>
+        // Micro-interactions for editor focus
+        const editorContainer = document.querySelector('.flex-1.bg-surface-container-lowest');
+        editorContainer.addEventListener('mouseenter', () => {
+            editorContainer.style.boxShadow = 'inset 0 0 40px rgba(233, 195, 73, 0.02)';
+        });
+        editorContainer.addEventListener('mouseleave', () => {
+            editorContainer.style.boxShadow = 'none';
+        });
+
+        // Simulating console typing effect
+        const cursor = document.querySelector('.animate-pulse');
+        setInterval(() => {
+            cursor.style.opacity = cursor.style.opacity === '0' ? '1' : '0';
+        }, 600);
+    </script>
+</body></html>

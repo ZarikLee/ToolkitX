@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NEON_LABS | 变量与动态逻辑</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Geist:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>body {
+    background-color: #131313;
+    color: #e4e2e1;
+    -webkit-font-smoothing: antialiased
+    }
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px
+    }
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #131313
+    }
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #2a2a2a
+    }
+.code-block {
+    background: #0e0e0e;
+    border-left: 2px solid #e9c349;
+    font-family: "JetBrains Mono", "Fira Code", monospace
+    }
+.glass-header {
+    backdrop-filter: blur(12px);
+    background: rgba(19, 19, 19, 0.8)
+    }
+.noise-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.02;
+    z-index: 9999;
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuDx4K8ueSAfOv4zOqGm7nZcZ9tKHd0sojL1npAUvU80m3TAwYIXviMQ2maiNPpXp674vCaO08DqPxHOSt4xIYn0ahlR2VHPpSTlwGZ1XYCUANBr9GC2k77tQxQ03vSkr8CHavsLiafH5xtAfPYGeGIWFrr1oPX4t1v_UABwJYa1U9dgVs8nTk2rmyaB51mSxB--wBynGg0yXKUQ6qYgwqxwPtVFvDEdSIcUpmS6mz1h1c0l20Q9blV-uBBDT6VSKAxtVwPDQYjJxzI)
+    }</style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                "error-container": "#93000a",
+                "primary": "#c8c6c5",
+                "on-background": "#e4e2e1",
+                "outline-variant": "#444748",
+                "on-surface": "#e4e2e1",
+                "secondary": "#e9c349",
+                "surface-container-highest": "#353535",
+                "surface-container": "#1f2020",
+                "background": "#131313",
+                "primary-container": "#121212",
+                "surface-container-lowest": "#0e0e0e",
+                "on-surface-variant": "#c4c7c7",
+                "surface-container-high": "#2a2a2a",
+                "tertiary-container": "#101314",
+                "secondary-container": "#af8d11",
+                "on-secondary": "#3c2f00",
+                "on-primary": "#313030",
+                "surface-container-low": "#1b1c1c"
+              },
+              "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+              },
+              "spacing": {
+                "container-max": "1280px",
+                "gutter": "24px",
+                "margin-desktop": "64px",
+                "margin-mobile": "20px",
+                "unit": "8px"
+              },
+              "fontFamily": {
+                "display-lg": ["Inter"],
+                "body-md": ["Inter"],
+                "label-sm": ["Geist"],
+                "headline-lg": ["Inter"]
+              },
+              "fontSize": {
+                "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                "label-sm": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "500"}]
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="font-body-md text-body-md">
+<div class="noise-overlay"></div>
+<!-- TopNavBar Component -->
+<header class="fixed top-0 left-0 right-0 z-50 glass-header border-b border-outline-variant">
+<nav class="flex justify-between items-center h-20 px-margin-desktop w-full max-w-container-max mx-auto">
+<div class="font-display-lg text-display-lg font-bold tracking-tighter text-primary">NEON_LABS</div>
+<div class="hidden md:flex gap-8 items-center">
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Library</a>
+<a class="text-secondary font-bold border-b-2 border-secondary pb-1" href="#">Simulations</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Tutorials</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Resources</a>
+</div>
+<div class="flex items-center gap-6">
+<button class="flex items-center text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="flex items-center text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="px-6 py-2 bg-secondary text-on-secondary font-medium tracking-tight hover:brightness-110 transition-all">
+                    Sign In
+                </button>
+</div>
+</nav>
+</header>
+<div class="flex pt-20 min-h-screen">
+<!-- SideNavBar / Table of Contents -->
+<aside class="hidden lg:flex flex-col w-64 fixed left-0 h-[calc(100vh-80px)] border-r border-outline-variant bg-surface-container-lowest py-8 gap-4 px-6 overflow-y-auto custom-scrollbar">
+<div class="mb-6">
+<p class="font-label-sm text-label-sm uppercase tracking-widest text-primary mb-1">Categories</p>
+<p class="text-xs text-on-surface-variant">Explore curated paths</p>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-sm text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all group" href="#">
+<span class="material-symbols-outlined text-sm">menu_book</span>
+<span class="font-label-sm text-label-sm uppercase tracking-widest">Core Concepts</span>
+</a>
+<!-- Active Item: Architecture represents the structural logic of code in this context -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-sm bg-secondary text-on-secondary font-bold transition-all" href="#">
+<span class="material-symbols-outlined text-sm">architecture</span>
+<span class="font-label-sm text-label-sm uppercase tracking-widest">Architecture</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-sm text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" href="#">
+<span class="material-symbols-outlined text-sm">security</span>
+<span class="font-label-sm text-label-sm uppercase tracking-widest">Security</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-sm text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" href="#">
+<span class="material-symbols-outlined text-sm">terminal</span>
+<span class="font-label-sm text-label-sm uppercase tracking-widest">DevOps</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-sm text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" href="#">
+<span class="material-symbols-outlined text-sm">database</span>
+<span class="font-label-sm text-label-sm uppercase tracking-widest">Data Science</span>
+</a>
+</nav>
+<div class="mt-auto pt-8 border-t border-outline-variant">
+<button class="w-full py-4 bg-surface-container-high text-primary font-bold text-xs uppercase tracking-widest hover:bg-surface-container-highest transition-all border border-outline-variant">
+                    Upgrade to Pro
+                </button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-0 lg:ml-64 px-6 md:px-margin-desktop py-12">
+<article class="max-w-4xl mx-auto">
+<!-- Header Section -->
+<header class="mb-16">
+<div class="flex items-center gap-2 mb-4">
+<span class="px-2 py-1 bg-surface-container-high text-primary font-label-sm text-[10px] tracking-widest">PYTHON 3.12</span>
+<span class="text-on-surface-variant text-xs">• 12 分钟阅读</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-surface mb-6">变量与动态逻辑</h1>
+<p class="text-on-surface-variant text-xl leading-relaxed max-w-2xl">
+                        深入理解 Python 的动态类型系统，探讨内存管理如何通过标签化机制处理数据结构。
+                    </p>
+</header>
+<!-- Hero Illustration -->
+<div class="w-full h-[400px] mb-16 relative overflow-hidden bg-surface-container-lowest border border-outline-variant group">
+
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<div class="text-center p-8 glass-header border border-outline-variant">
+<h2 class="font-headline-lg text-headline-lg text-secondary mb-2">Dynamic Mapping</h2>
+<p class="text-xs uppercase tracking-widest text-on-surface-variant">Module 02: Logic Flow</p>
+</div>
+</div>
+</div>
+<!-- Tutorial Content -->
+<section class="space-y-12">
+<div id="intro">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-6">1. 变量的概念模型</h2>
+<p class="text-on-surface-variant mb-6 leading-relaxed">
+                            在 Python 中，变量不应当被视为“容器”，而应当被视为“标签”。当你创建一个变量时，你实际上是在内存中创建了一个对象，并将一个名称指向该对象。这种引用机制是 Python 动态性的核心。
+                        </p>
+<div class="p-8 border border-outline-variant bg-surface-container-lowest my-8 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-secondary opacity-5 rotate-45 translate-x-12 -translate-y-12"></div>
+<h4 class="font-bold text-primary mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">info</span>
+                                核心逻辑
+                            </h4>
+<p class="text-on-surface-variant text-sm italic">
+                                “所有的变量都是指针，所有的对象都在堆内存中。”
+                            </p>
+</div>
+</div>
+<div id="code-example">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-6">2. 动态类型实践</h2>
+<p class="text-on-surface-variant mb-6">
+                            观察以下代码，注意变量 <code>x</code> 如何在不同类型之间无缝切换：
+                        </p>
+<div class="code-block p-6 mb-6">
+<pre class="text-sm text-primary leading-relaxed"><code><span class="text-secondary"># 定义初始数值类型</span>
+x = 42 
+print(f"Type: {type(x)}, Value: {x}")
+
+<span class="text-secondary"># 重新绑定为字符串</span>
+x = "NEON_LABS"
+print(f"Type: {type(x)}, Value: {x}")
+
+<span class="text-secondary"># 动态逻辑运算</span>
+multiplier = 3
+result = x * multiplier
+print(f"Result: {result}")</code></pre>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 my-8">
+<div class="p-6 bg-surface-container border border-outline-variant">
+<h3 class="font-bold text-on-surface mb-3">强类型保证</h3>
+<p class="text-sm text-on-surface-variant">尽管是动态绑定，但 Python 依然是强类型语言。这意味着 <code>"1" + 1</code> 会抛出错误，而不是隐式转换。</p>
+</div>
+<div class="p-6 bg-surface-container border border-outline-variant">
+<h3 class="font-bold text-on-surface mb-3">内存效率</h3>
+<p class="text-sm text-on-surface-variant">Python 的引用计数机制会自动管理不再被标签引用的对象，确保系统资源的有效分配。</p>
+</div>
+</div>
+</div>
+<div id="advanced-logic">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-6">3. 复杂逻辑结构</h2>
+<p class="text-on-surface-variant mb-6">
+                            在构建高性能架构时，理解如何利用列表推导式和 Lambda 表达式来简化动态逻辑至关重要。
+                        </p>
+<div class="code-block p-6">
+<pre class="text-sm text-primary leading-relaxed"><code><span class="text-secondary"># 列表推导式的动态生成</span>
+data_points = [x**2 for x in range(10) if x % 2 == 0]
+
+<span class="text-secondary"># 动态函数映射</span>
+logic_map = {
+    "init": lambda: "System Ready",
+    "process": lambda x: f"Processing {x}",
+    "error": lambda: "Critical Failure"
+}
+
+print(logic_map["process"]("CORE_DATA"))</code></pre>
+</div>
+</div>
+</section>
+<!-- Next Lesson CTA -->
+<footer class="mt-24 pt-12 border-t border-outline-variant">
+<div class="group cursor-pointer p-8 bg-surface-container-lowest border border-outline-variant hover:border-secondary transition-all flex flex-col md:flex-row justify-between items-center gap-6">
+<div>
+<p class="text-xs uppercase tracking-[0.3em] text-secondary mb-2">下一课预告</p>
+<h3 class="font-headline-lg text-headline-lg text-on-surface">控制流与递归算法</h3>
+<p class="text-on-surface-variant mt-2">探索 Python 的分支逻辑与深度递归性能瓶颈。</p>
+</div>
+<button class="flex items-center gap-4 bg-primary text-on-primary px-8 py-4 font-bold tracking-widest text-xs uppercase hover:bg-secondary transition-all">
+                            继续学习
+                            <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</footer>
+</article>
+</main>
+</div>
+<!-- Global Footer Component -->
+<footer class="border-t border-outline-variant bg-background">
+<div class="flex flex-col md:flex-row justify-between items-center py-12 px-margin-desktop w-full max-w-container-max mx-auto">
+<div class="flex flex-col gap-4 mb-8 md:mb-0">
+<div class="font-display-lg text-display-lg text-primary">NEON_LABS</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant max-w-xs">© 2024 NEON_LABS. Engineered for Excellence. 为开发者提供顶尖的数字工程教育。</p>
+</div>
+<div class="flex flex-col md:flex-row gap-12 text-center md:text-left">
+<div class="flex flex-col gap-3">
+<p class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface">Platform</p>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+</div>
+<div class="flex flex-col gap-3">
+<p class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface">Support</p>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">API Documentation</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Support</a>
+</div>
+</div>
+</div>
+</footer>
+<script>
+        // Smooth scroll implementation for local anchors
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Simple visibility observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100');
+                    entry.target.classList.remove('opacity-0', 'translate-y-4');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section > div').forEach(el => {
+            el.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-4');
+            observer.observe(el);
+        });
+    </script>
+</body></html>

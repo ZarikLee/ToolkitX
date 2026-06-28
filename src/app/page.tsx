@@ -2,657 +2,424 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
-  FileCode,
-  ScrollText,
   Search,
-  Terminal,
-  Globe,
-  FileText,
-  Activity,
-  Clock,
-  Lock,
-  Hash,
-  Key,
-  Fingerprint,
-  Palette,
-  Type,
-  ArrowRightLeft,
-  Link2,
-  QrCode,
-  IdCard,
-  Shield,
-  Timer,
-  Network,
-  TerminalSquare,
-  Database,
-  FileDiff,
-  Binary,
-  Scissors,
-  Braces,
-  Container,
-  ShieldCheck,
-  Regex,
-  Globe2,
-  FileSearch,
-  FileCode2,
-  Star,
   BookOpen,
+  Terminal,
+  ChevronRight,
+  ArrowRight,
+  Star,
+  Clock,
+  Zap,
+  Code,
+  Database,
+  Globe,
+  Shield,
+  Cpu,
+  FileCode,
+  Layers,
 } from "lucide-react";
+import { categories, type TutorialCategory } from "@/data/tutorials";
+import { getVisitCount, incrementVisitCount } from "@/lib/visit-counter";
 
 const allTools = [
-  {
-    name: "在线终端",
-    description: "SSH 连接 + 命令库",
-    href: "/terminal",
-    icon: Terminal,
-    gradient: "from-[#64d2ff] to-[#0a84ff]",
-    glow: "rgba(100, 210, 255, 0.15)",
-    category: "运维",
-    tags: ["ssh", "终端", "命令"],
-    hot: true,
-  },
-  {
-    name: "诊断工具",
-    description: "端口探测、DNS、SSL、路径追踪",
-    href: "/diagnostics",
-    icon: Search,
-    gradient: "from-[#bf5af2] to-[#5e5ce6]",
-    glow: "rgba(191, 90, 242, 0.15)",
-    category: "运维",
-    tags: ["端口", "dns", "ssl", "诊断"],
-    hot: true,
-  },
-  {
-    name: "技术知识库",
-    description: "100+ 教程 · 在线练习 · 模拟实验",
-    href: "/learn",
-    icon: BookOpen,
-    gradient: "from-[#30d158] to-[#0a84ff]",
-    glow: "rgba(48, 209, 88, 0.15)",
-    category: "运维",
-    tags: ["知识", "教程", "练习", "linux", "sql", "docker", "git"],
-    hot: true,
-  },
-  {
-    name: "JSON 格式化",
-    description: "JSON 格式化、压缩、校验",
-    href: "/tools?tool=json",
-    icon: Braces,
-    gradient: "from-[#ff9f0a] to-[#ff375f]",
-    glow: "rgba(255, 159, 10, 0.15)",
-    category: "数据格式",
-    tags: ["json", "格式化", "压缩", "校验"],
-  },
-  {
-    name: "编解码",
-    description: "Base64、URL 编码/解码",
-    href: "/tools?tool=encoding",
-    icon: Lock,
-    gradient: "from-[#64d2ff] to-[#0a84ff]",
-    glow: "rgba(100, 210, 255, 0.15)",
-    category: "编码加密",
-    tags: ["base64", "url", "编码", "解码"],
-  },
-  {
-    name: "时间戳转换",
-    description: "Unix 时间戳 ↔ 日期",
-    href: "/tools?tool=timestamp",
-    icon: Clock,
-    gradient: "from-[#ff9f0a] to-[#30d158]",
-    glow: "rgba(255, 159, 10, 0.15)",
-    category: "转换器",
-    tags: ["时间戳", "timestamp", "日期"],
-  },
-  {
-    name: "服务器监控",
-    description: "CPU/内存/磁盘实时监控",
-    href: "/monitor",
-    icon: Activity,
-    gradient: "from-[#40c8e0] to-[#0a84ff]",
-    glow: "rgba(64, 200, 224, 0.15)",
-    category: "运维",
-    tags: ["监控", "cpu", "内存", "磁盘"],
-  },
-  {
-    name: "日志查看",
-    description: "SSH 实时查看服务器日志",
-    href: "/log-viewer",
-    icon: FileText,
-    gradient: "from-[#ff9f0a] to-[#30d158]",
-    glow: "rgba(255, 159, 10, 0.15)",
-    category: "运维",
-    tags: ["日志", "log", "查看"],
-  },
-  {
-    name: "API 测试",
-    description: "REST API 调试工具",
-    href: "/api-tester",
-    icon: Globe,
-    gradient: "from-[#ff375f] to-[#bf5af2]",
-    glow: "rgba(255, 55, 95, 0.15)",
-    category: "运维",
-    tags: ["api", "http", "rest", "调试"],
-  },
-  {
-    name: "哈希计算",
-    description: "MD5、SHA-1、SHA-256",
-    href: "/tools?tool=hash",
-    icon: Hash,
-    gradient: "from-[#ff375f] to-[#bf5af2]",
-    glow: "rgba(255, 55, 95, 0.15)",
-    category: "编码加密",
-    tags: ["md5", "sha", "哈希", "hash"],
-  },
-  {
-    name: "配置生成器",
-    description: "Docker Compose、Nginx、Systemd 配置",
-    href: "/config-generator",
-    icon: FileCode,
-    gradient: "from-[#0a84ff] to-[#5e5ce6]",
-    glow: "rgba(10, 132, 255, 0.15)",
-    category: "运维",
-    tags: ["docker", "nginx", "systemd", "配置"],
-  },
-  {
-    name: "JWT 解码",
-    description: "JWT Token 解析查看",
-    href: "/tools?tool=jwt",
-    icon: Fingerprint,
-    gradient: "from-[#bf5af2] to-[#5e5ce6]",
-    glow: "rgba(191, 90, 242, 0.15)",
-    category: "编码加密",
-    tags: ["jwt", "token", "解码"],
-  },
-  {
-    name: "chmod 计算",
-    description: "文件权限计算器",
-    href: "/tools?tool=chmod",
-    icon: Lock,
-    gradient: "from-[#64d2ff] to-[#0a84ff]",
-    glow: "rgba(100, 210, 255, 0.15)",
-    category: "转换器",
-    tags: ["chmod", "权限", "计算"],
-  },
-  {
-    name: "密码生成",
-    description: "安全随机密码生成",
-    href: "/tools?tool=password",
-    icon: Key,
-    gradient: "from-[#64d2ff] to-[#0a84ff]",
-    glow: "rgba(100, 210, 255, 0.15)",
-    category: "生成器",
-    tags: ["密码", "password", "生成"],
-  },
-  {
-    name: "SQL 美化",
-    description: "SQL 语句格式化",
-    href: "/tools?tool=sql",
-    icon: Database,
-    gradient: "from-[#30d158] to-[#34c759]",
-    glow: "rgba(48, 209, 88, 0.15)",
-    category: "数据格式",
-    tags: ["sql", "格式化", "美化"],
-  },
-  {
-    name: "脚本库",
-    description: "Python/SQL/Shell 脚本模板 + AI",
-    href: "/scripts",
-    icon: ScrollText,
-    gradient: "from-[#30d158] to-[#34c759]",
-    glow: "rgba(48, 209, 88, 0.15)",
-    category: "运维",
-    tags: ["python", "sql", "shell", "脚本"],
-  },
-  {
-    name: "YAML ↔ JSON",
-    description: "YAML 与 JSON 互转",
-    href: "/tools?tool=yaml-json",
-    icon: ArrowRightLeft,
-    gradient: "from-[#0a84ff] to-[#5e5ce6]",
-    glow: "rgba(10, 132, 255, 0.15)",
-    category: "数据格式",
-    tags: ["yaml", "json", "转换"],
-  },
-  {
-    name: "正则测试",
-    description: "正则表达式测试",
-    href: "/tools?tool=regex",
-    icon: Regex,
-    gradient: "from-[#30d158] to-[#34c759]",
-    glow: "rgba(48, 209, 88, 0.15)",
-    category: "文本工具",
-    tags: ["正则", "regex", "测试"],
-  },
-  {
-    name: "子网计算器",
-    description: "IPv4 子网划分计算",
-    href: "/tools?tool=subnet",
-    icon: Network,
-    gradient: "from-[#64d2ff] to-[#0a84ff]",
-    glow: "rgba(100, 210, 255, 0.15)",
-    category: "网络工具",
-    tags: ["子网", "subnet", "ipv4", "计算"],
-  },
-  {
-    name: "Docker 转换",
-    description: "docker run → compose",
-    href: "/tools?tool=docker",
-    icon: Container,
-    gradient: "from-[#30d158] to-[#34c759]",
-    glow: "rgba(48, 209, 88, 0.15)",
-    category: "转换器",
-    tags: ["docker", "compose", "转换"],
-  },
-  {
-    name: "URL 解析",
-    description: "URL 各部分解析",
-    href: "/tools?tool=url",
-    icon: Link2,
-    gradient: "from-[#bf5af2] to-[#5e5ce6]",
-    glow: "rgba(191, 90, 242, 0.15)",
-    category: "Web 工具",
-    tags: ["url", "解析", "链接"],
-  },
-  {
-    name: "密码强度",
-    description: "密码强度分析评估",
-    href: "/tools?tool=strength",
-    icon: ShieldCheck,
-    gradient: "from-[#ff375f] to-[#bf5af2]",
-    glow: "rgba(255, 55, 95, 0.15)",
-    category: "生成器",
-    tags: ["密码", "强度", "分析"],
-  },
-  {
-    name: "文本对比",
-    description: "文本差异对比",
-    href: "/tools?tool=text-diff",
-    icon: Scissors,
-    gradient: "from-[#ff9f0a] to-[#30d158]",
-    glow: "rgba(255, 159, 10, 0.15)",
-    category: "文本工具",
-    tags: ["文本", "diff", "对比", "差异"],
-  },
-  {
-    name: "Markdown → HTML",
-    description: "Markdown 转 HTML",
-    href: "/tools?tool=markdown",
-    icon: FileCode2,
-    gradient: "from-[#bf5af2] to-[#5e5ce6]",
-    glow: "rgba(191, 90, 242, 0.15)",
-    category: "数据格式",
-    tags: ["markdown", "html", "转换"],
-  },
-  {
-    name: "HMAC 生成",
-    description: "HMAC-SHA256/512 签名",
-    href: "/tools?tool=hmac",
-    icon: Key,
-    gradient: "from-[#ff9f0a] to-[#30d158]",
-    glow: "rgba(255, 159, 10, 0.15)",
-    category: "编码加密",
-    tags: ["hmac", "签名", "sha256"],
-  },
-  {
-    name: "二维码生成",
-    description: "文本/URL 生成二维码",
-    href: "/tools?tool=qr",
-    icon: QrCode,
-    gradient: "from-[#30d158] to-[#34c759]",
-    glow: "rgba(48, 209, 88, 0.15)",
-    category: "生成器",
-    tags: ["二维码", "qr", "生成"],
-  },
-  {
-    name: "UUID 生成",
-    description: "UUID v1/v4 批量生成",
-    href: "/tools?tool=uuid",
-    icon: IdCard,
-    gradient: "from-[#0a84ff] to-[#5e5ce6]",
-    glow: "rgba(10, 132, 255, 0.15)",
-    category: "生成器",
-    tags: ["uuid", "生成", "批量"],
-  },
-  {
-    name: "OTP 生成",
-    description: "TOTP 动态验证码",
-    href: "/tools?tool=otp",
-    icon: Timer,
-    gradient: "from-[#ff9f0a] to-[#30d158]",
-    glow: "rgba(255, 159, 10, 0.15)",
-    category: "生成器",
-    tags: ["otp", "totp", "验证码"],
-  },
-  {
-    name: "MAC 地址",
-    description: "随机 MAC 地址生成",
-    href: "/tools?tool=mac",
-    icon: Network,
-    gradient: "from-[#30d158] to-[#34c759]",
-    glow: "rgba(48, 209, 88, 0.15)",
-    category: "生成器",
-    tags: ["mac", "地址", "生成"],
-  },
-  {
-    name: "颜色转换",
-    description: "HEX/RGB/HSL 互转",
-    href: "/tools?tool=color",
-    icon: Palette,
-    gradient: "from-[#ff375f] to-[#bf5af2]",
-    glow: "rgba(255, 55, 95, 0.15)",
-    category: "转换器",
-    tags: ["颜色", "color", "hex", "rgb", "hsl"],
-  },
-  {
-    name: "大小写转换",
-    description: "8种大小写格式转换",
-    href: "/tools?tool=case",
-    icon: Type,
-    gradient: "from-[#0a84ff] to-[#5e5ce6]",
-    glow: "rgba(10, 132, 255, 0.15)",
-    category: "转换器",
-    tags: ["大小写", "case", "转换"],
-  },
-  {
-    name: "UA 解析",
-    description: "User-Agent 解析",
-    href: "/tools?tool=ua",
-    icon: Globe2,
-    gradient: "from-[#ff9f0a] to-[#ff375f]",
-    glow: "rgba(255, 159, 10, 0.15)",
-    category: "Web 工具",
-    tags: ["ua", "user-agent", "解析"],
-  },
-  {
-    name: "MIME 参考",
-    description: "MIME 类型速查表",
-    href: "/tools?tool=mime",
-    icon: FileCode2,
-    gradient: "from-[#0a84ff] to-[#5e5ce6]",
-    glow: "rgba(10, 132, 255, 0.15)",
-    category: "Web 工具",
-    tags: ["mime", "类型", "参考"],
-  },
-  {
-    name: "JSON Diff",
-    description: "JSON 对比差异",
-    href: "/tools?tool=json-diff",
-    icon: FileDiff,
-    gradient: "from-[#ff375f] to-[#bf5af2]",
-    glow: "rgba(255, 55, 95, 0.15)",
-    category: "Web 工具",
-    tags: ["json", "diff", "对比", "差异"],
-  },
-  {
-    name: "文本统计",
-    description: "字符/单词/句子统计",
-    href: "/tools?tool=text-stat",
-    icon: Binary,
-    gradient: "from-[#bf5af2] to-[#5e5ce6]",
-    glow: "rgba(191, 90, 242, 0.15)",
-    category: "文本工具",
-    tags: ["文本", "统计", "字符", "单词"],
-  },
-  {
-    name: "Lorem Ipsum",
-    description: "占位文本生成",
-    href: "/tools?tool=lorem",
-    icon: FileText,
-    gradient: "from-[#bf5af2] to-[#5e5ce6]",
-    glow: "rgba(191, 90, 242, 0.15)",
-    category: "生成器",
-    tags: ["lorem", "ipsum", "占位", "文本"],
-  },
-  {
-    name: "配置漂移",
-    description: "配置文件变更检测",
-    href: "/drift",
-    icon: FileDiff,
-    gradient: "from-[#ff9f0a] to-[#ff375f]",
-    glow: "rgba(255, 159, 10, 0.15)",
-    category: "运维",
-    tags: ["配置", "漂移", "变更"],
-  },
-  {
-    name: "告警中心",
-    description: "告警聚合与管理",
-    href: "/alerts",
-    icon: Shield,
-    gradient: "from-[#ff375f] to-[#bf5af2]",
-    glow: "rgba(255, 55, 95, 0.15)",
-    category: "运维",
-    tags: ["告警", "alert", "管理"],
-  },
-  {
-    name: "故障知识库",
-    description: "KEDB 故障诊断知识",
-    href: "/kedb",
-    icon: Database,
-    gradient: "from-[#bf5af2] to-[#5e5ce6]",
-    glow: "rgba(191, 90, 242, 0.15)",
-    category: "运维",
-    tags: ["知识库", "kedb", "故障"],
-  },
-  {
-    name: "自动化流程",
-    description: "Runbook 自动化执行",
-    href: "/runbooks",
-    icon: Timer,
-    gradient: "from-[#30d158] to-[#34c759]",
-    glow: "rgba(48, 209, 88, 0.15)",
-    category: "运维",
-    tags: ["runbook", "自动化", "流程"],
-  },
-  {
-    name: "批量操作",
-    description: "多服务器命令执行",
-    href: "/batch",
-    icon: TerminalSquare,
-    gradient: "from-[#64d2ff] to-[#0a84ff]",
-    glow: "rgba(100, 210, 255, 0.15)",
-    category: "运维",
-    tags: ["批量", "多服务器", "执行"],
-  },
-  {
-    name: "证书监控",
-    description: "SSL 证书过期监控",
-    href: "/certs",
-    icon: ShieldCheck,
-    gradient: "from-[#30d158] to-[#34c759]",
-    glow: "rgba(48, 209, 88, 0.15)",
-    category: "运维",
-    tags: ["证书", "ssl", "监控"],
-  },
-  {
-    name: "审计日志",
-    description: "操作审计与合规",
-    href: "/audit",
-    icon: FileSearch,
-    gradient: "from-[#ff9f0a] to-[#30d158]",
-    glow: "rgba(255, 159, 10, 0.15)",
-    category: "运维",
-    tags: ["审计", "日志", "合规"],
-  },
+  { name: "在线终端", description: "SSH 连接 + 命令库", href: "/terminal", icon: Terminal, category: "运维" },
+  { name: "诊断工具", description: "端口探测、DNS、SSL", href: "/diagnostics", icon: Search, category: "运维" },
+  { name: "JSON 格式化", description: "JSON 格式化、压缩、校验", href: "/tools?tool=json", icon: Code, category: "数据格式" },
+  { name: "编解码", description: "Base64、URL 编码/解码", href: "/tools?tool=encoding", icon: Shield, category: "编码加密" },
+  { name: "时间戳转换", description: "Unix 时间戳与日期互转", href: "/tools?tool=timestamp", icon: Clock, category: "转换器" },
+  { name: "服务器监控", description: "CPU/内存/磁盘实时监控", href: "/monitor", icon: Cpu, category: "运维" },
+  { name: "日志查看", description: "SSH 实时查看服务器日志", href: "/log-viewer", icon: FileCode, category: "运维" },
+  { name: "哈希计算", description: "MD5、SHA-1、SHA-256", href: "/tools?tool=hash", icon: Shield, category: "编码加密" },
+  { name: "密码生成器", description: "安全随机密码生成", href: "/tools?tool=password", icon: Shield, category: "编码加密" },
+  { name: "正则测试", description: "正则表达式在线测试", href: "/tools?tool=regex", icon: Code, category: "开发" },
+  { name: "QR 码生成", description: "二维码生成器", href: "/tools?tool=qr", icon: Globe, category: "转换器" },
+  { name: "配置生成器", description: "Docker Compose、Nginx 配置", href: "/config-generator", icon: Layers, category: "运维" },
+  { name: "批量操作", description: "批量服务器命令执行", href: "/batch", icon: Terminal, category: "运维" },
+  { name: "证书管理", description: "SSL 证书检查与管理", href: "/certs", icon: Shield, category: "运维" },
+  { name: "知识库", description: "100+ 教程 · 在线练习", href: "/learn", icon: BookOpen, category: "学习" },
 ];
 
+type Mode = "knowledge" | "tools";
+
 export default function HomePage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [mode, setMode] = useState<Mode>("knowledge");
+  const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [visitCount, setVisitCount] = useState(0);
 
-  // Load favorites from localStorage
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("toolkitx_favorites");
-      if (saved) {
-        setFavorites(new Set(JSON.parse(saved)));
-      }
-    } catch {}
+    setVisitCount(incrementVisitCount());
   }, []);
 
-  // Restore scroll position from sessionStorage
-  useEffect(() => {
-    const scrollContainer = document.querySelector("main");
-    if (!scrollContainer) return;
-    const saved = sessionStorage.getItem("home_scroll_pos");
-    if (saved) {
-      scrollContainer.scrollTop = parseInt(saved, 10);
-    }
-    const handleScroll = () => {
-      sessionStorage.setItem("home_scroll_pos", scrollContainer.scrollTop.toString());
-    };
-    scrollContainer.addEventListener("scroll", handleScroll, { passive: true });
-    return () => scrollContainer.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const toggleFavorite = (toolName: string, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setFavorites((prev) => {
-      const next = new Set(prev);
-      if (next.has(toolName)) {
-        next.delete(toolName);
-      } else {
-        next.add(toolName);
-      }
-      try {
-        localStorage.setItem("toolkitx_favorites", JSON.stringify([...next]));
-      } catch {}
-      return next;
-    });
-  };
+  const filteredCategories = useMemo(() => {
+    if (!search && !selectedCategory) return categories;
+    const q = search.toLowerCase();
+    return categories
+      .map(cat => ({
+        ...cat,
+        tutorials: cat.tutorials.filter(
+          t =>
+            (!selectedCategory || cat.id === selectedCategory) &&
+            (t.title.toLowerCase().includes(q) ||
+              t.description.toLowerCase().includes(q) ||
+              t.tags.some(tag => tag.toLowerCase().includes(q)))
+        ),
+      }))
+      .filter(cat => cat.tutorials.length > 0);
+  }, [search, selectedCategory]);
 
   const filteredTools = useMemo(() => {
-    let tools = allTools;
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      tools = tools.filter(
-        (tool) =>
-          tool.name.toLowerCase().includes(query) ||
-          tool.description.toLowerCase().includes(query) ||
-          tool.category.toLowerCase().includes(query) ||
-          tool.tags.some((tag) => tag.includes(query))
-      );
-    }
-    // Sort: favorited tools first
-    return [...tools].sort((a, b) => {
-      const aFav = favorites.has(a.name) ? 1 : 0;
-      const bFav = favorites.has(b.name) ? 1 : 0;
-      return bFav - aFav;
-    });
-  }, [searchQuery, favorites]);
+    if (!search) return allTools;
+    const q = search.toLowerCase();
+    return allTools.filter(
+      t => t.name.toLowerCase().includes(q) || t.description.toLowerCase().includes(q)
+    );
+  }, [search]);
+
+  const totalTutorials = categories.reduce((sum, c) => sum + c.tutorials.length, 0);
 
   return (
-    <main className="flex-1 overflow-auto relative">
-      {/* Aurora Background */}
-      <div className="aurora-bg">
-        <div className="aurora-blob aurora-blob-1" />
-        <div className="aurora-blob aurora-blob-2" />
-        <div className="aurora-blob aurora-blob-3" />
-        <div className="aurora-blob aurora-blob-4" />
-      </div>
+    <div className="learn-neon h-screen flex flex-col overflow-hidden">
+      {/* Grain Overlay */}
+      <div className="grain-overlay" />
 
-      <div className="max-w-[1400px] mx-auto px-8 py-8 relative z-10">
-        {/* Hero */}
-        <div className="mb-6 animate-fade-in">
-          <h1 className="text-gradient text-[42px] font-bold tracking-tight mb-3">
-            ToolkitX
-          </h1>
-          <p className="text-muted-foreground text-[15px] leading-relaxed max-w-lg mb-6">
-            运维工具箱 + AI 助手，一站式解决日常运维需求
-          </p>
-
-          {/* Search Box */}
-          <div className="relative max-w-xl">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="搜索工具... (支持名称、描述、标签模糊搜索)"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] text-[14px] placeholder:text-muted-foreground/40 focus:outline-none focus:border-[#0a84ff]/50 focus:bg-white/[0.06] transition-all"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/40 hover:text-foreground transition-colors"
-              >
-                ✕
+      {/* Top Navigation */}
+      <header className="fixed top-0 left-0 right-0 z-40 border-b border-[var(--neon-outline-variant)]" style={{ background: "rgba(19,19,19,0.8)", backdropFilter: "blur(12px)" }}>
+        <nav className="flex justify-between items-center h-16 px-6 md:px-16 w-full max-w-[1280px] mx-auto">
+          <div className="flex items-center gap-10">
+            <Link href="/" className="text-[24px] font-bold tracking-tighter" style={{ color: "var(--neon-primary)" }}>
+              ToolkitX
+            </Link>
+            <div className="hidden md:flex gap-8 items-center">
+              <Link href="/" className="font-['Geist'] text-[12px] tracking-[0.05em] font-medium transition-colors" style={{ color: "var(--neon-secondary)", borderBottom: "2px solid var(--neon-secondary)", paddingBottom: "2px" }}>
+                知识库
+              </Link>
+              <Link href="/learn" className="font-['Geist'] text-[12px] tracking-[0.05em] font-medium transition-colors hover:text-[var(--neon-on-surface)]" style={{ color: "var(--neon-on-surface-variant)" }}>
+                教程
+              </Link>
+              <Link href="/tools" className="font-['Geist'] text-[12px] tracking-[0.05em] font-medium transition-colors hover:text-[var(--neon-on-surface)]" style={{ color: "var(--neon-on-surface-variant)" }}>
+                工具箱
+              </Link>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            {/* Mode Toggle */}
+            <div className="mode-toggle">
+              <button className={mode === "knowledge" ? "active" : ""} onClick={() => setMode("knowledge")}>
+                知识版
               </button>
-            )}
+              <button className={mode === "tools" ? "active" : ""} onClick={() => setMode("tools")}>
+                工具版
+              </button>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1 pt-16 overflow-y-auto">
+        {mode === "knowledge" ? (
+          <KnowledgeMode
+            search={search}
+            setSearch={setSearch}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            filteredCategories={filteredCategories}
+            totalTutorials={totalTutorials}
+          />
+        ) : (
+          <ToolsMode search={search} setSearch={setSearch} filteredTools={filteredTools} />
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-[var(--neon-outline-variant)]" style={{ background: "var(--neon-bg)" }}>
+        <div className="flex flex-col md:flex-row justify-between items-center py-8 px-6 md:px-16 w-full max-w-[1280px] mx-auto gap-6">
+          <div className="flex flex-col gap-2 mb-4 md:mb-0">
+            <div className="text-[24px] font-bold tracking-tighter" style={{ color: "var(--neon-primary)" }}>ToolkitX</div>
+            <p className="font-['Geist'] text-[12px] tracking-[0.05em]" style={{ color: "var(--neon-on-surface-variant)" }}>
+              技术知识库 & 运维工具箱 · {totalTutorials} 篇教程 · 37+ 工具
+            </p>
+          </div>
+          <div className="flex flex-col md:flex-row gap-12 text-center md:text-left">
+            <div className="flex flex-col gap-3">
+              <p className="font-['Geist'] text-[12px] uppercase tracking-[0.1em] font-medium" style={{ color: "var(--neon-on-surface)" }}>学习</p>
+              <Link href="/learn" className="font-['Geist'] text-[12px] transition-colors hover:text-[var(--neon-secondary)]" style={{ color: "var(--neon-on-surface-variant)" }}>全部教程</Link>
+              <Link href="/learn/linux" className="font-['Geist'] text-[12px] transition-colors hover:text-[var(--neon-secondary)]" style={{ color: "var(--neon-on-surface-variant)" }}>Linux</Link>
+              <Link href="/learn/python" className="font-['Geist'] text-[12px] transition-colors hover:text-[var(--neon-secondary)]" style={{ color: "var(--neon-on-surface-variant)" }}>Python</Link>
+            </div>
+            <div className="flex flex-col gap-3">
+              <p className="font-['Geist'] text-[12px] uppercase tracking-[0.1em] font-medium" style={{ color: "var(--neon-on-surface)" }}>工具</p>
+              <Link href="/terminal" className="font-['Geist'] text-[12px] transition-colors hover:text-[var(--neon-secondary)]" style={{ color: "var(--neon-on-surface-variant)" }}>在线终端</Link>
+              <Link href="/diagnostics" className="font-['Geist'] text-[12px] transition-colors hover:text-[var(--neon-secondary)]" style={{ color: "var(--neon-on-surface-variant)" }}>诊断工具</Link>
+              <Link href="/tools" className="font-['Geist'] text-[12px] transition-colors hover:text-[var(--neon-secondary)]" style={{ color: "var(--neon-on-surface-variant)" }}>更多工具</Link>
+            </div>
+          </div>
+          <div className="font-['Geist'] text-[10px] uppercase tracking-[0.1em]" style={{ color: "var(--neon-text-muted)" }}>
+            &copy; 2026 ToolkitX · 访问量：{visitCount}
           </div>
         </div>
+      </footer>
+    </div>
+  );
+}
 
-        {/* Tools Grid - 5 columns */}
-        <div className="grid gap-3 grid-cols-5">
-          {filteredTools.map((tool, i) => (
-            <Link
-              key={tool.name}
-              href={tool.href}
-              className={`group relative p-4 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:shadow-[0_8px_32px_rgba(0,0,0,0.2)] animate-fade-in ${
-                i < 5 ? `stagger-${i + 1}` : ""
-              }`}
-            >
-              <div
-                className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                style={{
-                  background: `radial-gradient(300px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${tool.glow}, transparent 60%)`,
-                }}
+/* ============ Knowledge Mode ============ */
+function KnowledgeMode({
+  search,
+  setSearch,
+  selectedCategory,
+  setSelectedCategory,
+  filteredCategories,
+  totalTutorials,
+}: {
+  search: string;
+  setSearch: (s: string) => void;
+  selectedCategory: string | null;
+  setSelectedCategory: (c: string | null) => void;
+  filteredCategories: TutorialCategory[];
+  totalTutorials: number;
+}) {
+  return (
+    <>
+      {/* Hero Section */}
+      <section className="relative min-h-[500px] flex flex-col items-center justify-center overflow-hidden border-b border-[var(--neon-outline-variant)]">
+        <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
+          <span className="font-['Geist'] text-[12px] uppercase tracking-[0.3em] mb-6 block" style={{ color: "var(--neon-secondary)" }}>
+            System Protocol v4.0
+          </span>
+          <h1 className="text-[48px] md:text-[84px] font-semibold leading-none mb-8" style={{ letterSpacing: "-0.02em", color: "var(--neon-on-surface)" }}>
+            工程卓越的<br />数字基石
+          </h1>
+          <p className="text-[16px] leading-relaxed mb-12 max-w-2xl mx-auto" style={{ color: "var(--neon-on-surface-variant)" }}>
+            ToolkitX 提供执行级的技术学习体验。通过精密的课程架构与极致的交互逻辑，重塑现代开发知识体系。共 {totalTutorials} 篇教程，覆盖 {categories.length} 个技术领域。
+          </p>
+
+          {/* Search */}
+          <div className="max-w-xl mx-auto relative">
+            <div className="flex items-center p-4 border border-[var(--neon-outline-variant)] focus-within:border-[var(--neon-secondary)] transition-all" style={{ background: "var(--neon-surface-container-low)" }}>
+              <Search className="h-5 w-5 mr-3" style={{ color: "var(--neon-on-surface-variant)" }} />
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="搜索教程... (例如 Linux, grep, JOIN, Docker)"
+                className="bg-transparent border-none outline-none w-full text-[16px]"
+                style={{ color: "var(--neon-on-surface)", fontFamily: "'Inter', sans-serif" }}
               />
-              <div className="relative">
-                <div className="flex items-center gap-3 mb-2">
-                  <div
-                    className={`w-8 h-8 rounded-lg bg-gradient-to-br ${tool.gradient} flex items-center justify-center shadow-sm`}
-                  >
-                    <tool.icon className="h-4 w-4 text-white" />
-                  </div>
-                  <span className="text-[11px] text-muted-foreground/50 font-medium flex-1">
-                    {tool.category}
-                  </span>
-                  {"hot" in tool && tool.hot && (
-                    <span className="px-1.5 py-0.5 text-[9px] font-bold bg-gradient-to-r from-[#ff375f] to-[#ff9f0a] text-white rounded-md shadow-sm">
-                      HOT
-                    </span>
-                  )}
-                  <button
-                    onClick={(e) => toggleFavorite(tool.name, e)}
-                    className="p-1 rounded-md hover:bg-white/[0.1] transition-all"
-                  >
-                    <Star
-                      className={`h-3.5 w-3.5 transition-all ${
-                        favorites.has(tool.name)
-                          ? "fill-[#ff9f0a] text-[#ff9f0a]"
-                          : "text-muted-foreground/30 hover:text-muted-foreground/60"
-                      }`}
-                    />
-                  </button>
-                </div>
-                <h3 className="text-[13px] font-semibold tracking-tight mb-0.5">
-                  {tool.name}
-                </h3>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  {tool.description}
-                </p>
-              </div>
-            </Link>
+              <kbd className="text-[10px] px-2 py-1 border border-[var(--neon-outline-variant)] ml-3 font-['Geist']" style={{ color: "var(--neon-text-muted)", background: "var(--neon-surface-container)" }}>
+                ⌘K
+              </kbd>
+            </div>
+          </div>
+        </div>
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce opacity-40">
+          <ChevronRight className="h-6 w-6 rotate-90" style={{ color: "var(--neon-on-surface-variant)" }} />
+        </div>
+      </section>
+
+      {/* Category Filter */}
+      <section className="py-6 px-6 md:px-16 max-w-[1280px] mx-auto border-b border-[var(--neon-outline-variant)]">
+        <div className="flex flex-wrap gap-2 justify-center">
+          <button
+            onClick={() => setSelectedCategory(null)}
+            className={`px-4 py-2 font-['Geist'] text-[12px] tracking-[0.05em] uppercase border transition-all ${
+              !selectedCategory
+                ? "border-[var(--neon-secondary)] font-bold"
+                : "border-[var(--neon-outline-variant)] hover:border-[var(--neon-secondary)]"
+            }`}
+            style={{
+              background: !selectedCategory ? "var(--neon-secondary)" : "transparent",
+              color: !selectedCategory ? "var(--neon-surface-container-lowest)" : "var(--neon-on-surface-variant)",
+            }}
+          >
+            全部
+          </button>
+          {categories.map(cat => (
+            <button
+              key={cat.id}
+              onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
+              className={`px-4 py-2 font-['Geist'] text-[12px] tracking-[0.05em] uppercase border transition-all ${
+                selectedCategory === cat.id
+                  ? "border-[var(--neon-secondary)] font-bold"
+                  : "border-[var(--neon-outline-variant)] hover:border-[var(--neon-secondary)]"
+              }`}
+              style={{
+                background: selectedCategory === cat.id ? "var(--neon-secondary)" : "transparent",
+                color: selectedCategory === cat.id ? "var(--neon-surface-container-lowest)" : "var(--neon-on-surface-variant)",
+              }}
+            >
+              {cat.name}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* Categories Grid */}
+      <section className="py-16 px-6 md:px-16 max-w-[1280px] mx-auto">
+        <div className="flex justify-between items-end mb-12">
+          <div>
+            <h2 className="text-[32px] font-semibold mb-2" style={{ color: "var(--neon-on-surface)" }}>核心探索路径</h2>
+            <p style={{ color: "var(--neon-on-surface-variant)" }}>精选架构范式，助力突破性增长。</p>
+          </div>
+          <span className="font-['Geist'] text-[12px] tracking-[0.05em] uppercase" style={{ color: "var(--neon-secondary)" }}>
+            {filteredCategories.length} 个分类
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredCategories.map(cat => (
+            <CategoryCard key={cat.id} category={cat} />
           ))}
         </div>
 
-        {/* Empty State */}
-        {filteredTools.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-muted-foreground/40 text-[14px]">
-              没有找到匹配的工具
-            </p>
-            <button
-              onClick={() => setSearchQuery("")}
-              className="mt-3 text-[#0a84ff] text-[13px] hover:underline"
-            >
-              清除搜索
-            </button>
+        {filteredCategories.length === 0 && (
+          <div className="text-center py-20">
+            <Search className="h-12 w-12 mx-auto mb-4" style={{ color: "var(--neon-text-muted)" }} />
+            <p className="text-[14px] font-['Geist']" style={{ color: "var(--neon-text-muted)" }}>没有找到相关教程</p>
           </div>
         )}
+      </section>
+
+      {/* Stats */}
+      <section className="py-16 px-6 md:px-16 max-w-[1280px] mx-auto border-t border-[var(--neon-outline-variant)]">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+          <div>
+            <div className="text-[48px] font-semibold leading-none mb-2" style={{ color: "var(--neon-secondary)", letterSpacing: "-0.02em" }}>{totalTutorials}+</div>
+            <div className="font-['Geist'] text-[12px] uppercase tracking-[0.1em]" style={{ color: "var(--neon-text-muted)" }}>技术教程</div>
+          </div>
+          <div>
+            <div className="text-[48px] font-semibold leading-none mb-2" style={{ color: "var(--neon-secondary)", letterSpacing: "-0.02em" }}>{categories.length}</div>
+            <div className="font-['Geist'] text-[12px] uppercase tracking-[0.1em]" style={{ color: "var(--neon-text-muted)" }}>技术领域</div>
+          </div>
+          <div>
+            <div className="text-[48px] font-semibold leading-none mb-2" style={{ color: "var(--neon-secondary)", letterSpacing: "-0.02em" }}>37+</div>
+            <div className="font-['Geist'] text-[12px] uppercase tracking-[0.1em]" style={{ color: "var(--neon-text-muted)" }}>运维工具</div>
+          </div>
+          <div>
+            <div className="text-[48px] font-semibold leading-none mb-2" style={{ color: "var(--neon-secondary)", letterSpacing: "-0.02em" }}>24/7</div>
+            <div className="font-['Geist'] text-[12px] uppercase tracking-[0.1em]" style={{ color: "var(--neon-text-muted)" }}>在线访问</div>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+/* ============ Tools Mode ============ */
+function ToolsMode({
+  search,
+  setSearch,
+  filteredTools,
+}: {
+  search: string;
+  setSearch: (s: string) => void;
+  filteredTools: typeof allTools;
+}) {
+  const toolCategories = [...new Set(allTools.map(t => t.category))];
+
+  return (
+    <>
+      {/* Hero */}
+      <section className="relative min-h-[400px] flex flex-col items-center justify-center overflow-hidden border-b border-[var(--neon-outline-variant)]">
+        <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
+          <span className="font-['Geist'] text-[12px] uppercase tracking-[0.3em] mb-6 block" style={{ color: "var(--neon-secondary)" }}>
+            Developer Toolbox
+          </span>
+          <h1 className="text-[48px] md:text-[64px] font-semibold leading-none mb-8" style={{ letterSpacing: "-0.02em", color: "var(--neon-on-surface)" }}>
+            运维工具箱
+          </h1>
+          <p className="text-[16px] leading-relaxed mb-12 max-w-2xl mx-auto" style={{ color: "var(--neon-on-surface-variant)" }}>
+            {allTools.length} 款在线工具，覆盖终端、诊断、编码、格式化等运维场景。
+          </p>
+          <div className="max-w-xl mx-auto">
+            <div className="flex items-center p-4 border border-[var(--neon-outline-variant)] focus-within:border-[var(--neon-secondary)] transition-all" style={{ background: "var(--neon-surface-container-low)" }}>
+              <Search className="h-5 w-5 mr-3" style={{ color: "var(--neon-on-surface-variant)" }} />
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="搜索工具..."
+                className="bg-transparent border-none outline-none w-full text-[16px]"
+                style={{ color: "var(--neon-on-surface)" }}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Tools by Category */}
+      <section className="py-16 px-6 md:px-16 max-w-[1280px] mx-auto">
+        {toolCategories.map(cat => (
+          <div key={cat} className="mb-12">
+            <h3 className="text-[24px] font-semibold mb-6" style={{ color: "var(--neon-on-surface)" }}>{cat}</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {filteredTools
+                .filter(t => t.category === cat)
+                .map(tool => (
+                  <Link key={tool.href} href={tool.href}>
+                    <div className="neon-card p-6 h-full group cursor-pointer">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 flex items-center justify-center border border-[var(--neon-outline-variant)]" style={{ background: "var(--neon-surface-container)" }}>
+                          <tool.icon className="h-5 w-5" style={{ color: "var(--neon-secondary)" }} />
+                        </div>
+                        <div>
+                          <h4 className="font-medium group-hover:text-[var(--neon-secondary)] transition-colors" style={{ color: "var(--neon-on-surface)" }}>{tool.name}</h4>
+                          <p className="text-[12px]" style={{ color: "var(--neon-text-muted)" }}>{tool.description}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+            </div>
+          </div>
+        ))}
+      </section>
+    </>
+  );
+}
+
+/* ============ Category Card ============ */
+function CategoryCard({ category }: { category: TutorialCategory }) {
+  const iconMap: Record<string, React.ReactNode> = {
+    linux: <Terminal className="h-6 w-6" />,
+    sql: <Database className="h-6 w-6" />,
+    docker: <Layers className="h-6 w-6" />,
+    git: <FileCode className="h-6 w-6" />,
+    nginx: <Globe className="h-6 w-6" />,
+    python: <Code className="h-6 w-6" />,
+    javascript: <Zap className="h-6 w-6" />,
+    shell: <Terminal className="h-6 w-6" />,
+    network: <Globe className="h-6 w-6" />,
+    redis: <Database className="h-6 w-6" />,
+  };
+
+  return (
+    <Link href={`/learn/${category.id}`}>
+      <div className="neon-card p-8 h-full flex flex-col group cursor-pointer">
+        <div className="flex justify-between items-start mb-6">
+          <div className="w-12 h-12 flex items-center justify-center border border-[var(--neon-outline-variant)]" style={{ background: "var(--neon-surface-container)" }}>
+            <span style={{ color: "var(--neon-secondary)" }}>{iconMap[category.id] || <BookOpen className="h-6 w-6" />}</span>
+          </div>
+          <span className="neon-tag">{category.tutorials.length} 个模块</span>
+        </div>
+
+        <h3 className="text-[24px] font-semibold mb-3" style={{ color: "var(--neon-on-surface)" }}>{category.name}</h3>
+        <p className="text-[14px] leading-relaxed mb-8 flex-grow" style={{ color: "var(--neon-on-surface-variant)" }}>
+          {category.description}
+        </p>
+
+        <div className="flex items-center justify-between mt-auto">
+          <span className="font-['Geist'] text-[12px]" style={{ color: "var(--neon-text-muted)" }}>
+            {category.tutorials.length} 篇教程
+          </span>
+          <div className="w-8 h-8 flex items-center justify-center border border-[var(--neon-outline-variant)] group-hover:border-[var(--neon-secondary)] group-hover:text-[var(--neon-secondary)] transition-all">
+            <ArrowRight className="h-4 w-4" />
+          </div>
+        </div>
       </div>
-    </main>
+    </Link>
   );
 }

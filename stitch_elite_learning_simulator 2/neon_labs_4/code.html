@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NEON_LABS | 卓越工程架构</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Geist:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #131313;
+            color: #e4e2e1;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .grain-overlay {
+            pointer-events: none;
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+        }
+        .muted-gold-glow {
+            box-shadow: 0 0 20px rgba(233, 195, 73, 0.1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#93000a",
+                        "primary": "#c8c6c5",
+                        "on-background": "#e4e2e1",
+                        "on-tertiary-fixed-variant": "#454748",
+                        "on-tertiary-container": "#7c7e7f",
+                        "primary-fixed": "#e5e2e1",
+                        "outline-variant": "#444748",
+                        "on-surface": "#e4e2e1",
+                        "on-tertiary-fixed": "#191c1d",
+                        "tertiary": "#c5c7c8",
+                        "on-secondary-container": "#342800",
+                        "surface-container-highest": "#353535",
+                        "secondary-fixed": "#ffe088",
+                        "surface-container": "#1f2020",
+                        "background": "#131313",
+                        "inverse-primary": "#5f5e5e",
+                        "on-secondary-fixed-variant": "#574500",
+                        "primary-container": "#121212",
+                        "on-error": "#690005",
+                        "on-primary-fixed": "#1c1b1b",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-fixed": "#e1e3e4",
+                        "on-surface-variant": "#c4c7c7",
+                        "secondary": "#e9c349",
+                        "primary-fixed-dim": "#c8c6c5",
+                        "surface-container-high": "#2a2a2a",
+                        "inverse-surface": "#e4e2e1",
+                        "tertiary-container": "#101314",
+                        "secondary-container": "#af8d11",
+                        "surface-tint": "#c8c6c5",
+                        "surface-bright": "#393939",
+                        "outline": "#8e9192",
+                        "tertiary-fixed-dim": "#c5c7c8",
+                        "on-primary-container": "#7e7d7d",
+                        "on-primary": "#313030",
+                        "on-tertiary": "#2e3132",
+                        "surface": "#131313",
+                        "on-secondary-fixed": "#241a00",
+                        "surface-dim": "#131313",
+                        "secondary-fixed-dim": "#e9c349",
+                        "surface-variant": "#353535",
+                        "on-secondary": "#3c2f00",
+                        "inverse-on-surface": "#303030",
+                        "error": "#ffb4ab",
+                        "on-primary-fixed-variant": "#474646",
+                        "surface-container-low": "#1b1c1c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "container-max": "1280px",
+                        "gutter": "24px",
+                        "margin-desktop": "64px",
+                        "margin-mobile": "20px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["Geist"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "500"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background selection:bg-secondary selection:text-on-secondary">
+<div class="grain-overlay"></div>
+<!-- Top Navigation Bar -->
+<header class="bg-background border-b border-outline-variant fixed top-0 w-full z-40 transition-all duration-200 ease-in-out">
+<div class="flex justify-between items-center h-20 px-margin-desktop w-full max-w-container-max mx-auto">
+<div class="flex items-center gap-12">
+<a class="font-display-lg text-display-lg font-bold tracking-tighter text-primary" href="#">NEON_LABS</a>
+<nav class="hidden md:flex gap-8">
+<a class="text-secondary font-bold border-b-2 border-secondary pb-1 font-body-md text-body-md" href="#">Library</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md" href="#">Simulations</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md" href="#">Tutorials</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md" href="#">Resources</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden lg:flex items-center bg-surface-container-low px-4 py-2 border border-outline-variant focus-within:border-secondary transition-all">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-on-surface font-body-md text-body-md placeholder:text-outline-variant w-48" placeholder="探索协议..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:text-primary transition-all" data-icon="notifications">notifications</button>
+<button class="px-6 py-2 bg-secondary text-on-secondary font-label-sm text-label-sm uppercase tracking-widest hover:brightness-110 transition-all">Sign In</button>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-20">
+<!-- Hero Section -->
+<section class="relative h-[870px] flex items-center justify-center overflow-hidden">
+
+<div class="relative z-10 text-center px-margin-mobile max-w-4xl mx-auto">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.3em] mb-6 block">System Protocol v4.0.2</span>
+<h1 class="font-display-lg text-display-lg md:text-[84px] text-on-background mb-8 leading-none">工程卓越的<br/>数字基石</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mb-12 max-w-2xl mx-auto">
+                    NEON_LABS 提供执行级的数字体验。通过精密的算法架构与极致的交互逻辑，重塑现代开发范式。
+                </p>
+<div class="flex flex-col md:flex-row items-center justify-center gap-4">
+<button class="w-full md:w-auto px-10 py-4 bg-secondary text-on-secondary font-label-sm text-label-sm uppercase tracking-[0.2em] font-bold transition-all hover:scale-[1.02] active:scale-[0.98]">
+                        Ready to initialize?
+                    </button>
+<button class="w-full md:w-auto px-10 py-4 border border-outline-variant text-on-surface font-label-sm text-label-sm uppercase tracking-[0.2em] hover:bg-surface-container-high transition-all">
+                        Documentation
+                    </button>
+</div>
+</div>
+<div class="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce opacity-40">
+<span class="material-symbols-outlined" data-icon="expand_more">expand_more</span>
+</div>
+</section>
+<!-- Featured Paths (Bento Grid) -->
+<section class="py-24 px-margin-desktop max-w-container-max mx-auto">
+<div class="flex justify-between items-end mb-16">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-background mb-2">核心探索路径</h2>
+<p class="text-on-surface-variant font-body-md">精选架构范式，助力突破性增长。</p>
+</div>
+<a class="text-secondary font-label-sm text-label-sm uppercase tracking-widest flex items-center gap-2 hover:opacity-80" href="#">
+                    查看全部路径 <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-[240px]">
+<!-- Python/Data Science -->
+<div class="md:col-span-8 bg-surface-container-lowest border border-outline-variant p-10 flex flex-col justify-between group cursor-pointer hover:border-secondary transition-all">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-secondary text-[40px]" data-icon="database">database</span>
+<span class="font-label-sm text-label-sm text-outline-variant">PATH_01</span>
+</div>
+<div>
+<h3 class="font-headline-lg text-headline-lg mb-2">Python &amp; 数据科学</h3>
+<p class="text-on-surface-variant font-body-md max-w-md">构建弹性数据管道与前沿分析模型，释放数据的深层潜力。</p>
+</div>
+</div>
+<!-- AI/Smart Dev -->
+<div class="md:col-span-4 bg-surface-container-low border border-outline-variant p-8 flex flex-col group cursor-pointer hover:border-secondary transition-all">
+<div class="flex-grow">
+<span class="material-symbols-outlined text-secondary mb-4" data-icon="psychology">psychology</span>
+<h3 class="font-headline-lg text-headline-lg mb-4 text-[24px]">AI &amp; 智能开发</h3>
+<p class="text-on-surface-variant font-label-sm text-label-sm leading-relaxed uppercase">集成式大型语言模型架构，实现全自动开发工作流。</p>
+</div>
+<div class="pt-4 flex items-center gap-2 text-secondary">
+<span class="font-label-sm">了解详情</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="trending_flat">trending_flat</span>
+</div>
+</div>
+<!-- Frontend Architecture -->
+<div class="md:col-span-5 bg-surface-container-low border border-outline-variant p-8 flex flex-col group cursor-pointer hover:border-secondary transition-all overflow-hidden relative">
+<div class="relative z-10">
+<span class="material-symbols-outlined text-secondary mb-4" data-icon="architecture">architecture</span>
+<h3 class="font-headline-lg text-headline-lg mb-4 text-[24px]">前端系统架构</h3>
+<p class="text-on-surface-variant font-label-sm text-label-sm leading-relaxed uppercase">微前端架构设计，打造高性能、可扩展的响应式用户界面。</p>
+</div>
+<div class="absolute -right-8 -bottom-8 opacity-5 scale-150">
+<span class="material-symbols-outlined text-[180px]" data-icon="layers">layers</span>
+</div>
+</div>
+<!-- Backend & Infra -->
+<div class="md:col-span-7 bg-surface-container-lowest border border-outline-variant p-10 flex flex-col justify-between group cursor-pointer hover:border-secondary transition-all">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-lg text-headline-lg mb-2">后端与基础设施</h3>
+<p class="text-on-surface-variant font-body-md max-w-sm">高可用、零停机的基础设施管理，定义云原生新高度。</p>
+</div>
+<span class="material-symbols-outlined text-secondary text-[40px]" data-icon="terminal">terminal</span>
+</div>
+<div class="flex gap-4">
+<span class="px-3 py-1 border border-outline-variant font-label-sm text-[10px] uppercase text-on-surface-variant">Kubernetes</span>
+<span class="px-3 py-1 border border-outline-variant font-label-sm text-[10px] uppercase text-on-surface-variant">Rust</span>
+<span class="px-3 py-1 border border-outline-variant font-label-sm text-[10px] uppercase text-on-surface-variant">DevOps</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Live Simulation & Pulse Feed -->
+<section class="py-24 bg-surface-container-lowest">
+<div class="px-margin-desktop max-w-container-max mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16">
+<!-- Simulation Overview -->
+<div class="relative">
+<div class="sticky top-32">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-widest mb-4 block">Engine Status</span>
+<h2 class="font-headline-lg text-headline-lg text-on-background mb-8">实时仿真系统总览</h2>
+<div class="aspect-video bg-background border border-outline-variant relative overflow-hidden flex items-center justify-center">
+
+<div class="absolute top-4 left-4 flex gap-2">
+<div class="w-2 h-2 bg-secondary animate-pulse"></div>
+<span class="font-label-sm text-[10px] text-on-surface-variant">LIVE MONITORING</span>
+</div>
+</div>
+<div class="mt-8 grid grid-cols-3 gap-8">
+<div>
+<div class="font-display-lg text-[24px] text-secondary">0.03ms</div>
+<div class="font-label-sm text-label-sm text-outline-variant uppercase">Latency</div>
+</div>
+<div>
+<div class="font-display-lg text-[24px] text-on-surface">99.99%</div>
+<div class="font-label-sm text-label-sm text-outline-variant uppercase">Uptime</div>
+</div>
+<div>
+<div class="font-display-lg text-[24px] text-on-surface">4.2GB/s</div>
+<div class="font-label-sm text-label-sm text-outline-variant uppercase">Throughput</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Pulses Activity Feed -->
+<div>
+<h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mb-8 pb-4 border-b border-outline-variant">Recent Pulses / 活动追踪</h3>
+<div class="space-y-0">
+<div class="py-6 border-b border-outline-variant hover:bg-surface-container transition-colors px-4 flex items-start gap-6 group">
+<span class="font-label-sm text-outline-variant pt-1">14:02:11</span>
+<div class="flex-grow">
+<h4 class="font-body-md font-bold text-on-surface mb-1">协议升级: NEON_DELTA_7</h4>
+<p class="text-on-surface-variant font-body-md text-sm">核心共识算法已更新。优化了异步节点的同步周期，减少了30%的冗余流量。</p>
+</div>
+<span class="material-symbols-outlined text-secondary opacity-0 group-hover:opacity-100 transition-opacity" data-icon="arrow_outward">arrow_outward</span>
+</div>
+<div class="py-6 border-b border-outline-variant hover:bg-surface-container transition-colors px-4 flex items-start gap-6 group">
+<span class="font-label-sm text-outline-variant pt-1">12:45:00</span>
+<div class="flex-grow">
+<h4 class="font-body-md font-bold text-on-surface mb-1">新模拟节点上线</h4>
+<p class="text-on-surface-variant font-body-md text-sm">位于 [Zone_Asia_North] 的 4,000 个计算节点已成功接入全球仿真阵列。</p>
+</div>
+<span class="material-symbols-outlined text-secondary opacity-0 group-hover:opacity-100 transition-opacity" data-icon="arrow_outward">arrow_outward</span>
+</div>
+<div class="py-6 border-b border-outline-variant hover:bg-surface-container transition-colors px-4 flex items-start gap-6 group">
+<span class="font-label-sm text-outline-variant pt-1">09:12:33</span>
+<div class="flex-grow">
+<h4 class="font-body-md font-bold text-on-surface mb-1">安全审计报告已归档</h4>
+<p class="text-on-surface-variant font-body-md text-sm">Q3 季度网络安全渗透测试完成。未发现关键性漏洞，当前安全评级：AAA。</p>
+</div>
+<span class="material-symbols-outlined text-secondary opacity-0 group-hover:opacity-100 transition-opacity" data-icon="arrow_outward">arrow_outward</span>
+</div>
+<div class="py-6 border-b border-outline-variant hover:bg-surface-container transition-colors px-4 flex items-start gap-6 group">
+<span class="font-label-sm text-outline-variant pt-1">06:55:12</span>
+<div class="flex-grow">
+<h4 class="font-body-md font-bold text-on-surface mb-1">开源组件更新</h4>
+<p class="text-on-surface-variant font-body-md text-sm">Neon-UI-Core 发布 v2.1.0 版本，引入了基于 WebGL 的高级阴影渲染器。</p>
+</div>
+<span class="material-symbols-outlined text-secondary opacity-0 group-hover:opacity-100 transition-opacity" data-icon="arrow_outward">arrow_outward</span>
+</div>
+</div>
+<button class="mt-12 w-full py-4 border border-outline-variant font-label-sm text-label-sm uppercase tracking-widest hover:border-secondary hover:text-secondary transition-all">
+                        查看完整日志流
+                    </button>
+</div>
+</div>
+</section>
+<!-- Stats Section -->
+<section class="py-20 border-y border-outline-variant">
+<div class="px-margin-desktop max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
+<div class="text-center md:text-left">
+<div class="font-display-lg text-[48px] text-primary mb-1">1,204,552</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-[0.2em]">Active Nodes Globally</div>
+</div>
+<div class="hidden md:block h-16 w-[1px] bg-outline-variant"></div>
+<div class="text-center md:text-left">
+<div class="font-display-lg text-[48px] text-secondary mb-1">128.4 PB</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-[0.2em]">Protocol Data Processed</div>
+</div>
+<div class="hidden md:block h-16 w-[1px] bg-outline-variant"></div>
+<div class="text-center md:text-left">
+<div class="font-display-lg text-[48px] text-primary mb-1">15ms</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-[0.2em]">Global Average Consensus</div>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="py-32 px-margin-mobile relative overflow-hidden">
+
+<div class="relative z-10 max-w-3xl mx-auto text-center">
+<h2 class="font-display-lg text-display-lg text-on-background mb-8 leading-tight">准备好加入<br/>下一代计算浪潮吗？</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-12">立刻开始您的初始化进程，体验前所未有的工程效能。</p>
+<button class="px-12 py-5 bg-secondary text-on-secondary font-label-sm text-label-sm uppercase tracking-[0.3em] font-bold transition-all hover:scale-[1.05] muted-gold-glow">
+                    Start Initializing
+                </button>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-background border-t border-outline-variant transition-colors duration-300">
+<div class="flex flex-col md:flex-row justify-between items-center py-12 px-margin-desktop w-full max-w-container-max mx-auto gap-8">
+<div class="flex flex-col items-center md:items-start gap-4">
+<span class="font-display-lg text-display-lg text-primary text-[32px]">NEON_LABS</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant">© 2024 NEON_LABS. Engineered for Excellence.</p>
+</div>
+<nav class="flex flex-wrap justify-center gap-8">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">API Documentation</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Support</a>
+</nav>
+<div class="flex gap-4">
+<a class="w-10 h-10 border border-outline-variant flex items-center justify-center hover:border-secondary transition-all text-on-surface-variant hover:text-secondary" href="#">
+<span class="material-symbols-outlined text-[18px]" data-icon="terminal">terminal</span>
+</a>
+<a class="w-10 h-10 border border-outline-variant flex items-center justify-center hover:border-secondary transition-all text-on-surface-variant hover:text-secondary" href="#">
+<span class="material-symbols-outlined text-[18px]" data-icon="code">code</span>
+</a>
+<a class="w-10 h-10 border border-outline-variant flex items-center justify-center hover:border-secondary transition-all text-on-surface-variant hover:text-secondary" href="#">
+<span class="material-symbols-outlined text-[18px]" data-icon="language">language</span>
+</a>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interactions and subtle header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.classList.add('bg-background/80', 'backdrop-blur-xl');
+            } else {
+                header.classList.remove('bg-background/80', 'backdrop-blur-xl');
+            }
+        });
+
+        // Simple fade-in animation for scroll elements
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-10');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach(section => {
+            section.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-10');
+            observer.observe(section);
+        });
+    </script>
+</body></html>

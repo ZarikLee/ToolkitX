@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NEON_LABS | Python 3 Variables Tutorial</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;800&amp;family=Newsreader:ital,wght@0,400;0,500;1,400&amp;family=Geist:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed-dim": "#cdc0e9",
+                    "error-container": "#ffdad6",
+                    "surface-container-high": "#ece6ee",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed-variant": "#4b4263",
+                    "error": "#ba1a1a",
+                    "surface-bright": "#fdf7ff",
+                    "secondary-fixed": "#e9ddff",
+                    "surface-dim": "#ded8e0",
+                    "on-surface-variant": "#494551",
+                    "on-secondary": "#ffffff",
+                    "primary-container": "#6750a4",
+                    "inverse-primary": "#cfbcff",
+                    "primary-fixed": "#e9ddff",
+                    "outline": "#7a7582",
+                    "primary": "#4f378a",
+                    "surface-variant": "#e6e0e9",
+                    "on-tertiary-container": "#503d00",
+                    "surface-container-low": "#f8f2fa",
+                    "secondary": "#63597c",
+                    "on-primary-container": "#e0d2ff",
+                    "tertiary-fixed-dim": "#e7c365",
+                    "on-surface": "#1d1b20",
+                    "on-error": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#c9a74d",
+                    "tertiary-fixed": "#ffdf93",
+                    "on-secondary-fixed": "#1f1635",
+                    "on-background": "#1d1b20",
+                    "secondary-container": "#e1d4fd",
+                    "on-primary": "#ffffff",
+                    "surface-tint": "#6750a4",
+                    "surface": "#fdf7ff",
+                    "on-secondary-container": "#645a7d",
+                    "surface-container-highest": "#e6e0e9",
+                    "surface-container": "#f2ecf4",
+                    "on-primary-fixed-variant": "#4f378a",
+                    "inverse-surface": "#322f35",
+                    "primary-fixed-dim": "#cfbcff",
+                    "background": "#fdf7ff",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-fixed": "#241a00",
+                    "outline-variant": "#cbc4d2",
+                    "inverse-on-surface": "#f5eff7",
+                    "tertiary": "#765b00",
+                    "on-primary-fixed": "#22005d",
+                    "on-tertiary-fixed-variant": "#594400",
+                    "obsidian": "#121212",
+                    "aurelian-gold": "#C5A059"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0px",
+                    "lg": "0px",
+                    "xl": "0px",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "4px",
+                    "container-max": "1200px",
+                    "margin-desktop": "48px",
+                    "xl": "64px",
+                    "margin-mobile": "16px",
+                    "lg": "40px",
+                    "sm": "16px",
+                    "xs": "8px",
+                    "md": "24px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "body-md": ["Newsreader"],
+                    "label-sm": ["Geist"],
+                    "display-lg": ["Hanken Grotesk"],
+                    "display-lg-mobile": ["Hanken Grotesk"],
+                    "mono-label": ["Geist"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "body-lg": ["Newsreader"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "mono-label": ["13px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { background-color: #FAFAFA; color: #121212; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .code-block {
+            font-family: 'Geist', monospace;
+            background-color: #F8F8F8;
+            border: 1px solid #E5E5E5;
+        }
+        .prose-aurelian p { margin-bottom: 24px; }
+        .sidebar-active { color: #121212; font-weight: 700; border-left: 2px solid #121212; padding-left: 12px; margin-left: -14px; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #E5E5E5; }
+    </style>
+</head>
+<body class="font-body-md antialiased overflow-x-hidden">
+<!-- TopNavBar (Shared Component Translation) -->
+<header class="w-full h-16 bg-surface border-b border-outline-variant fixed top-0 z-50">
+<div class="flex justify-between items-center px-margin-desktop max-w-container-max mx-auto h-full">
+<div class="font-headline-md text-headline-md font-bold tracking-tighter text-on-surface">AURELIAN</div>
+<nav class="hidden md:flex items-center gap-lg">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Library</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Simulations</a>
+<a class="font-label-sm text-label-sm text-primary border-b-2 border-primary pb-2" href="#">Tutorials</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Community</a>
+</nav>
+<div class="flex items-center gap-md">
+<button class="scale-95 active:opacity-80 transition-all text-primary">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="scale-95 active:opacity-80 transition-all text-primary">
+<span class="material-symbols-outlined">person</span>
+</button>
+</div>
+</div>
+</header>
+<main class="pt-16 max-w-container-max mx-auto px-margin-desktop flex gap-xl min-h-screen">
+<!-- Sidebar Navigation -->
+<aside class="hidden lg:block w-64 pt-xl sticky top-16 h-[calc(100vh-64px)] overflow-y-auto border-r border-outline-variant pr-md">
+<div class="mb-lg">
+<h3 class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant mb-md">Python Fundamentals</h3>
+<ul class="space-y-sm">
+<li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">01. Getting Started</a></li>
+<li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">02. Basic Syntax</a></li>
+<li><a class="sidebar-active font-label-sm text-label-sm block" href="#">03. Variables &amp; Types</a></li>
+<li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">04. Numbers &amp; Math</a></li>
+<li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">05. String Manipulation</a></li>
+</ul>
+</div>
+<div class="mb-lg">
+<h3 class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant mb-md">Control Flow</h3>
+<ul class="space-y-sm">
+<li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">06. Logic &amp; Comparators</a></li>
+<li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">07. Conditionals</a></li>
+<li><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">08. Loops (For/While)</a></li>
+</ul>
+</div>
+</aside>
+<!-- Content Canvas -->
+<article class="flex-1 py-xl max-w-3xl">
+<header class="mb-xl">
+<div class="flex items-center gap-xs mb-sm">
+<span class="bg-surface-container-highest px-xs py-[2px] font-mono-label text-mono-label text-[10px] uppercase">Intermediate</span>
+<span class="text-on-surface-variant font-mono-label text-mono-label">• 8 Min Read</span>
+</div>
+<h1 class="font-display-lg text-display-lg mb-md leading-tight">Mastering Variable Assignment in Python 3</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant italic leading-relaxed">
+                    A deep dive into the mechanical nature of pointers, memory management, and the philosophy of dynamic typing within the Python ecosystem.
+                </p>
+</header>
+<section class="prose-aurelian font-body-md text-body-md text-on-surface leading-relaxed">
+<p>
+                    In the architectural framework of Python, a variable is more than a container; it is a label attached to an object. Unlike statically typed languages where a variable is a reserved memory location of a fixed size, Python variables are symbolic names that act as pointers to objects residing in memory.
+                </p>
+<div class="my-lg border border-outline-variant p-md bg-white">
+<div class="flex items-center justify-between mb-sm pb-xs border-b border-outline-variant">
+<span class="font-mono-label text-mono-label text-xs uppercase tracking-tighter opacity-60">basic_assignment.py</span>
+<span class="material-symbols-outlined text-sm opacity-40 cursor-pointer hover:opacity-100">content_copy</span>
+</div>
+<pre class="code-block p-sm overflow-x-auto text-sm leading-6"><code><span class="text-primary-container font-bold"># Assigning an integer</span>
+x = <span class="text-tertiary">42</span>
+
+<span class="text-primary-container font-bold"># Reassigning to a string (Dynamic Typing)</span>
+x = <span class="text-tertiary">"Aurelian Technical"</span>
+
+<span class="text-primary-container font-bold"># Multiple assignment</span>
+a, b, c = <span class="text-tertiary">5</span>, <span class="text-tertiary">10</span>, <span class="text-tertiary">15</span></code></pre>
+</div>
+<h2 class="font-headline-md text-headline-md mt-xl mb-md">The Philosophy of Dynamic Typing</h2>
+<p>
+                    Python’s dynamic nature allows for rapid prototyping and fluid structural changes. This flexibility, however, demands a disciplined approach to naming conventions. PEP 8 suggests using <span class="font-bold">snake_case</span> for variable names, ensuring readability across complex codebases.
+                </p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md my-lg">
+<div class="p-md bg-surface border border-outline-variant">
+<span class="material-symbols-outlined text-aurelian-gold mb-xs">check_circle</span>
+<h4 class="font-label-sm text-label-sm uppercase mb-xs font-bold">Valid Names</h4>
+<ul class="font-mono-label text-xs space-y-1 opacity-70">
+<li>user_id = 101</li>
+<li>_internal_cache = {}</li>
+<li>MAX_CONSTANT = 99</li>
+</ul>
+</div>
+<div class="p-md bg-surface border border-outline-variant">
+<span class="material-symbols-outlined text-error mb-xs">cancel</span>
+<h4 class="font-label-sm text-label-sm uppercase mb-xs font-bold">Invalid Names</h4>
+<ul class="font-mono-label text-xs space-y-1 opacity-70">
+<li>2nd_user = "Error"</li>
+<li>user-name = "Error"</li>
+<li>global = "Keyword"</li>
+</ul>
+</div>
+</div>
+<h2 class="font-headline-md text-headline-md mt-xl mb-md">Memory Address Observation</h2>
+<p>
+                    To truly understand the "label" concept, one must observe the memory address. The <code class="font-mono-label bg-surface-variant px-1">id()</code> function reveals the unique identifier of the object the variable is currently pointing to.
+                </p>
+<div class="my-lg border border-outline-variant p-md bg-white">
+<pre class="code-block p-sm overflow-x-auto text-sm leading-6"><code>y = <span class="text-tertiary">100</span>
+print(id(y))  <span class="text-primary-container font-bold"># Output: 14073289...</span>
+
+z = y
+print(id(z))  <span class="text-primary-container font-bold"># Same Output: Both point to same object</span></code></pre>
+</div>
+<div class="mt-xl p-lg bg-obsidian text-white relative overflow-hidden">
+<div class="absolute right-[-40px] top-[-40px] opacity-10">
+<span class="material-symbols-outlined text-[120px]">lightbulb</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-xs">Aurelian Lab Tip</h3>
+<p class="font-body-md opacity-80 max-w-lg mb-md">
+                        Always remember that Python optimizes memory for small integers (typically -5 to 256) by pre-allocating them in memory. This is called "Integer Interning."
+                    </p>
+<button class="px-md py-sm bg-aurelian-gold text-obsidian font-label-sm text-label-sm font-bold uppercase tracking-widest hover:brightness-110 transition-all">
+                        Deep Dive: Interning
+                    </button>
+</div>
+</section>
+<!-- Interactive Pagination -->
+<footer class="mt-xl pt-lg border-t border-outline-variant flex justify-between items-center">
+<a class="flex items-center gap-xs group" href="#">
+<span class="material-symbols-outlined group-hover:-translate-x-1 transition-transform">arrow_back</span>
+<div>
+<div class="font-mono-label text-[10px] opacity-40 uppercase">Previous</div>
+<div class="font-label-sm text-label-sm font-bold">02. Basic Syntax</div>
+</div>
+</a>
+<a class="flex items-center gap-xs text-right group" href="#">
+<div>
+<div class="font-mono-label text-[10px] opacity-40 uppercase">Next</div>
+<div class="font-label-sm text-label-sm font-bold">04. Numbers &amp; Math</div>
+</div>
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+</footer>
+</article>
+<!-- Right Content: Meta Info -->
+<aside class="hidden xl:block w-48 pt-xl sticky top-16 h-fit">
+<div class="space-y-lg">
+<div>
+<h4 class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant mb-sm">Difficulty</h4>
+<div class="flex gap-1">
+<div class="h-1 w-8 bg-obsidian"></div>
+<div class="h-1 w-8 bg-obsidian"></div>
+<div class="h-1 w-8 bg-outline-variant"></div>
+</div>
+</div>
+<div>
+<h4 class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant mb-sm">Instructor</h4>
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 bg-surface-variant border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a female software engineer in a high-key, minimalist workspace. She wears a clean black turtleneck and spectacles, embodying a high-end technical editorial aesthetic. The lighting is soft and directional, creating a sense of intellectual authority and modern sophistication." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyjBxRMFiLmtbu1xEvdoIkhaBx8oCR0ETQ5gjb9iRDml9zUn6uFz7dXMabINOSVU6NtsCprTxlpBfOjjAbOr4Fv9H8UlrCkOd35TGgQkvt6QgTBvTE2Bgw720d1J178aedd6HY478LafDtt5qnO_RHf-IC9KT2C8p1sVRIACKVt5zPj7yTkNH0_vyrwJoLtxf78iu4GQJ3JOwTZGdgnY9kPrt5D7U2U3vardiYGmFzJ1bERCTv6-0C_dozA0kfHN3PoytJv3Os0X4"/>
+</div>
+<span class="font-label-sm text-label-sm font-bold">Dr. Aris Thorne</span>
+</div>
+</div>
+<div class="pt-md border-t border-outline-variant">
+<button class="w-full py-sm border border-obsidian text-obsidian font-label-sm text-label-sm uppercase tracking-widest hover:bg-obsidian hover:text-white transition-all">
+                        Take Quiz
+                    </button>
+</div>
+</div>
+</aside>
+</main>
+<!-- Footer (Shared Component Translation) -->
+<footer class="w-full py-xl mt-xl bg-surface-container-low border-t border-outline-variant">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop max-w-container-max mx-auto gap-md">
+<div class="font-headline-md text-headline-md font-bold text-on-surface">AURELIAN</div>
+<div class="flex gap-md">
+<a class="font-mono-label text-mono-label uppercase tracking-widest text-on-surface-variant hover:text-primary underline decoration-1 underline-offset-4 transition-opacity" href="#">Documentation</a>
+<a class="font-mono-label text-mono-label uppercase tracking-widest text-on-surface-variant hover:text-primary underline decoration-1 underline-offset-4 transition-opacity" href="#">Privacy Policy</a>
+<a class="font-mono-label text-mono-label uppercase tracking-widest text-on-surface-variant hover:text-primary underline decoration-1 underline-offset-4 transition-opacity" href="#">Terms of Service</a>
+<a class="font-mono-label text-mono-label uppercase tracking-widest text-on-surface-variant hover:text-primary underline decoration-1 underline-offset-4 transition-opacity" href="#">Status</a>
+</div>
+<div class="font-mono-label text-mono-label uppercase tracking-widest text-on-surface-variant text-[10px]">
+                © 2024 AURELIAN TECHNICAL. ALL RIGHTS RESERVED.
+            </div>
+</div>
+</footer>
+<script>
+        // Micro-interaction for code copy
+        document.querySelectorAll('.material-symbols-outlined').forEach(icon => {
+            if(icon.innerText === 'content_copy') {
+                icon.addEventListener('click', function() {
+                    const code = this.closest('div').nextElementSibling.innerText;
+                    navigator.clipboard.writeText(code);
+                    this.innerText = 'check';
+                    this.classList.add('text-primary');
+                    setTimeout(() => {
+                        this.innerText = 'content_copy';
+                        this.classList.remove('text-primary');
+                    }, 2000);
+                });
+            }
+        });
+
+        // Simple scroll reveal for sidebar highlights
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 20) {
+                header.classList.add('shadow-sm');
+            } else {
+                header.classList.remove('shadow-sm');
+            }
+        });
+    </script>
+</body></html>

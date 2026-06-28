@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AURELIAN | NEON_LABS Library</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&amp;family=Geist:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Injection of Tailwind Config from Brand Anchors -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed-dim": "#cdc0e9",
+                    "error-container": "#ffdad6",
+                    "surface-container-high": "#ece6ee",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed-variant": "#4b4263",
+                    "error": "#ba1a1a",
+                    "surface-bright": "#fdf7ff",
+                    "secondary-fixed": "#e9ddff",
+                    "surface-dim": "#ded8e0",
+                    "on-surface-variant": "#494551",
+                    "on-secondary": "#ffffff",
+                    "primary-container": "#6750a4",
+                    "inverse-primary": "#cfbcff",
+                    "primary-fixed": "#e9ddff",
+                    "outline": "#7a7582",
+                    "primary": "#4f378a",
+                    "surface-variant": "#e6e0e9",
+                    "on-tertiary-container": "#503d00",
+                    "surface-container-low": "#f8f2fa",
+                    "secondary": "#63597c",
+                    "on-primary-container": "#e0d2ff",
+                    "tertiary-fixed-dim": "#e7c365",
+                    "on-surface": "#1d1b20",
+                    "on-error": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#c9a74d",
+                    "tertiary-fixed": "#ffdf93",
+                    "on-secondary-fixed": "#1f1635",
+                    "on-background": "#1d1b20",
+                    "secondary-container": "#e1d4fd",
+                    "on-primary": "#ffffff",
+                    "surface-tint": "#6750a4",
+                    "surface": "#fdf7ff",
+                    "on-secondary-container": "#645a7d",
+                    "surface-container-highest": "#e6e0e9",
+                    "surface-container": "#f2ecf4",
+                    "on-primary-fixed-variant": "#4f378a",
+                    "inverse-surface": "#322f35",
+                    "primary-fixed-dim": "#cfbcff",
+                    "background": "#fdf7ff",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-fixed": "#241a00",
+                    "outline-variant": "#cbc4d2",
+                    "inverse-on-surface": "#f5eff7",
+                    "tertiary": "#765b00",
+                    "on-primary-fixed": "#22005d",
+                    "on-tertiary-fixed-variant": "#594400"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "4px",
+                    "container-max": "1200px",
+                    "margin-desktop": "48px",
+                    "xl": "64px",
+                    "margin-mobile": "16px",
+                    "lg": "40px",
+                    "sm": "16px",
+                    "xs": "8px",
+                    "md": "24px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "body-md": ["Newsreader"],
+                    "label-sm": ["Geist"],
+                    "display-lg": ["Hanken Grotesk"],
+                    "display-lg-mobile": ["Hanken Grotesk"],
+                    "mono-label": ["Geist"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "body-lg": ["Newsreader"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "mono-label": ["13px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #FAFAFA;
+            color: #1d1b20;
+            -webkit-font-smoothing: antialiased;
+        }
+        .tech-archive-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1px;
+            background-color: #E5E5E5;
+            border: 1px solid #E5E5E5;
+        }
+        .tech-card {
+            background-color: #FFFFFF;
+            padding: 24px;
+            transition: all 0.2s ease;
+        }
+        .tech-card:hover {
+            background-color: #f8f2fa;
+            z-index: 10;
+            outline: 1px solid #4f378a;
+        }
+        .sidebar-sticky {
+            position: sticky;
+            top: 80px;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+        /* Custom Scrollbar for minimalist feel */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbc4d2; }
+    </style>
+</head>
+<body class="font-body-md text-body-md selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-background border-b border-outline-variant dark:border-outline w-full h-16 sticky top-0 z-50">
+<nav class="flex justify-between items-center px-margin-desktop max-w-container-max mx-auto h-full">
+<div class="font-headline-md text-headline-md font-bold tracking-tighter text-on-surface dark:text-on-background">
+                AURELIAN
+            </div>
+<div class="hidden md:flex items-center gap-lg">
+<a class="font-label-sm text-label-sm text-primary dark:text-primary-fixed border-b-2 border-primary dark:border-primary-fixed pb-2 hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200 scale-95 active:opacity-80 transition-all" href="#">Library</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200 scale-95 active:opacity-80 transition-all" href="#">Simulations</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200 scale-95 active:opacity-80 transition-all" href="#">Tutorials</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200 scale-95 active:opacity-80 transition-all" href="#">Community</a>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden lg:flex items-center bg-surface-container-low px-sm py-xs border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-label-sm font-label-sm w-48" placeholder="Search archive..." type="text"/>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">person</button>
+</div>
+</nav>
+</header>
+<main class="max-w-container-max mx-auto px-margin-desktop py-lg flex gap-xl">
+<!-- Sidebar Navigation (Tech Categories) -->
+<aside class="hidden md:block w-64 flex-shrink-0">
+<div class="sidebar-sticky">
+<div class="mb-lg">
+<h3 class="font-mono-label text-mono-label uppercase tracking-widest text-on-surface-variant mb-md">Architecture</h3>
+<ul class="space-y-xs">
+<li><a class="font-label-sm text-label-sm text-primary font-bold flex items-center gap-xs" href="#">Frontend Labs <span class="material-symbols-outlined text-[14px]">arrow_forward</span></a></li>
+<li><a class="font-label-sm text-label-sm text-on-surface hover:text-primary transition-colors" href="#">Backend Engineering</a></li>
+<li><a class="font-label-sm text-label-sm text-on-surface hover:text-primary transition-colors" href="#">DevOps &amp; Cloud</a></li>
+<li><a class="font-label-sm text-label-sm text-on-surface hover:text-primary transition-colors" href="#">Systems Design</a></li>
+</ul>
+</div>
+<div class="mb-lg">
+<h3 class="font-mono-label text-mono-label uppercase tracking-widest text-on-surface-variant mb-md">Intelligence</h3>
+<ul class="space-y-xs">
+<li><a class="font-label-sm text-label-sm text-on-surface hover:text-primary transition-colors" href="#">Neural Networks</a></li>
+<li><a class="font-label-sm text-label-sm text-on-surface hover:text-primary transition-colors" href="#">Natural Language</a></li>
+<li><a class="font-label-sm text-label-sm text-on-surface hover:text-primary transition-colors" href="#">Computer Vision</a></li>
+<li><a class="font-label-sm text-label-sm text-on-surface hover:text-primary transition-colors" href="#">Model Optimization</a></li>
+</ul>
+</div>
+<div class="mb-lg">
+<h3 class="font-mono-label text-mono-label uppercase tracking-widest text-on-surface-variant mb-md">Specialized</h3>
+<ul class="space-y-xs">
+<li><a class="font-label-sm text-label-sm text-on-surface hover:text-primary transition-colors" href="#">Quantum Computing</a></li>
+<li><a class="font-label-sm text-label-sm text-on-surface hover:text-primary transition-colors" href="#">Distributed Ledger</a></li>
+<li><a class="font-label-sm text-label-sm text-on-surface hover:text-primary transition-colors" href="#">Embedded Systems</a></li>
+</ul>
+</div>
+<div class="p-md bg-tertiary-container/10 border border-tertiary-container/30">
+<p class="font-label-sm text-label-sm text-tertiary font-bold mb-xs">Contribute</p>
+<p class="font-mono-label text-[11px] leading-relaxed text-on-surface-variant">Access the technical submission guidelines for NEON_LABS archive expansion.</p>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<section class="flex-1">
+<div class="mb-xl flex justify-between items-end">
+<div>
+<span class="font-mono-label text-mono-label uppercase tracking-widest text-primary mb-xs block">Technical Repository</span>
+<h1 class="font-display-lg text-display-lg text-on-surface">Knowledge Library</h1>
+</div>
+<div class="hidden lg:flex gap-sm">
+<button class="bg-surface border border-outline-variant px-md py-xs font-label-sm text-label-sm hover:bg-surface-container-high transition-all">Latest</button>
+<button class="bg-primary text-on-primary px-md py-xs font-label-sm text-label-sm hover:opacity-90 transition-all">A-Z Archive</button>
+</div>
+</div>
+<!-- Bento Featured Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter mb-xl">
+<div class="lg:col-span-2 relative h-80 overflow-hidden group">
+<div class="absolute inset-0 bg-neutral-900/40 z-10"></div>
+<div class="absolute inset-0" data-alt="A macro photograph of high-tech server circuitry illuminated by ethereal blue and purple neon light strips in a dark, sophisticated environment. The image uses a clean, editorial composition with a shallow depth of field, highlighting the precision of the hardware. The aesthetic is futuristic yet grounded in premium technical design." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAzuQdRRYZydms_UETRjfPhYndIWZHfmaPUMNbbHq7D1MC1km1cXSq79MKRq1Bqi8fUfXmdkK8zRd6SSXsX7PLeyZTxvebYu2YWTmAYchZPfiGBhjsKrCyKfxHDcbZ0ZPBbE7BriLLCNecc2_b0dqluIfyQkYVONJJZOEh-JGBpPmrcuTcQm4mkWWCuaDL_3l7jm7-NJujxt2_o3Iomu8oMew9V-f53YZJYcgcYfxy4Z1O0Wzs9JxlNZ2dy_JweAvms4nvQox305WI')"></div>
+<div class="absolute bottom-0 left-0 p-lg z-20 text-white w-full bg-gradient-to-t from-black/80 to-transparent">
+<div class="flex gap-xs mb-sm">
+<span class="bg-primary px-xs py-[2px] font-mono-label text-[10px] uppercase">New Release</span>
+<span class="bg-white/20 backdrop-blur-md px-xs py-[2px] font-mono-label text-[10px] uppercase">12m Read</span>
+</div>
+<h2 class="font-headline-md text-headline-md mb-xs">Advanced Concurrent Pattern Logic in Rust</h2>
+<p class="font-body-md text-sm opacity-90 max-w-md">Deconstructing zero-cost abstractions and memory safety in multi-threaded micro-environments.</p>
+</div>
+</div>
+<div class="bg-surface-container border border-outline-variant p-lg flex flex-col justify-between">
+<div>
+<span class="material-symbols-outlined text-primary mb-md text-[32px]">science</span>
+<h3 class="font-headline-md text-headline-md mb-sm">Labs Beta</h3>
+<p class="font-body-md text-sm text-on-surface-variant">Test and simulate high-density data structures in our live sandbox environment.</p>
+</div>
+<button class="w-full border border-on-surface py-sm font-label-sm text-label-sm hover:bg-on-surface hover:text-white transition-all uppercase tracking-widest">Enter Sandbox</button>
+</div>
+</div>
+<!-- High Density Tech Grid (Runoob Style Efficiency) -->
+<div class="mb-xl">
+<div class="flex items-center gap-md mb-md">
+<h2 class="font-headline-md text-headline-md whitespace-nowrap">Development Stacks</h2>
+<div class="h-[1px] w-full bg-outline-variant"></div>
+</div>
+<div class="tech-archive-grid">
+<!-- Column 1 Items -->
+<div class="tech-card group">
+<div class="flex justify-between items-start mb-md">
+<span class="material-symbols-outlined text-[24px] text-primary">javascript</span>
+<span class="font-mono-label text-[10px] text-on-surface-variant">32 Modules</span>
+</div>
+<h4 class="font-label-sm text-label-sm font-bold mb-xs">EcmaScript Next</h4>
+<p class="font-mono-label text-[11px] text-on-surface-variant leading-relaxed">Modern patterns, ES2024 features, and performance profiling.</p>
+</div>
+<div class="tech-card group">
+<div class="flex justify-between items-start mb-md">
+<span class="material-symbols-outlined text-[24px] text-primary">data_object</span>
+<span class="font-mono-label text-[10px] text-on-surface-variant">18 Modules</span>
+</div>
+<h4 class="font-label-sm text-label-sm font-bold mb-xs">TypeScript Core</h4>
+<p class="font-mono-label text-[11px] text-on-surface-variant leading-relaxed">Advanced type gymnastics, generic constraints, and decorators.</p>
+</div>
+<div class="tech-card group">
+<div class="flex justify-between items-start mb-md">
+<span class="material-symbols-outlined text-[24px] text-primary">terminal</span>
+<span class="font-mono-label text-[10px] text-on-surface-variant">24 Modules</span>
+</div>
+<h4 class="font-label-sm text-label-sm font-bold mb-xs">Python Mastery</h4>
+<p class="font-mono-label text-[11px] text-on-surface-variant leading-relaxed">Asynchronous I/O, data analysis, and scientific computing stacks.</p>
+</div>
+<div class="tech-card group">
+<div class="flex justify-between items-start mb-md">
+<span class="material-symbols-outlined text-[24px] text-primary">memory</span>
+<span class="font-mono-label text-[10px] text-on-surface-variant">14 Modules</span>
+</div>
+<h4 class="font-label-sm text-label-sm font-bold mb-xs">C++ Memory</h4>
+<p class="font-mono-label text-[11px] text-on-surface-variant leading-relaxed">Smart pointers, low-level optimization, and concurrency primitives.</p>
+</div>
+<!-- Row 2 -->
+<div class="tech-card group">
+<div class="flex justify-between items-start mb-md">
+<span class="material-symbols-outlined text-[24px] text-primary">storage</span>
+<span class="font-mono-label text-[10px] text-on-surface-variant">21 Modules</span>
+</div>
+<h4 class="font-label-sm text-label-sm font-bold mb-xs">PostgreSQL Adv.</h4>
+<p class="font-mono-label text-[11px] text-on-surface-variant leading-relaxed">Indexing strategies, partitioning, and complex query tuning.</p>
+</div>
+<div class="tech-card group">
+<div class="flex justify-between items-start mb-md">
+<span class="material-symbols-outlined text-[24px] text-primary">cloud</span>
+<span class="font-mono-label text-[10px] text-on-surface-variant">40 Modules</span>
+</div>
+<h4 class="font-label-sm text-label-sm font-bold mb-xs">AWS Solutions</h4>
+<p class="font-mono-label text-[11px] text-on-surface-variant leading-relaxed">Serverless architecture, VPC networking, and IAM security.</p>
+</div>
+<div class="tech-card group">
+<div class="flex justify-between items-start mb-md">
+<span class="material-symbols-outlined text-[24px] text-primary">api</span>
+<span class="font-mono-label text-[10px] text-on-surface-variant">12 Modules</span>
+</div>
+<h4 class="font-label-sm text-label-sm font-bold mb-xs">Go Routines</h4>
+<p class="font-mono-label text-[11px] text-on-surface-variant leading-relaxed">Channel patterns, context management, and microservices.</p>
+</div>
+<div class="tech-card group">
+<div class="flex justify-between items-start mb-md">
+<span class="material-symbols-outlined text-[24px] text-primary">view_quilt</span>
+<span class="font-mono-label text-[10px] text-on-surface-variant">28 Modules</span>
+</div>
+<h4 class="font-label-sm text-label-sm font-bold mb-xs">React Engine</h4>
+<p class="font-mono-label text-[11px] text-on-surface-variant leading-relaxed">Fiber architecture, server components, and state synchronization.</p>
+</div>
+<!-- Row 3 -->
+<div class="tech-card group">
+<div class="flex justify-between items-start mb-md">
+<span class="material-symbols-outlined text-[24px] text-primary">lan</span>
+<span class="font-mono-label text-[10px] text-on-surface-variant">09 Modules</span>
+</div>
+<h4 class="font-label-sm text-label-sm font-bold mb-xs">Docker Systems</h4>
+<p class="font-mono-label text-[11px] text-on-surface-variant leading-relaxed">Containerization, multi-stage builds, and orchestration basics.</p>
+</div>
+<div class="tech-card group">
+<div class="flex justify-between items-start mb-md">
+<span class="material-symbols-outlined text-[24px] text-primary">security</span>
+<span class="font-mono-label text-[10px] text-on-surface-variant">15 Modules</span>
+</div>
+<h4 class="font-label-sm text-label-sm font-bold mb-xs">Ethical Sec</h4>
+<p class="font-mono-label text-[11px] text-on-surface-variant leading-relaxed">Penetration testing, encryption standards, and threat modeling.</p>
+</div>
+<div class="tech-card group">
+<div class="flex justify-between items-start mb-md">
+<span class="material-symbols-outlined text-[24px] text-primary">hub</span>
+<span class="font-mono-label text-[10px] text-on-surface-variant">11 Modules</span>
+</div>
+<h4 class="font-label-sm text-label-sm font-bold mb-xs">Kubernetes</h4>
+<p class="font-mono-label text-[11px] text-on-surface-variant leading-relaxed">Auto-scaling, ingress controllers, and helm chart deployments.</p>
+</div>
+<div class="tech-card group">
+<div class="flex justify-between items-start mb-md">
+<span class="material-symbols-outlined text-[24px] text-primary">auto_graph</span>
+<span class="font-mono-label text-[10px] text-on-surface-variant">20 Modules</span>
+</div>
+<h4 class="font-label-sm text-label-sm font-bold mb-xs">Machine Learning</h4>
+<p class="font-mono-label text-[11px] text-on-surface-variant leading-relaxed">TensorFlow pipelines, Scikit-learn models, and PyTorch tensors.</p>
+</div>
+</div>
+</div>
+<!-- Recently Updated List -->
+<div>
+<div class="flex items-center justify-between mb-md">
+<h2 class="font-headline-md text-headline-md">Latest Documentation</h2>
+<a class="font-mono-label text-[11px] text-primary underline" href="#">View Full Changelog</a>
+</div>
+<div class="space-y-[1px] bg-outline-variant border border-outline-variant">
+<div class="bg-white p-sm md:p-md flex items-center gap-md hover:bg-surface-container-low transition-colors cursor-pointer">
+<span class="font-mono-label text-[10px] text-on-surface-variant w-24">OCT 24, 2024</span>
+<div class="flex-1">
+<h5 class="font-label-sm text-label-sm font-bold">Node.js v22 Long-term Support Migration</h5>
+<p class="text-xs text-on-surface-variant truncate">Critical updates to the event loop handling and V8 engine integration...</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</div>
+<div class="bg-white p-sm md:p-md flex items-center gap-md hover:bg-surface-container-low transition-colors cursor-pointer">
+<span class="font-mono-label text-[10px] text-on-surface-variant w-24">OCT 22, 2024</span>
+<div class="flex-1">
+<h5 class="font-label-sm text-label-sm font-bold">Zustand vs Redux Toolkit: Performance Benchmarks</h5>
+<p class="text-xs text-on-surface-variant truncate">Comparative analysis of state management overhead in large-scale applications...</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</div>
+<div class="bg-white p-sm md:p-md flex items-center gap-md hover:bg-surface-container-low transition-colors cursor-pointer">
+<span class="font-mono-label text-[10px] text-on-surface-variant w-24">OCT 21, 2024</span>
+<div class="flex-1">
+<h5 class="font-label-sm text-label-sm font-bold">GraphQL Federation with Apollo Router</h5>
+<p class="text-xs text-on-surface-variant truncate">Implementing subgraphs and managed gateways for distributed teams...</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-low dark:bg-surface-dim border-t border-outline-variant dark:border-outline w-full py-xl mt-xl">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop max-w-container-max mx-auto gap-md">
+<div class="font-headline-md text-headline-md font-bold text-on-surface">AURELIAN</div>
+<div class="flex gap-lg">
+<a class="font-mono-label text-mono-label uppercase tracking-widest text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-1 underline-offset-4 transition-opacity" href="#">Documentation</a>
+<a class="font-mono-label text-mono-label uppercase tracking-widest text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-1 underline-offset-4 transition-opacity" href="#">Privacy Policy</a>
+<a class="font-mono-label text-mono-label uppercase tracking-widest text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-1 underline-offset-4 transition-opacity" href="#">Terms of Service</a>
+<a class="font-mono-label text-mono-label uppercase tracking-widest text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-1 underline-offset-4 transition-opacity" href="#">Status</a>
+</div>
+<div class="font-mono-label text-mono-label uppercase tracking-widest text-on-surface-variant opacity-60 text-center md:text-right">
+                © 2024 AURELIAN TECHNICAL. ALL RIGHTS RESERVED.
+            </div>
+</div>
+</footer>
+<!-- Simple Hover Interaction Script -->
+<script>
+        document.querySelectorAll('.tech-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body></html>
