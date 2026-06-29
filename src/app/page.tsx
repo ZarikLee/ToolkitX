@@ -15,9 +15,8 @@ import {
   BookOpen,
   Wrench,
   Clock,
-  ChevronRight,
 } from "lucide-react";
-import { categories, type TutorialCategory } from "@/data/tutorials";
+import { categories } from "@/data/tutorials";
 import { getVisitCount, incrementVisitCount } from "@/lib/visit-counter";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 
@@ -50,25 +49,17 @@ const iconMap: Record<string, React.ReactNode> = {
   network: <Globe className="w-5 h-5" />,
   redis: <Database className="w-5 h-5" />,
   frontend: <Code className="w-5 h-5" />,
-  backend: <Server className="w-5 h-5" />,
+  backend: <Code className="w-5 h-5" />,
   ai: <Cpu className="w-5 h-5" />,
   mobile: <Globe className="w-5 h-5" />,
   languages: <FileCode className="w-5 h-5" />,
   fundamentals: <BookOpen className="w-5 h-5" />,
 };
 
-function Server(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect width="20" height="8" x="2" y="2" rx="2" ry="2" />
-      <rect width="20" height="8" x="2" y="14" rx="2" ry="2" />
-      <line x1="6" x2="6.01" y1="6" y2="6" />
-      <line x1="6" x2="6.01" y1="18" y2="18" />
-    </svg>
-  );
-}
+type Mode = "knowledge" | "tools";
 
 export default function HomePage() {
+  const [mode, setMode] = useState<Mode>("knowledge");
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [visitCount, setVisitCount] = useState(0);
@@ -114,13 +105,35 @@ export default function HomePage() {
                 type="text"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                placeholder="搜索教程..."
+                placeholder={mode === "knowledge" ? "搜索教程..." : "搜索工具..."}
                 className="bg-transparent border-none outline-none w-full text-sm"
                 style={{ color: "var(--on-surface)" }}
               />
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <div className="flex rounded border overflow-hidden" style={{ borderColor: "var(--outline-variant)" }}>
+              <button
+                onClick={() => setMode("knowledge")}
+                className="px-3 py-1.5 text-xs font-medium transition-colors"
+                style={{
+                  background: mode === "knowledge" ? "var(--secondary)" : "transparent",
+                  color: mode === "knowledge" ? "var(--on-secondary)" : "var(--on-surface-variant)",
+                }}
+              >
+                知识库
+              </button>
+              <button
+                onClick={() => setMode("tools")}
+                className="px-3 py-1.5 text-xs font-medium transition-colors"
+                style={{
+                  background: mode === "tools" ? "var(--secondary)" : "transparent",
+                  color: mode === "tools" ? "var(--on-secondary)" : "var(--on-surface-variant)",
+                }}
+              >
+                工具箱
+              </button>
+            </div>
             <ThemeToggle />
           </div>
         </div>
@@ -128,127 +141,117 @@ export default function HomePage() {
 
       {/* Navigation */}
       <nav className="border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
-        <div className="max-w-[1200px] mx-auto px-4 flex items-center gap-1 overflow-x-auto">
-          <Link href="/" className="px-3 py-2.5 text-sm font-medium shrink-0 border-b-2" style={{ color: "var(--secondary)", borderColor: "var(--secondary)" }}>
+        <div className="max-w-[1200px] mx-auto px-4 flex items-center gap-1">
+          <Link href="/" className="px-3 py-2.5 text-sm font-medium border-b-2" style={{ color: "var(--secondary)", borderColor: "var(--secondary)" }}>
             首页
-          </Link>
-          <Link href="/learn" className="px-3 py-2.5 text-sm font-medium shrink-0 border-b-2 border-transparent hover:opacity-80" style={{ color: "var(--on-surface-variant)" }}>
-            教程
-          </Link>
-          <Link href="/tools" className="px-3 py-2.5 text-sm font-medium shrink-0 border-b-2 border-transparent hover:opacity-80" style={{ color: "var(--on-surface-variant)" }}>
-            工具箱
-          </Link>
-          <Link href="/terminal" className="px-3 py-2.5 text-sm font-medium shrink-0 border-b-2 border-transparent hover:opacity-80" style={{ color: "var(--on-surface-variant)" }}>
-            终端
-          </Link>
-          <Link href="/monitor" className="px-3 py-2.5 text-sm font-medium shrink-0 border-b-2 border-transparent hover:opacity-80" style={{ color: "var(--on-surface-variant)" }}>
-            监控
           </Link>
         </div>
       </nav>
 
       {/* Main Content */}
       <div className="max-w-[1200px] mx-auto px-4 py-4 flex gap-4">
-        {/* Left Sidebar */}
-        <aside className="w-44 shrink-0 hidden lg:block">
-          <div className="sticky top-4 rounded-lg border overflow-hidden" style={{ background: "var(--surface-container-lowest)", borderColor: "var(--outline-variant)" }}>
-            <div className="px-3 py-2.5 text-sm font-semibold border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-low)", color: "var(--on-surface)" }}>
-              全部教程
+        {/* Left Sidebar - only in knowledge mode */}
+        {mode === "knowledge" && (
+          <aside className="w-44 shrink-0 hidden lg:block">
+            <div className="sticky top-4 rounded-lg border overflow-hidden" style={{ background: "var(--surface-container-lowest)", borderColor: "var(--outline-variant)" }}>
+              <div className="px-3 py-2.5 text-sm font-semibold border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-low)", color: "var(--on-surface)" }}>
+                全部教程
+              </div>
+              <div className="py-1">
+                {categories.map(cat => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setActiveCategory(activeCategory === cat.id ? null : cat.id)}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-left text-[13px] transition-colors border-l-3 border-transparent"
+                    style={{
+                      color: activeCategory === cat.id ? "var(--secondary)" : "var(--on-surface-variant)",
+                      background: activeCategory === cat.id ? "color-mix(in srgb, var(--secondary) 8%, transparent)" : "transparent",
+                      borderLeftColor: activeCategory === cat.id ? "var(--secondary)" : "transparent",
+                      fontWeight: activeCategory === cat.id ? 600 : 400,
+                    }}
+                  >
+                    <span className="text-base">{cat.icon}</span>
+                    <span className="truncate">{cat.name}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="py-1">
-              {categories.map(cat => (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveCategory(activeCategory === cat.id ? null : cat.id)}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-left text-[13px] transition-colors border-l-3 border-transparent"
-                  style={{
-                    color: activeCategory === cat.id ? "var(--secondary)" : "var(--on-surface-variant)",
-                    background: activeCategory === cat.id ? "color-mix(in srgb, var(--secondary) 8%, transparent)" : "transparent",
-                    borderLeftColor: activeCategory === cat.id ? "var(--secondary)" : "transparent",
-                    fontWeight: activeCategory === cat.id ? 600 : 400,
-                  }}
-                >
-                  <span className="text-base">{cat.icon}</span>
-                  <span className="truncate">{cat.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </aside>
+          </aside>
+        )}
 
         {/* Main Content */}
         <main className="flex-1 min-w-0">
-          {/* Mobile category filter */}
-          <div className="lg:hidden flex gap-1.5 overflow-x-auto pb-3 mb-3">
-            <button
-              onClick={() => setActiveCategory(null)}
-              className="px-3 py-1.5 text-xs font-medium rounded border shrink-0"
-              style={{
-                background: !activeCategory ? "var(--secondary)" : "var(--surface-container-low)",
-                color: !activeCategory ? "var(--on-secondary)" : "var(--on-surface-variant)",
-                borderColor: !activeCategory ? "var(--secondary)" : "var(--outline-variant)",
-              }}
-            >
-              全部
-            </button>
-            {categories.map(cat => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(activeCategory === cat.id ? null : cat.id)}
-                className="px-3 py-1.5 text-xs font-medium rounded border shrink-0"
-                style={{
-                  background: activeCategory === cat.id ? "var(--secondary)" : "var(--surface-container-low)",
-                  color: activeCategory === cat.id ? "var(--on-secondary)" : "var(--on-surface-variant)",
-                  borderColor: activeCategory === cat.id ? "var(--secondary)" : "var(--outline-variant)",
-                }}
-              >
-                {cat.icon} {cat.name}
-              </button>
-            ))}
-          </div>
-
-          {/* Tutorial sections */}
-          {filteredCategories.map(cat => (
-            <div key={cat.id} className="mb-4">
-              <div className="rounded-lg border overflow-hidden" style={{ background: "var(--surface-container-lowest)", borderColor: "var(--outline-variant)" }}>
-                {/* Section header */}
-                <div className="flex items-center gap-2 px-4 py-2.5 border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-low)" }}>
-                  <span style={{ color: cat.color }}>{iconMap[cat.id] || <BookOpen className="w-5 h-5" />}</span>
-                  <h2 className="text-sm font-semibold" style={{ color: "var(--on-surface)" }}>{cat.name}</h2>
-                  <span className="ml-auto text-xs" style={{ color: "var(--outline)" }}>{cat.tutorials.length} 篇</span>
-                </div>
-                {/* Tutorial grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-                  {cat.tutorials.map(tutorial => (
-                    <Link
-                      key={tutorial.slug}
-                      href={`/learn/${cat.id}/${tutorial.slug}`}
-                      className="flex items-center gap-3 px-4 py-3 border-b border-r transition-colors hover:opacity-80"
-                      style={{ borderColor: "var(--outline-variant)" }}
-                    >
-                      <div className="w-9 h-9 rounded flex items-center justify-center shrink-0 text-sm" style={{ background: "var(--surface-container)", color: cat.color }}>
-                        {iconMap[cat.id] || <BookOpen className="w-4 h-4" />}
-                      </div>
-                      <div className="min-w-0">
-                        <h4 className="text-[13px] font-medium truncate" style={{ color: "var(--on-surface)" }}>{tutorial.title}</h4>
-                        <p className="text-[11px] truncate" style={{ color: "var(--outline)" }}>{tutorial.description}</p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
+          {mode === "knowledge" ? (
+            <>
+              {/* Mobile category filter */}
+              <div className="lg:hidden flex gap-1.5 overflow-x-auto pb-3 mb-3">
+                <button
+                  onClick={() => setActiveCategory(null)}
+                  className="px-3 py-1.5 text-xs font-medium rounded border shrink-0"
+                  style={{
+                    background: !activeCategory ? "var(--secondary)" : "var(--surface-container-low)",
+                    color: !activeCategory ? "var(--on-secondary)" : "var(--on-surface-variant)",
+                    borderColor: !activeCategory ? "var(--secondary)" : "var(--outline-variant)",
+                  }}
+                >
+                  全部
+                </button>
+                {categories.map(cat => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setActiveCategory(activeCategory === cat.id ? null : cat.id)}
+                    className="px-3 py-1.5 text-xs font-medium rounded border shrink-0"
+                    style={{
+                      background: activeCategory === cat.id ? "var(--secondary)" : "var(--surface-container-low)",
+                      color: activeCategory === cat.id ? "var(--on-secondary)" : "var(--on-surface-variant)",
+                      borderColor: activeCategory === cat.id ? "var(--secondary)" : "var(--outline-variant)",
+                    }}
+                  >
+                    {cat.icon} {cat.name}
+                  </button>
+                ))}
               </div>
-            </div>
-          ))}
 
-          {filteredCategories.length === 0 && (
-            <div className="text-center py-16">
-              <Search className="w-10 h-10 mx-auto mb-3" style={{ color: "var(--outline)" }} />
-              <p className="text-sm" style={{ color: "var(--outline)" }}>没有找到相关教程</p>
-            </div>
-          )}
+              {/* Tutorial sections */}
+              {filteredCategories.map(cat => (
+                <div key={cat.id} className="mb-4">
+                  <div className="rounded-lg border overflow-hidden" style={{ background: "var(--surface-container-lowest)", borderColor: "var(--outline-variant)" }}>
+                    <div className="flex items-center gap-2 px-4 py-2.5 border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-low)" }}>
+                      <span style={{ color: cat.color }}>{iconMap[cat.id] || <BookOpen className="w-5 h-5" />}</span>
+                      <h2 className="text-sm font-semibold" style={{ color: "var(--on-surface)" }}>{cat.name}</h2>
+                      <span className="ml-auto text-xs" style={{ color: "var(--outline)" }}>{cat.tutorials.length} 篇</span>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+                      {cat.tutorials.map(tutorial => (
+                        <Link
+                          key={tutorial.slug}
+                          href={`/learn/${cat.id}/${tutorial.slug}`}
+                          className="flex items-center gap-3 px-4 py-3 border-b border-r transition-colors hover:opacity-80"
+                          style={{ borderColor: "var(--outline-variant)" }}
+                        >
+                          <div className="w-9 h-9 rounded flex items-center justify-center shrink-0 text-sm" style={{ background: "var(--surface-container)", color: cat.color }}>
+                            {iconMap[cat.id] || <BookOpen className="w-4 h-4" />}
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="text-[13px] font-medium truncate" style={{ color: "var(--on-surface)" }}>{tutorial.title}</h4>
+                            <p className="text-[11px] truncate" style={{ color: "var(--outline)" }}>{tutorial.description}</p>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
 
-          {/* Tools section */}
-          <div className="mt-6 mb-4">
+              {filteredCategories.length === 0 && (
+                <div className="text-center py-16">
+                  <Search className="w-10 h-10 mx-auto mb-3" style={{ color: "var(--outline)" }} />
+                  <p className="text-sm" style={{ color: "var(--outline)" }}>没有找到相关教程</p>
+                </div>
+              )}
+            </>
+          ) : (
+            /* Tools Mode */
             <div className="rounded-lg border overflow-hidden" style={{ background: "var(--surface-container-lowest)", borderColor: "var(--outline-variant)" }}>
               <div className="flex items-center gap-2 px-4 py-2.5 border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-low)" }}>
                 <Wrench className="w-5 h-5" style={{ color: "var(--secondary)" }} />
@@ -256,22 +259,24 @@ export default function HomePage() {
                 <span className="ml-auto text-xs" style={{ color: "var(--outline)" }}>{toolLinks.length} 款</span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-                {toolLinks.map(tool => (
-                  <Link
-                    key={tool.href}
-                    href={tool.href}
-                    className="flex items-center gap-3 px-4 py-3 border-b border-r transition-colors hover:opacity-80"
-                    style={{ borderColor: "var(--outline-variant)" }}
-                  >
-                    <div className="w-9 h-9 rounded flex items-center justify-center shrink-0" style={{ background: "var(--surface-container)", color: "var(--secondary)" }}>
-                      <tool.icon className="w-4 h-4" />
-                    </div>
-                    <span className="text-[13px] font-medium" style={{ color: "var(--on-surface)" }}>{tool.name}</span>
-                  </Link>
-                ))}
+                {toolLinks
+                  .filter(t => !search || t.name.toLowerCase().includes(search.toLowerCase()))
+                  .map(tool => (
+                    <Link
+                      key={tool.href}
+                      href={tool.href}
+                      className="flex items-center gap-3 px-4 py-3 border-b border-r transition-colors hover:opacity-80"
+                      style={{ borderColor: "var(--outline-variant)" }}
+                    >
+                      <div className="w-9 h-9 rounded flex items-center justify-center shrink-0" style={{ background: "var(--surface-container)", color: "var(--secondary)" }}>
+                        <tool.icon className="w-4 h-4" />
+                      </div>
+                      <span className="text-[13px] font-medium" style={{ color: "var(--on-surface)" }}>{tool.name}</span>
+                    </Link>
+                  ))}
               </div>
             </div>
-          </div>
+          )}
         </main>
       </div>
 
@@ -282,11 +287,6 @@ export default function HomePage() {
             <span className="font-semibold" style={{ color: "var(--secondary)" }}>ToolkitX</span>
             <span>·</span>
             <span>{totalTutorials} 篇教程 · {toolLinks.length}+ 工具</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link href="/learn" className="hover:opacity-80">教程</Link>
-            <Link href="/tools" className="hover:opacity-80">工具</Link>
-            <Link href="/terminal" className="hover:opacity-80">终端</Link>
           </div>
           <div>&copy; 2026 ToolkitX · 访问量：{visitCount}</div>
         </div>

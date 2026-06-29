@@ -2,15 +2,9 @@
 
 import { use } from "react";
 import Link from "next/link";
-import LearnLayout, { TutorialSidebar } from "@/components/learn/layout";
+import LearnLayout, { CategoryNav, TutorialSidebar } from "@/components/learn/layout";
 import { getCategoryById } from "@/data/tutorials";
 import { notFound } from "next/navigation";
-
-const difficultyConfig = {
-  beginner: { label: "入门", color: "var(--tertiary)", bg: "color-mix(in srgb, var(--tertiary) 10%, transparent)" },
-  intermediate: { label: "进阶", color: "var(--primary)", bg: "color-mix(in srgb, var(--border-glow) 10%, transparent)" },
-  advanced: { label: "高级", color: "var(--error)", bg: "color-mix(in srgb, var(--error) 10%, transparent)" },
-};
 
 export default function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
   const { category: categoryId } = use(params);
@@ -19,74 +13,57 @@ export default function CategoryPage({ params }: { params: Promise<{ category: s
 
   return (
     <LearnLayout>
+      {/* Top Nav: All categories */}
+      <CategoryNav activeId={categoryId} />
+
       <div className="flex">
-        {/* Left Sidebar */}
+        {/* Left Sidebar: Tutorials for this category */}
         <TutorialSidebar category={category} />
 
-        {/* Main Content */}
-        <main className="flex-1 min-w-0 overflow-y-auto px-6 py-8 max-w-4xl mx-auto">
-          {/* Breadcrumbs */}
-          <div className="flex items-center gap-2 mb-8 font-['Geist'] text-[14px]" style={{ color: "var(--outline)" }}>
-            <Link href="/learn" className="hover:text-[var(--primary)] transition-colors">文库</Link>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
-            <span className="text-[var(--primary)]">{category.name}</span>
+        {/* Main Content: Category intro */}
+        <main className="flex-1 min-w-0 px-6 py-6">
+          {/* Category Header */}
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-2xl">{category.icon}</span>
+            <div>
+              <h1 className="text-xl font-bold" style={{ color: "var(--on-surface)" }}>{category.name}</h1>
+              <p className="text-sm" style={{ color: "var(--outline)" }}>{category.description} · {category.tutorials.length} 篇教程</p>
+            </div>
           </div>
 
-          {/* Category Header */}
-          <section className="mb-16">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 flex items-center justify-center rounded border border-[color-mix(in srgb, var(--border-glow) 20%, transparent)]" style={{ background: "color-mix(in srgb, var(--border-glow) 10%, transparent)" }}>
-                <span className="text-[24px]">{category.icon}</span>
-              </div>
-              <div>
-                <h1 className="text-[32px] font-bold" style={{ color: "var(--primary)" }}>{category.name}</h1>
-                <p className="font-['Geist'] text-[12px]" style={{ color: "var(--outline)" }}>
-                  {category.description} · {category.tutorials.length} 个模块
-                </p>
-              </div>
-            </div>
-            <div className="progress-beam w-full mt-6" />
-          </section>
+          {/* Quick start */}
+          <div className="rounded-lg border p-4 mb-6" style={{ background: "var(--surface-container-low)", borderColor: "var(--outline-variant)" }}>
+            <p className="text-sm" style={{ color: "var(--on-surface-variant)" }}>
+              从左侧选择教程开始学习，或点击下方链接进入第一篇。
+            </p>
+            <Link
+              href={`/learn/${categoryId}/${category.tutorials[0]?.slug}`}
+              className="inline-block mt-3 px-4 py-2 rounded text-sm font-medium"
+              style={{ background: "var(--secondary)", color: "var(--on-secondary)" }}
+            >
+              开始学习 →
+            </Link>
+          </div>
 
-          {/* Tutorial List */}
-          <article className="space-y-6">
-            {category.tutorials.map((tutorial, i) => {
-              const diff = difficultyConfig[tutorial.difficulty];
-              return (
-                <Link
-                  key={tutorial.slug}
-                  href={`/learn/${categoryId}/${tutorial.slug}`}
-                  className="glass-card flex items-center gap-5 p-5 group cursor-pointer"
-                >
-                  <div className="w-10 h-10 rounded flex items-center justify-center shrink-0 border border-[var(--outline-variant)]" style={{ background: "var(--surface-container)" }}>
-                    <span className="font-['Geist'] text-[12px] font-bold" style={{ color: "var(--primary)" }}>
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-[16px] font-semibold mb-1 group-hover:text-[var(--primary)] transition-colors" style={{ color: "var(--primary)" }}>
-                      {tutorial.title}
-                    </h3>
-                    <p className="text-[14px] line-clamp-1" style={{ color: "var(--on-surface-variant)" }}>
-                      {tutorial.description}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span className="tag-neon" style={{ color: diff.color, borderColor: `${diff.color}40`, background: diff.bg }}>
-                      {diff.label}
-                    </span>
-                    <div className="flex items-center gap-1.5" style={{ color: "var(--outline)" }}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
-                      <span className="font-['Geist'] text-[11px]">{tutorial.readTime}</span>
-                    </div>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[var(--outline)] group-hover:text-[var(--primary)] group-hover:translate-x-1 transition-all">
-                      <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </Link>
-              );
-            })}
-          </article>
+          {/* Tutorial Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {category.tutorials.map((tutorial, i) => (
+              <Link
+                key={tutorial.slug}
+                href={`/learn/${categoryId}/${tutorial.slug}`}
+                className="flex items-center gap-3 p-3 rounded-lg border transition-colors hover:opacity-80"
+                style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}
+              >
+                <div className="w-8 h-8 rounded flex items-center justify-center shrink-0" style={{ background: "var(--surface-container)", color: "var(--secondary)" }}>
+                  <span className="text-xs font-bold">{String(i + 1).padStart(2, "0")}</span>
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-medium truncate" style={{ color: "var(--on-surface)" }}>{tutorial.title}</h3>
+                  <p className="text-xs truncate" style={{ color: "var(--outline)" }}>{tutorial.description}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
         </main>
       </div>
     </LearnLayout>
