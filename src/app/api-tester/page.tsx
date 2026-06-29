@@ -5,7 +5,7 @@ import { RequestBuilder, RequestBuilderRef } from "@/components/api-tester/reque
 import { ResponseViewer } from "@/components/api-tester/response-viewer";
 import { SubPageLayout } from "@/components/layout/sub-page-layout";
 import { Clock, Trash2, ArrowUpRight, FileCode } from "lucide-react";
-import { apiPost, apiDelete, apiGet, isLoginRequired } from "@/lib/api";
+import { apiPost, apiDelete, apiGet } from "@/lib/api";
 
 const helpContent = [
   {
@@ -71,7 +71,6 @@ export default function ApiTesterPage() {
   const builderRef = useRef<RequestBuilderRef>(null);
 
   const loadHistory = async () => {
-    if (isLoginRequired()) return;
     try {
       const data = await apiGet<HistoryEntry[]>("/api/api-history");
       setHistory(data);
@@ -116,20 +115,18 @@ export default function ApiTesterPage() {
           timestamp: Date.now(),
         };
 
-        // Save to database if logged in
-        if (!isLoginRequired()) {
-          try {
-            await apiPost("/api/api-history", {
-              name: entry.name,
-              method: entry.method,
-              url: entry.url,
-              headers: entry.headers,
-              body: entry.body,
-              status: entry.status,
-              time: entry.time,
-            });
-          } catch {}
-        }
+        // Save to database
+        try {
+          await apiPost("/api/api-history", {
+            name: entry.name,
+            method: entry.method,
+            url: entry.url,
+            headers: entry.headers,
+            body: entry.body,
+            status: entry.status,
+            time: entry.time,
+          });
+        } catch {}
 
         const newHistory = [entry, ...history].slice(0, 50);
         setHistory(newHistory);
@@ -147,21 +144,17 @@ export default function ApiTesterPage() {
   };
 
   const clearHistory = async () => {
-    if (!isLoginRequired()) {
-      try {
-        await apiDelete("/api/api-history");
-      } catch {}
-    }
+    try {
+      await apiDelete("/api/api-history");
+    } catch {}
     localStorage.removeItem(HISTORY_KEY);
     setHistory([]);
   };
 
   const removeHistory = async (id: string) => {
-    if (!isLoginRequired()) {
-      try {
-        await apiDelete("/api/api-history", id);
-      } catch {}
-    }
+    try {
+      await apiDelete("/api/api-history", id);
+    } catch {}
     const updated = history.filter((h) => h.id !== id);
     setHistory(updated);
     localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));

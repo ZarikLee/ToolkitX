@@ -1,15 +1,9 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const runbooks = await prisma.runbook.findMany({
-    where: { userId: user.userId },
+    where: { userId: "default" },
     orderBy: { updatedAt: "desc" },
   });
 
@@ -29,11 +23,6 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await request.json();
   const { title, description, triggerType, triggerConfig, steps } = body;
 
@@ -46,7 +35,7 @@ export async function POST(request: Request) {
 
   const runbook = await prisma.runbook.create({
     data: {
-      userId: user.userId,
+      userId: "default",
       title,
       description: description || null,
       triggerType,
@@ -69,11 +58,6 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await request.json();
   const { id, triggerConfig, steps, ...updates } = body;
 
@@ -90,7 +74,7 @@ export async function PUT(request: Request) {
   }
 
   const runbook = await prisma.runbook.update({
-    where: { id, userId: user.userId },
+    where: { id, userId: "default" },
     data: updateData,
   });
 
@@ -108,11 +92,6 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
 
@@ -121,7 +100,7 @@ export async function DELETE(request: Request) {
   }
 
   await prisma.runbook.deleteMany({
-    where: { id, userId: user.userId },
+    where: { id, userId: "default" },
   });
 
   return NextResponse.json({ success: true });

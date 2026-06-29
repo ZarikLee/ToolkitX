@@ -81,7 +81,7 @@ export default function HomePage() {
   const totalTutorials = categories.reduce((sum, c) => sum + c.tutorials.length, 0);
 
   return (
-    <div className="learn-neon h-screen flex flex-col overflow-hidden">
+    <div className="learn-neon min-h-screen flex flex-col">
       {/* Grain Overlay */}
       <div className="grain-overlay" />
 

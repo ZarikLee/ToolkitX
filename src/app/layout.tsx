@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./learn/neon.css";
-import { MigrationProvider } from "@/components/layout/migration-provider";
-import { ToastProvider } from "@/hooks/use-toast";
 
 export const metadata: Metadata = {
   title: "ToolkitX - 技术知识库 & 运维工具箱",
@@ -21,13 +19,9 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
       </head>
-      <body className="h-screen overflow-hidden flex flex-col" style={{ background: "#131313", color: "#e4e2e1" }}>
-        <MigrationProvider>
-          <ToastProvider>
-            <div className="grain-overlay" />
-            <div className="flex-1 overflow-hidden flex flex-col">{children}</div>
-          </ToastProvider>
-        </MigrationProvider>
+      <body style={{ background: "#131313", color: "#e4e2e1" }}>
+        <div className="grain-overlay" />
+        {children}
       </body>
     </html>
   );

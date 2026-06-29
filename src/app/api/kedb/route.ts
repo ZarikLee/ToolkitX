@@ -1,19 +1,13 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { searchParams } = new URL(request.url);
   const search = searchParams.get("search") || "";
   const severity = searchParams.get("severity");
   const tag = searchParams.get("tag");
 
-  const where: any = { userId: user.userId };
+  const where: any = { userId: "default" };
 
   if (search) {
     where.OR = [
@@ -54,11 +48,6 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await request.json();
   const { title, symptom, cause, solution, tags, severity } = body;
 
@@ -71,7 +60,7 @@ export async function POST(request: Request) {
 
   const entry = await prisma.knowledgeEntry.create({
     data: {
-      userId: user.userId,
+      userId: "default",
       title,
       symptom,
       cause,
@@ -96,11 +85,6 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await request.json();
   const { id, tags, ...updates } = body;
 
@@ -114,7 +98,7 @@ export async function PUT(request: Request) {
   }
 
   const entry = await prisma.knowledgeEntry.update({
-    where: { id, userId: user.userId },
+    where: { id, userId: "default" },
     data: updateData,
   });
 
@@ -133,11 +117,6 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
 
@@ -146,7 +125,7 @@ export async function DELETE(request: Request) {
   }
 
   await prisma.knowledgeEntry.deleteMany({
-    where: { id, userId: user.userId },
+    where: { id, userId: "default" },
   });
 
   return NextResponse.json({ success: true });

@@ -1,22 +1,16 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 import { readFile } from "fs/promises";
 import { createHash } from "crypto";
 
 // POST - trigger drift check for a config (or all enabled configs)
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await request.json();
   const { baselineId } = body;
 
   const where = baselineId
-    ? { id: baselineId, userId: user.userId }
-    : { userId: user.userId, enabled: true };
+    ? { id: baselineId, userId: "default" }
+    : { userId: "default", enabled: true };
 
   const baselines = await prisma.configBaseline.findMany({ where });
   const results = [];
@@ -53,7 +47,7 @@ export async function POST(request: Request) {
         // Create alert event
         await prisma.alertEvent.create({
           data: {
-            userId: user.userId,
+            userId: "default",
             type: "config_drift",
             severity: "warning",
             title: `配置漂移: ${baseline.fileName}`,

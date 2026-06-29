@@ -1,20 +1,14 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { searchParams } = new URL(request.url);
   const action = searchParams.get("action");
   const resource = searchParams.get("resource");
   const startDate = searchParams.get("startDate");
   const endDate = searchParams.get("endDate");
 
-  const where: any = { userId: user.userId };
+  const where: any = { userId: "default" };
 
   if (action) {
     where.action = action;

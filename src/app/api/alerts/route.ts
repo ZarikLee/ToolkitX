@@ -1,20 +1,14 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 // GET - list alerts with filters
 export async function GET(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { searchParams } = new URL(request.url);
   const status = searchParams.get("status"); // active, acknowledged, resolved
   const severity = searchParams.get("severity");
   const limit = parseInt(searchParams.get("limit") || "50");
 
-  const where: any = { userId: user.userId };
+  const where: any = { userId: "default" };
   if (status === "active") where.resolved = false;
   if (status === "resolved") where.resolved = true;
   if (severity) where.severity = severity;
@@ -41,17 +35,12 @@ export async function GET(request: Request) {
 
 // POST - create manual alert
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await request.json();
   const { type, severity, title, message } = body;
 
   const alert = await prisma.alertEvent.create({
     data: {
-      userId: user.userId,
+      userId: "default",
       type: type || "manual",
       severity: severity || "info",
       title,
@@ -72,11 +61,6 @@ export async function POST(request: Request) {
 
 // PUT - acknowledge/resolve alert
 export async function PUT(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await request.json();
   const { id, resolved } = body;
 
@@ -85,7 +69,7 @@ export async function PUT(request: Request) {
   }
 
   const alert = await prisma.alertEvent.update({
-    where: { id, userId: user.userId },
+    where: { id, userId: "default" },
     data: { resolved: resolved ?? true },
   });
 
@@ -94,11 +78,6 @@ export async function PUT(request: Request) {
 
 // DELETE - delete alert
 export async function DELETE(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
 
@@ -106,7 +85,7 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "Missing id" }, { status: 400 });
   }
 
-  await prisma.alertEvent.deleteMany({ where: { id, userId: user.userId } });
+  await prisma.alertEvent.deleteMany({ where: { id, userId: "default" } });
 
   return NextResponse.json({ success: true });
 }

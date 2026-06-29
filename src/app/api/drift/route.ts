@@ -1,18 +1,12 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 import { readFile } from "fs/promises";
 import { createHash } from "crypto";
 
 // GET - list monitored configs with drift status
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const baselines = await prisma.configBaseline.findMany({
-    where: { userId: user.userId },
+    where: { userId: "default" },
     include: { drifts: { orderBy: { detectedAt: "desc" }, take: 1 } },
     orderBy: { createdAt: "desc" },
   });
@@ -36,11 +30,6 @@ export async function GET() {
 
 // POST - add config file to monitor
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await request.json();
   const { filePath, fileName } = body;
 
@@ -54,7 +43,7 @@ export async function POST(request: Request) {
 
     const baseline = await prisma.configBaseline.create({
       data: {
-        userId: user.userId,
+        userId: "default",
         filePath,
         fileName: fileName || filePath.split("/").pop() || filePath,
         hash,
@@ -77,11 +66,6 @@ export async function POST(request: Request) {
 
 // DELETE - remove config from monitoring
 export async function DELETE(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
 
@@ -89,7 +73,7 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "Missing id" }, { status: 400 });
   }
 
-  await prisma.configBaseline.deleteMany({ where: { id, userId: user.userId } });
+  await prisma.configBaseline.deleteMany({ where: { id, userId: "default" } });
 
   return NextResponse.json({ success: true });
 }

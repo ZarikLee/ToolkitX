@@ -1,16 +1,10 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 // GET - 获取用户反馈列表
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const feedbacks = await prisma.feedback.findMany({
-    where: { userId: user.userId },
+    where: { userId: "default" },
     orderBy: { createdAt: "desc" },
   });
 
@@ -29,11 +23,6 @@ export async function GET() {
 
 // POST - 提交反馈
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await request.json();
   const { type, title, content } = body;
 
@@ -43,7 +32,7 @@ export async function POST(request: Request) {
 
   const feedback = await prisma.feedback.create({
     data: {
-      userId: user.userId,
+      userId: "default",
       type: type || "suggestion",
       title,
       content,

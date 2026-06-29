@@ -1,15 +1,9 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const history = await prisma.commandHistory.findMany({
-    where: { userId: user.userId },
+    where: { userId: "default" },
     orderBy: { createdAt: "desc" },
     take: 100,
   });
@@ -26,11 +20,6 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await request.json();
   const { command, output, serverId } = body;
 
@@ -43,7 +32,7 @@ export async function POST(request: Request) {
 
   const entry = await prisma.commandHistory.create({
     data: {
-      userId: user.userId,
+      userId: "default",
       command,
       output: output || null,
       serverId: serverId || null,
@@ -60,21 +49,16 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
 
   if (id) {
     await prisma.commandHistory.deleteMany({
-      where: { id, userId: user.userId },
+      where: { id, userId: "default" },
     });
   } else {
     await prisma.commandHistory.deleteMany({
-      where: { userId: user.userId },
+      where: { userId: "default" },
     });
   }
 

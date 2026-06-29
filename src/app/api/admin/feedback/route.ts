@@ -1,14 +1,8 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 // GET - 管理员获取所有用户反馈
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "admin") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-
   const feedbacks = await prisma.feedback.findMany({
     orderBy: { createdAt: "desc" },
     include: {
@@ -35,11 +29,6 @@ export async function GET() {
 
 // POST - 管理员回复反馈
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "admin") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-
   const body = await request.json();
   const { feedbackId, reply, status } = body;
 

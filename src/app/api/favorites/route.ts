@@ -1,16 +1,10 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 // GET - 获取用户收藏列表
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const favorites = await prisma.userFavorites.findMany({
-    where: { userId: user.userId },
+    where: { userId: "default" },
     select: { toolId: true },
   });
 
@@ -21,11 +15,6 @@ export async function GET() {
 
 // POST - 切换收藏状态
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await request.json();
   const { toolId } = body;
 
@@ -36,7 +25,7 @@ export async function POST(request: Request) {
   const existing = await prisma.userFavorites.findUnique({
     where: {
       userId_toolId: {
-        userId: user.userId,
+        userId: "default",
         toolId,
       },
     },
@@ -49,7 +38,7 @@ export async function POST(request: Request) {
   } else {
     await prisma.userFavorites.create({
       data: {
-        userId: user.userId,
+        userId: "default",
         toolId,
       },
     });
@@ -57,7 +46,7 @@ export async function POST(request: Request) {
 
   // Return updated list
   const updated = await prisma.userFavorites.findMany({
-    where: { userId: user.userId },
+    where: { userId: "default" },
     select: { toolId: true },
   });
 

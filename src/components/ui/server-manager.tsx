@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Server, Plus, Pencil, Trash2, X, ChevronDown } from "lucide-react";
-import { apiGet, apiPost, apiDelete, isLoginRequired, getLocalStorage } from "@/lib/api";
+import { apiGet, apiPost, apiDelete, getLocalStorage } from "@/lib/api";
 
 export interface SavedServer {
   id: string;
@@ -38,23 +38,15 @@ export function ServerManager({
   const [showModal, setShowModal] = useState(false);
   const [editingServer, setEditingServer] = useState<SavedServer | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   useEffect(() => {
-    setIsLoggedIn(!isLoginRequired());
     loadServers();
   }, []);
 
   const loadServers = async () => {
-    if (isLoginRequired()) {
-      setIsLoggedIn(false);
-      setServers(getLocalStorage<SavedServer[]>(STORAGE_KEY, []));
-      return;
-    }
     try {
       const data = await apiGet<SavedServer[]>("/api/servers");
       setServers(data);
-      // Sync to localStorage as backup
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch {
       setServers(getLocalStorage<SavedServer[]>(STORAGE_KEY, []));
@@ -66,15 +58,11 @@ export function ServerManager({
   }, []);
 
   const addServer = async (data: Omit<SavedServer, "id">) => {
-    if (isLoggedIn) {
-      try {
-        const newServer = await apiPost<SavedServer>("/api/servers", data);
-        setServers((prev) => [...prev, newServer]);
-        return;
-      } catch {
-        // Fall back to localStorage
-      }
-    }
+    try {
+      const newServer = await apiPost<SavedServer>("/api/servers", data);
+      setServers((prev) => [...prev, newServer]);
+      return;
+    } catch {}
     const newServer: SavedServer = {
       ...data,
       id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
@@ -87,15 +75,11 @@ export function ServerManager({
   };
 
   const updateServer = async (data: SavedServer) => {
-    if (isLoggedIn) {
-      try {
-        await apiPost<SavedServer>("/api/servers", data);
-        setServers((prev) => prev.map((s) => (s.id === data.id ? data : s)));
-        return;
-      } catch {
-        // Fall back to localStorage
-      }
-    }
+    try {
+      await apiPost<SavedServer>("/api/servers", data);
+      setServers((prev) => prev.map((s) => (s.id === data.id ? data : s)));
+      return;
+    } catch {}
     setServers((prev) => {
       const updated = prev.map((s) => (s.id === data.id ? data : s));
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
@@ -104,13 +88,9 @@ export function ServerManager({
   };
 
   const deleteServer = async (id: string) => {
-    if (isLoggedIn) {
-      try {
-        await apiDelete("/api/servers", id);
-      } catch {
-        // Continue with local delete
-      }
-    }
+    try {
+      await apiDelete("/api/servers", id);
+    } catch {}
     setServers((prev) => {
       const updated = prev.filter((s) => s.id !== id);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));

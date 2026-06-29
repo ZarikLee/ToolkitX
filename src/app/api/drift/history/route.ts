@@ -1,14 +1,8 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 // GET - get drift history for a config
 export async function GET(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { searchParams } = new URL(request.url);
   const baselineId = searchParams.get("baselineId");
 
@@ -18,7 +12,7 @@ export async function GET(request: Request) {
 
   // Verify ownership
   const baseline = await prisma.configBaseline.findFirst({
-    where: { id: baselineId, userId: user.userId },
+    where: { id: baselineId, userId: "default" },
   });
 
   if (!baseline) {

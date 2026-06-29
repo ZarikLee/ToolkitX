@@ -43,11 +43,6 @@ export async function apiDelete(url: string, id?: string): Promise<void> {
   }
 }
 
-export function isLoginRequired(): boolean {
-  if (typeof window === "undefined") return false;
-  return !document.cookie.includes("toolkitx_token");
-}
-
 export function getLocalStorage<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
   try {

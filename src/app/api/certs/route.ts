@@ -1,15 +1,9 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const certs = await prisma.certMonitor.findMany({
-    where: { userId: user.userId },
+    where: { userId: "default" },
     orderBy: { createdAt: "desc" },
   });
 
@@ -32,11 +26,6 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await request.json();
   const { domain, port, label } = body;
 
@@ -48,7 +37,7 @@ export async function POST(request: Request) {
   }
 
   const existing = await prisma.certMonitor.findFirst({
-    where: { userId: user.userId, domain, port: port || 443 },
+    where: { userId: "default", domain, port: port || 443 },
   });
 
   if (existing) {
@@ -60,7 +49,7 @@ export async function POST(request: Request) {
 
   const cert = await prisma.certMonitor.create({
     data: {
-      userId: user.userId,
+      userId: "default",
       domain,
       port: port || 443,
       label: label || null,
@@ -84,11 +73,6 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
 
@@ -97,7 +81,7 @@ export async function DELETE(request: Request) {
   }
 
   await prisma.certMonitor.deleteMany({
-    where: { id, userId: user.userId },
+    where: { id, userId: "default" },
   });
 
   return NextResponse.json({ success: true });

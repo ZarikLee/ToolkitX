@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 import { exec } from "child_process";
 import { promisify } from "util";
@@ -48,11 +47,6 @@ async function checkCertificate(domain: string, port = 443) {
 }
 
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   let body: any = {};
   try {
     body = await request.json();
@@ -69,7 +63,7 @@ export async function POST(request: Request) {
   let certRecord;
   if (id) {
     certRecord = await prisma.certMonitor.findFirst({
-      where: { id, userId: user.userId },
+      where: { id, userId: "default" },
     });
     if (!certRecord) {
       return NextResponse.json({ error: "Certificate not found" }, { status: 404 });

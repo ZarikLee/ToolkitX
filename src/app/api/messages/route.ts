@@ -1,24 +1,18 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 // GET - 获取消息列表
 // 普通用户：广播公告 + 自己的反馈（含管理员回复）
 // 管理员：广播公告 + 所有用户反馈
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const isAdmin = user.role === "admin";
+  const isAdmin = "admin" === "admin";
 
   // 广播公告 + 已读状态
   const messages = await prisma.message.findMany({
     orderBy: { createdAt: "desc" },
     include: {
       reads: {
-        where: { userId: user.userId },
+        where: { userId: "default" },
         select: { read: true },
       },
     },
@@ -37,7 +31,7 @@ export async function GET() {
   // 反馈列表
   const feedbackWhere = isAdmin
     ? {}
-    : { userId: user.userId };
+    : { userId: "default" };
 
   const feedbacks = await prisma.feedback.findMany({
     where: feedbackWhere,
@@ -52,7 +46,7 @@ export async function GET() {
   const reads = await prisma.messageRead.findMany({
     where: {
       messageId: { in: fbIds },
-      userId: user.userId,
+      userId: "default",
     },
   });
   const readSet = new Set(reads.filter((r) => r.read).map((r) => r.messageId));
@@ -94,17 +88,12 @@ export async function GET() {
 
 // POST - 标记已读 / 管理员回复反馈
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await request.json();
   const { messageId, markAll, reply } = body;
 
   // 回复反馈
   if (reply && messageId?.startsWith("fb-")) {
-    if (user.role !== "admin") {
+    if ("admin" !== "admin") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -122,16 +111,16 @@ export async function POST(request: Request) {
 
     // 管理员回复后，标记管理员已读
     const existing = await prisma.messageRead.findFirst({
-      where: { messageId, userId: user.userId },
+      where: { messageId, userId: "default" },
     });
     if (!existing) {
       await prisma.messageRead.create({
-        data: { messageId, userId: user.userId, read: true },
+        data: { messageId, userId: "default", read: true },
       });
     }
 
     // 通知用户：标记用户的反馈为未读，这样用户打开消息中心就能看到管理员的回复
-    if (feedback && feedback.userId !== user.userId) {
+    if (feedback && feedback.userId !== "default") {
       // 删除用户的已读标记，使其变为未读
       await prisma.messageRead.deleteMany({
         where: { messageId, userId: feedback.userId },
@@ -144,27 +133,27 @@ export async function POST(request: Request) {
   if (markAll) {
     // 公告全部已读
     const unreadMessages = await prisma.message.findMany({
-      where: { reads: { none: { userId: user.userId } } },
+      where: { reads: { none: { userId: "default" } } },
       select: { id: true },
     });
     await prisma.messageRead.createMany({
       data: unreadMessages.map((m) => ({
         messageId: m.id,
-        userId: user.userId,
+        userId: "default",
         read: true,
       })),
     });
     // 反馈全部已读
-    const feedbackWhere = user.role === "admin"
+    const feedbackWhere = "admin" === "admin"
       ? { status: "pending" as const }
-      : { userId: user.userId };
+      : { userId: "default" };
     const unreadFeedbacks = await prisma.feedback.findMany({
       where: feedbackWhere,
       select: { id: true },
     });
     const fbReads = unreadFeedbacks.map((f) => ({
       messageId: `fb-${f.id}`,
-      userId: user.userId,
+      userId: "default",
       read: true,
     }));
     if (fbReads.length > 0) {
@@ -173,18 +162,18 @@ export async function POST(request: Request) {
   } else if (messageId) {
     if (messageId.startsWith("fb-")) {
       const existing = await prisma.messageRead.findFirst({
-        where: { messageId, userId: user.userId },
+        where: { messageId, userId: "default" },
       });
       if (!existing) {
         await prisma.messageRead.create({
-          data: { messageId, userId: user.userId, read: true },
+          data: { messageId, userId: "default", read: true },
         });
       }
     } else {
       await prisma.messageRead.upsert({
-        where: { messageId_userId: { messageId, userId: user.userId } },
+        where: { messageId_userId: { messageId, userId: "default" } },
         update: { read: true },
-        create: { messageId, userId: user.userId, read: true },
+        create: { messageId, userId: "default", read: true },
       });
     }
   }
@@ -194,20 +183,11 @@ export async function POST(request: Request) {
 
 // DELETE - 管理员删除消息
 export async function DELETE(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
 
   if (!id) {
     return NextResponse.json({ error: "Missing id" }, { status: 400 });
-  }
-
-  if (user.role !== "admin") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   if (id.startsWith("fb-")) {

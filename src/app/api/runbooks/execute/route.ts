@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 import { Client } from "ssh2";
 
@@ -81,11 +80,6 @@ function executeCommand(
 }
 
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await request.json();
   const { runbookId, servers, stepIds } = body;
 
@@ -97,7 +91,7 @@ export async function POST(request: Request) {
   }
 
   const runbook = await prisma.runbook.findFirst({
-    where: { id: runbookId, userId: user.userId },
+    where: { id: runbookId, userId: "default" },
   });
 
   if (!runbook) {
@@ -161,7 +155,7 @@ export async function POST(request: Request) {
 
   await prisma.auditLog.create({
     data: {
-      userId: user.userId,
+      userId: "default",
       action: "runbook.execute",
       resource: `runbook:${runbookId}`,
       detail: JSON.stringify({

@@ -1,16 +1,10 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 // GET - list alert rules
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const rules = await prisma.alertRule.findMany({
-    where: { userId: user.userId },
+    where: { userId: "default" },
     orderBy: { createdAt: "desc" },
   });
 
@@ -32,11 +26,6 @@ export async function GET() {
 
 // POST - create alert rule
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await request.json();
   const { name, type, condition, threshold, severity, cooldown } = body;
 
@@ -46,7 +35,7 @@ export async function POST(request: Request) {
 
   const rule = await prisma.alertRule.create({
     data: {
-      userId: user.userId,
+      userId: "default",
       name,
       type,
       condition,
@@ -71,11 +60,6 @@ export async function POST(request: Request) {
 
 // PUT - update alert rule
 export async function PUT(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await request.json();
   const { id, ...updates } = body;
 
@@ -84,7 +68,7 @@ export async function PUT(request: Request) {
   }
 
   const rule = await prisma.alertRule.update({
-    where: { id, userId: user.userId },
+    where: { id, userId: "default" },
     data: updates,
   });
 
@@ -103,11 +87,6 @@ export async function PUT(request: Request) {
 
 // DELETE - delete alert rule
 export async function DELETE(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
 
@@ -116,7 +95,7 @@ export async function DELETE(request: Request) {
   }
 
   const existing = await prisma.alertRule.findFirst({
-    where: { id, userId: user.userId },
+    where: { id, userId: "default" },
   });
   if (!existing) {
     return NextResponse.json({ error: "Rule not found" }, { status: 404 });

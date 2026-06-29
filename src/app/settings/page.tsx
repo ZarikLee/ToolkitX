@@ -6,7 +6,7 @@ import { ThemeSettings } from '@/components/settings/theme-settings';
 import { MonitorSettings } from '@/components/settings/monitor-settings';
 import { TerminalSettings } from '@/components/settings/terminal-settings';
 import { Save } from 'lucide-react';
-import { apiGet, apiPut, isLoginRequired, getLocalStorage } from '@/lib/api';
+import { apiGet, apiPut, getLocalStorage } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 
 interface Settings {
@@ -17,7 +17,7 @@ interface Settings {
 }
 
 const defaultSettings: Settings = {
-  theme: 'light',
+  theme: 'dark',
   monitorRefreshInterval: 5000,
   terminalFontSize: 14,
   terminalFontFamily: 'Menlo, Monaco, "Courier New", monospace',
@@ -34,10 +34,6 @@ export default function SettingsPage() {
   }, []);
 
   const loadSettings = async () => {
-    if (isLoginRequired()) {
-      setSettings({ ...defaultSettings, ...getLocalStorage(SETTINGS_KEY, {} as Settings) });
-      return;
-    }
     try {
       const data = await apiGet<Settings>('/api/settings');
       setSettings(data);
@@ -48,11 +44,6 @@ export default function SettingsPage() {
   };
 
   const saveSettings = async () => {
-    if (isLoginRequired()) {
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-      toast('设置已保存');
-      return;
-    }
     try {
       const data = await apiPut<Settings>('/api/settings', settings);
       setSettings(data);

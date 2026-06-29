@@ -1,15 +1,9 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const history = await prisma.apiHistory.findMany({
-    where: { userId: user.userId },
+    where: { userId: "default" },
     orderBy: { createdAt: "desc" },
     take: 50,
   });
@@ -30,11 +24,6 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await request.json();
   const { name, method, url, headers, body: reqBody, status, time } = body;
 
@@ -47,7 +36,7 @@ export async function POST(request: Request) {
 
   const entry = await prisma.apiHistory.create({
     data: {
-      userId: user.userId,
+      userId: "default",
       name,
       method,
       url,
@@ -72,21 +61,16 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
 
   if (id) {
     await prisma.apiHistory.deleteMany({
-      where: { id, userId: user.userId },
+      where: { id, userId: "default" },
     });
   } else {
     await prisma.apiHistory.deleteMany({
-      where: { userId: user.userId },
+      where: { userId: "default" },
     });
   }
 
