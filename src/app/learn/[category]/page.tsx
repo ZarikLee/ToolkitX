@@ -7,9 +7,9 @@ import { getCategoryById } from "@/data/tutorials";
 import { notFound } from "next/navigation";
 
 const difficultyConfig = {
-  beginner: { label: "入门", color: "var(--neon-tertiary)", bg: "rgba(162,239,0,0.1)" },
-  intermediate: { label: "进阶", color: "var(--neon-primary)", bg: "rgba(0,240,255,0.1)" },
-  advanced: { label: "高级", color: "var(--neon-danger)", bg: "rgba(255,0,85,0.1)" },
+  beginner: { label: "入门", color: "var(--tertiary)", bg: "color-mix(in srgb, var(--tertiary) 10%, transparent)" },
+  intermediate: { label: "进阶", color: "var(--primary)", bg: "color-mix(in srgb, var(--border-glow) 10%, transparent)" },
+  advanced: { label: "高级", color: "var(--error)", bg: "color-mix(in srgb, var(--error) 10%, transparent)" },
 };
 
 export default function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
@@ -19,28 +19,28 @@ export default function CategoryPage({ params }: { params: Promise<{ category: s
 
   return (
     <LearnLayout>
-      <div className="learn-neon flex">
+      <div className="flex">
         {/* Left Sidebar */}
         <TutorialSidebar category={category} />
 
         {/* Main Content */}
         <main className="flex-1 min-w-0 overflow-y-auto px-6 py-8 max-w-4xl mx-auto">
           {/* Breadcrumbs */}
-          <div className="flex items-center gap-2 mb-8 font-['JetBrains_Mono'] text-[14px]" style={{ color: "var(--text-muted)" }}>
-            <Link href="/learn" className="hover:text-[var(--neon-primary)] transition-colors">文库</Link>
+          <div className="flex items-center gap-2 mb-8 font-['Geist'] text-[14px]" style={{ color: "var(--outline)" }}>
+            <Link href="/learn" className="hover:text-[var(--primary)] transition-colors">文库</Link>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>
-            <span className="text-[var(--neon-primary)]">{category.name}</span>
+            <span className="text-[var(--primary)]">{category.name}</span>
           </div>
 
           {/* Category Header */}
           <section className="mb-16">
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 flex items-center justify-center rounded border border-[rgba(0,240,255,0.2)]" style={{ background: "rgba(0,240,255,0.1)" }}>
+              <div className="w-12 h-12 flex items-center justify-center rounded border border-[color-mix(in srgb, var(--border-glow) 20%, transparent)]" style={{ background: "color-mix(in srgb, var(--border-glow) 10%, transparent)" }}>
                 <span className="text-[24px]">{category.icon}</span>
               </div>
               <div>
-                <h1 className="text-[32px] font-bold" style={{ color: "var(--neon-primary)" }}>{category.name}</h1>
-                <p className="font-['JetBrains_Mono'] text-[12px]" style={{ color: "var(--text-muted)" }}>
+                <h1 className="text-[32px] font-bold" style={{ color: "var(--primary)" }}>{category.name}</h1>
+                <p className="font-['Geist'] text-[12px]" style={{ color: "var(--outline)" }}>
                   {category.description} · {category.tutorials.length} 个模块
                 </p>
               </div>
@@ -59,12 +59,12 @@ export default function CategoryPage({ params }: { params: Promise<{ category: s
                   className="glass-card flex items-center gap-5 p-5 group cursor-pointer"
                 >
                   <div className="w-10 h-10 rounded flex items-center justify-center shrink-0 border border-[var(--outline-variant)]" style={{ background: "var(--surface-container)" }}>
-                    <span className="font-['JetBrains_Mono'] text-[12px] font-bold" style={{ color: "var(--neon-primary)" }}>
+                    <span className="font-['Geist'] text-[12px] font-bold" style={{ color: "var(--primary)" }}>
                       {String(i + 1).padStart(2, "0")}
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-[16px] font-semibold mb-1 group-hover:text-[var(--neon-primary)] transition-colors" style={{ color: "var(--neon-primary)" }}>
+                    <h3 className="text-[16px] font-semibold mb-1 group-hover:text-[var(--primary)] transition-colors" style={{ color: "var(--primary)" }}>
                       {tutorial.title}
                     </h3>
                     <p className="text-[14px] line-clamp-1" style={{ color: "var(--on-surface-variant)" }}>
@@ -75,11 +75,11 @@ export default function CategoryPage({ params }: { params: Promise<{ category: s
                     <span className="tag-neon" style={{ color: diff.color, borderColor: `${diff.color}40`, background: diff.bg }}>
                       {diff.label}
                     </span>
-                    <div className="flex items-center gap-1.5" style={{ color: "var(--text-muted)" }}>
+                    <div className="flex items-center gap-1.5" style={{ color: "var(--outline)" }}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
-                      <span className="font-['JetBrains_Mono'] text-[11px]">{tutorial.readTime}</span>
+                      <span className="font-['Geist'] text-[11px]">{tutorial.readTime}</span>
                     </div>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[var(--outline)] group-hover:text-[var(--neon-primary)] group-hover:translate-x-1 transition-all">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[var(--outline)] group-hover:text-[var(--primary)] group-hover:translate-x-1 transition-all">
                       <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
                   </div>

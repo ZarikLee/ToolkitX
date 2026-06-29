@@ -31,13 +31,13 @@ export default function LearnPage() {
 
   return (
     <LearnLayout>
-      <div className="learn-neon">
+      <div className="">
         {/* Hero Section */}
         <section className="relative min-h-[600px] flex flex-col items-center justify-center overflow-hidden border-b border-[var(--outline-variant)]">
           <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
             {/* Status Badge */}
-            <div className="inline-block px-4 py-1.5 border border-[rgba(0,240,255,0.3)] rounded-full mb-8" style={{ background: "rgba(0,240,255,0.05)" }}>
-              <span className="font-['JetBrains_Mono'] text-[12px] text-[var(--neon-primary)] tracking-[0.2em]">系统状态: 在线</span>
+            <div className="inline-block px-4 py-1.5 border border-[color-mix(in srgb, var(--border-glow) 30%, transparent)] rounded-full mb-8" style={{ background: "color-mix(in srgb, var(--border-glow) 5%, transparent)" }}>
+              <span className="font-['Geist'] text-[12px] text-[var(--primary)] tracking-[0.2em]">系统状态: 在线</span>
             </div>
 
             <h1 className="text-[48px] font-extrabold leading-tight mb-6 neon-text-glow" style={{ letterSpacing: "-0.02em" }}>
@@ -49,9 +49,9 @@ export default function LearnPage() {
 
             {/* Glowing Search Bar */}
             <div className="relative max-w-xl mx-auto group">
-              <div className="absolute -inset-1 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity" style={{ background: "rgba(0,240,255,0.2)" }} />
+              <div className="absolute -inset-1 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity" style={{ background: "color-mix(in srgb, var(--border-glow) 20%, transparent)" }} />
               <div className="relative flex items-center p-4 rounded-lg border border-[var(--outline-variant)]" style={{ background: "var(--surface-container-high)", backdropFilter: "blur(16px)", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--neon-primary)" strokeWidth="2" className="mr-4 shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" strokeWidth="2" className="mr-4 shrink-0">
                   <polyline points="4,17 10,11 4,5" /><line x1="12" y1="19" x2="20" y2="19" />
                 </svg>
                 <input
@@ -60,7 +60,7 @@ export default function LearnPage() {
                   onChange={e => setSearch(e.target.value)}
                   placeholder="开始输入路径... (例如 grep, JOIN, Docker)"
                   className="bg-transparent border-none w-full outline-none text-[16px] placeholder:text-[var(--outline-variant)]"
-                  style={{ fontFamily: "'JetBrains Mono', monospace", color: "var(--neon-primary)" }}
+                  style={{ fontFamily: "'JetBrains Mono', monospace", color: "var(--primary)" }}
                   onKeyDown={e => {
                     if (e.key === "Enter" && search.trim()) {
                       // Trigger filter
@@ -68,8 +68,8 @@ export default function LearnPage() {
                   }}
                 />
                 <div className="flex items-center gap-2 shrink-0 ml-4">
-                  <span className="text-[12px] font-['JetBrains_Mono'] text-[var(--outline-variant)]">按下</span>
-                  <kbd className="px-2 py-1 rounded text-[12px] font-['JetBrains_Mono'] text-[var(--neon-primary)] border border-[var(--outline-variant)]" style={{ background: "rgba(59,73,75,0.2)" }}>
+                  <span className="text-[12px] font-['Geist'] text-[var(--outline-variant)]">按下</span>
+                  <kbd className="px-2 py-1 rounded text-[12px] font-['Geist'] text-[var(--primary)] border border-[var(--outline-variant)]" style={{ background: "rgba(59,73,75,0.2)" }}>
                     ENTER
                   </kbd>
                 </div>
@@ -77,7 +77,7 @@ export default function LearnPage() {
             </div>
           </div>
           {/* Bottom Fade */}
-          <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-[var(--terminal-black)] to-transparent" />
+          <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-[var(--surface-container-lowest)] to-transparent" />
         </section>
 
         {/* Category Filter */}
@@ -85,10 +85,10 @@ export default function LearnPage() {
           <div className="flex flex-wrap gap-2 justify-center">
             <button
               onClick={() => setSelectedCategory(null)}
-              className={`px-4 py-2 font-['JetBrains_Mono'] text-[12px] border transition-all ${
+              className={`px-4 py-2 font-['Geist'] text-[12px] border transition-all ${
                 !selectedCategory
-                  ? "bg-[var(--neon-primary)] text-[var(--terminal-black)] border-[var(--neon-primary)] font-bold"
-                  : "border-[var(--outline-variant)] text-[var(--on-surface-variant)] hover:border-[var(--neon-primary)] hover:text-[var(--neon-primary)]"
+                  ? "bg-[var(--primary)] text-[var(--surface-container-lowest)] border-[var(--primary)] font-bold"
+                  : "border-[var(--outline-variant)] text-[var(--on-surface-variant)] hover:border-[var(--primary)] hover:text-[var(--primary)]"
               }`}
             >
               全部
@@ -97,10 +97,10 @@ export default function LearnPage() {
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
-                className={`px-4 py-2 font-['JetBrains_Mono'] text-[12px] border transition-all ${
+                className={`px-4 py-2 font-['Geist'] text-[12px] border transition-all ${
                   selectedCategory === cat.id
-                    ? "bg-[var(--neon-primary)] text-[var(--terminal-black)] border-[var(--neon-primary)] font-bold"
-                    : "border-[var(--outline-variant)] text-[var(--on-surface-variant)] hover:border-[var(--neon-primary)] hover:text-[var(--neon-primary)]"
+                    ? "bg-[var(--primary)] text-[var(--surface-container-lowest)] border-[var(--primary)] font-bold"
+                    : "border-[var(--outline-variant)] text-[var(--on-surface-variant)] hover:border-[var(--primary)] hover:text-[var(--primary)]"
                 }`}
               >
                 {cat.icon} {cat.name}
@@ -116,7 +116,7 @@ export default function LearnPage() {
               <h2 className="text-[32px] font-bold mb-2">精选路径</h2>
               <div className="progress-beam w-24" />
             </div>
-            <span className="font-['JetBrains_Mono'] text-[14px] text-[var(--neon-primary)]">
+            <span className="font-['Geist'] text-[14px] text-[var(--primary)]">
               共 {filteredCategories.length} 个分类
             </span>
           </div>
@@ -129,10 +129,10 @@ export default function LearnPage() {
 
           {filteredCategories.length === 0 && (
             <div className="text-center py-20">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5" className="mx-auto mb-4">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--outline)" strokeWidth="1.5" className="mx-auto mb-4">
                 <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
               </svg>
-              <p className="text-[14px] font-['JetBrains_Mono']" style={{ color: "var(--text-muted)" }}>没有找到相关教程</p>
+              <p className="text-[14px] font-['Geist']" style={{ color: "var(--outline)" }}>没有找到相关教程</p>
             </div>
           )}
         </section>
@@ -169,24 +169,24 @@ function CategoryCard({ category }: { category: TutorialCategory }) {
       <div className="glass-card p-6 flex flex-col h-full relative overflow-hidden group cursor-pointer">
         <div className="scanline opacity-0 group-hover:opacity-100 transition-opacity" />
         <div className="mb-6 flex justify-between items-start">
-          <div className="w-12 h-12 flex items-center justify-center rounded border border-[rgba(0,240,255,0.2)]" style={{ background: "rgba(0,240,255,0.1)" }}>
+          <div className="w-12 h-12 flex items-center justify-center rounded border border-[color-mix(in srgb, var(--border-glow) 20%, transparent)]" style={{ background: "color-mix(in srgb, var(--border-glow) 10%, transparent)" }}>
             <span className="text-[20px]">{category.icon}</span>
           </div>
-          <span className="tag-neon" style={{ color: "var(--neon-tertiary)", borderColor: "rgba(162,239,0,0.3)" }}>
+          <span className="tag-neon" style={{ color: "var(--tertiary)", borderColor: "color-mix(in srgb, var(--tertiary) 30%, transparent)" }}>
             {category.tutorials.length} 个模块
           </span>
         </div>
 
-        <h3 className="text-[24px] font-semibold mb-3" style={{ color: "var(--neon-primary)" }}>{category.name}</h3>
+        <h3 className="text-[24px] font-semibold mb-3" style={{ color: "var(--primary)" }}>{category.name}</h3>
         <p className="text-[16px] leading-relaxed mb-8 flex-grow" style={{ color: "var(--on-surface-variant)" }}>
           {category.description}
         </p>
 
         <div className="flex items-center justify-between mt-auto">
-          <span className="font-['JetBrains_Mono'] text-[12px]" style={{ color: "var(--text-muted)" }}>
+          <span className="font-['Geist'] text-[12px]" style={{ color: "var(--outline)" }}>
             {category.tutorials.length} 篇教程
           </span>
-          <div className="w-8 h-8 flex items-center justify-center border border-[var(--outline-variant)] rounded-full group-hover:border-[var(--neon-primary)] group-hover:text-[var(--neon-primary)] transition-all">
+          <div className="w-8 h-8 flex items-center justify-center border border-[var(--outline-variant)] rounded-full group-hover:border-[var(--primary)] group-hover:text-[var(--primary)] transition-all">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>

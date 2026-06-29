@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Search, Menu, X } from "lucide-react";
 import { categories, type TutorialCategory } from "@/data/tutorials";
-import "@/app/learn/neon.css";
 
 export default function LearnLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -13,77 +12,61 @@ export default function LearnLayout({ children }: { children: React.ReactNode })
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <div className="learn-neon">
+    <div className="min-h-screen">
       {/* TopNavBar */}
-      <nav className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-[var(--outline-variant)]" style={{ background: "var(--surface-glass)", boxShadow: "0 4px 30px rgba(0,0,0,0.5)" }}>
+      <nav className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-[var(--outline-variant)]" style={{ background: "color-mix(in srgb, var(--background) 80%, transparent)" }}>
         <div className="flex justify-between items-center w-full px-6 h-16 max-w-[1440px] mx-auto">
           <div className="flex items-center gap-8">
-            <Link href="/learn" className="text-[32px] font-black tracking-tighter neon-text-glow" style={{ color: "var(--neon-primary)", textShadow: "0 0 8px rgba(0,240,255,0.6)" }}>
-              NEON_LABS
+            <Link href="/" className="text-[24px] font-bold tracking-tighter" style={{ color: "var(--secondary)" }}>
+              ToolkitX
             </Link>
             <div className="hidden md:flex gap-6 items-center">
               <Link
                 href="/learn"
-                className={`font-['JetBrains_Mono'] text-[14px] font-bold border-b-2 pb-1 transition-colors ${
+                className={`font-['Geist'] text-[12px] font-medium border-b-2 pb-1 transition-colors tracking-[0.05em] ${
                   pathname === "/learn"
-                    ? "text-[var(--neon-primary)] border-[var(--neon-primary)]"
-                    : "text-[var(--on-surface-variant)] hover:text-[var(--neon-primary)] border-transparent"
+                    ? "border-[var(--secondary)]"
+                    : "border-transparent hover:text-[var(--on-surface)]"
                 }`}
-                style={{ letterSpacing: "0.05em" }}
+                style={{ color: pathname === "/learn" ? "var(--secondary)" : "var(--on-surface-variant)" }}
               >
                 文库
               </Link>
               <Link
                 href="/tools"
-                className="font-['JetBrains_Mono'] text-[14px] text-[var(--on-surface-variant)] hover:text-[var(--neon-primary)] transition-colors"
-                style={{ letterSpacing: "0.05em" }}
-              >
-                模拟
-              </Link>
-              <Link
-                href="/tools"
-                className="font-['JetBrains_Mono'] text-[14px] text-[var(--on-surface-variant)] hover:text-[var(--neon-primary)] transition-colors"
-                style={{ letterSpacing: "0.05em" }}
+                className="font-['Geist'] text-[12px] tracking-[0.05em] transition-colors hover:text-[var(--on-surface)]"
+                style={{ color: "var(--on-surface-variant)" }}
               >
                 工具箱
               </Link>
               <Link
-                href="/tools"
-                className="font-['JetBrains_Mono'] text-[14px] text-[var(--on-surface-variant)] hover:text-[var(--neon-primary)] transition-colors"
-                style={{ letterSpacing: "0.05em" }}
+                href="/"
+                className="font-['Geist'] text-[12px] tracking-[0.05em] transition-colors hover:text-[var(--on-surface)]"
+                style={{ color: "var(--on-surface-variant)" }}
               >
-                社区
+                首页
               </Link>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            {/* Search */}
-            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded border border-[var(--outline-variant)] search-glow transition-all focus-within:border-[var(--neon-primary)]" style={{ background: "var(--surface-container-low)" }}>
-              <Search className="h-4 w-4 text-[var(--on-surface-variant)]" />
+            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded border border-[var(--outline-variant)] transition-all focus-within:border-[var(--secondary)]" style={{ background: "var(--surface-container-low)" }}>
+              <Search className="h-4 w-4" style={{ color: "var(--on-surface-variant)" }} />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                placeholder="搜索协议..."
-                className="bg-transparent border-none text-[14px] w-48 outline-none placeholder:text-[var(--text-muted)]"
-                style={{ fontFamily: "'JetBrains Mono', monospace", color: "var(--neon-primary)" }}
+                placeholder="搜索教程..."
+                className="bg-transparent border-none text-[12px] w-48 outline-none font-['Geist']"
+                style={{ color: "var(--on-surface)" }}
                 onKeyDown={e => {
                   if (e.key === "Enter" && searchQuery.trim()) {
                     window.location.href = `/learn?search=${encodeURIComponent(searchQuery)}`;
                   }
                 }}
               />
-              <kbd className="text-[10px] px-1.5 py-0.5 rounded text-[var(--text-muted)] border border-[var(--outline-variant)]" style={{ fontFamily: "'JetBrains Mono', monospace", background: "rgba(59,73,75,0.3)" }}>
+              <kbd className="text-[10px] px-1.5 py-0.5 rounded border border-[var(--outline-variant)] font-['Geist']" style={{ color: "var(--outline)", background: "var(--surface-container)" }}>
                 ⌘K
               </kbd>
-            </div>
-            <div className="flex gap-2">
-              <button className="p-2 text-[var(--on-surface-variant)] hover:bg-[rgba(57,56,62,0.2)] rounded-lg transition-all">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-              </button>
-              <button className="p-2 text-[var(--on-surface-variant)] hover:bg-[rgba(57,56,62,0.2)] rounded-lg transition-all">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              </button>
             </div>
           </div>
         </div>
@@ -93,18 +76,21 @@ export default function LearnLayout({ children }: { children: React.ReactNode })
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div className="absolute inset-0 bg-black/60" onClick={() => setMobileMenuOpen(false)} />
-          <div className="absolute left-0 top-16 bottom-0 w-72 bg-[var(--terminal-black)] border-r border-[var(--outline-variant)] p-6 overflow-y-auto">
+          <div className="absolute left-0 top-16 bottom-0 w-72 border-r border-[var(--outline-variant)] p-6 overflow-y-auto" style={{ background: "var(--surface-container-lowest)" }}>
             <div className="space-y-1">
               {categories.map(cat => (
                 <Link
                   key={cat.id}
                   href={`/learn/${cat.id}`}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-4 py-3 font-['JetBrains_Mono'] text-[14px] transition-all ${
+                  className={`block px-4 py-3 text-[13px] transition-all rounded ${
                     pathname.startsWith(`/learn/${cat.id}`)
-                      ? "sidebar-active text-[var(--neon-primary)]"
-                      : "text-[var(--on-surface-variant)] hover:bg-[rgba(53,52,58,0.5)]"
+                      ? "font-semibold"
+                      : "hover:bg-[var(--surface-container-high)]"
                   }`}
+                  style={{
+                    color: pathname.startsWith(`/learn/${cat.id}`) ? "var(--secondary)" : "var(--on-surface-variant)",
+                  }}
                 >
                   {cat.icon} {cat.name}
                 </Link>
@@ -118,20 +104,20 @@ export default function LearnLayout({ children }: { children: React.ReactNode })
       <main className="pt-16">{children}</main>
 
       {/* Footer */}
-      <footer className="neon-footer mt-[80px]">
+      <footer className="mt-[80px] border-t border-[var(--outline-variant)]" style={{ background: "var(--background)" }}>
         <div className="flex flex-col md:flex-row justify-between items-center px-6 py-8 max-w-[1440px] mx-auto gap-8">
           <div className="mb-4 md:mb-0">
-            <span className="font-['JetBrains_Mono'] text-[var(--neon-primary)] text-[14px] font-bold">
-              NEON_LABS // 未发现关机序列
+            <span className="font-['Geist'] text-[14px] font-bold" style={{ color: "var(--secondary)" }}>
+              ToolkitX
             </span>
           </div>
           <div className="flex gap-8">
-            <Link href="/learn" className="text-[var(--text-muted)] hover:text-[var(--neon-tertiary)] font-['JetBrains_Mono'] text-[14px] transition-colors">文库</Link>
-            <Link href="/tools" className="text-[var(--text-muted)] hover:text-[var(--neon-tertiary)] font-['JetBrains_Mono'] text-[14px] transition-colors">工具箱</Link>
-            <Link href="/" className="text-[var(--text-muted)] hover:text-[var(--neon-tertiary)] font-['JetBrains_Mono'] text-[14px] transition-colors">首页</Link>
+            <Link href="/learn" className="hover:text-[var(--secondary)] font-['Geist'] text-[12px] tracking-[0.05em] transition-colors" style={{ color: "var(--outline)" }}>文库</Link>
+            <Link href="/tools" className="hover:text-[var(--secondary)] font-['Geist'] text-[12px] tracking-[0.05em] transition-colors" style={{ color: "var(--outline)" }}>工具箱</Link>
+            <Link href="/" className="hover:text-[var(--secondary)] font-['Geist'] text-[12px] tracking-[0.05em] transition-colors" style={{ color: "var(--outline)" }}>首页</Link>
           </div>
-          <div className="text-[10px] text-[var(--text-muted)] font-['JetBrains_Mono']">
-            © 2026 NEON_LABS
+          <div className="text-[10px] font-['Geist'] tracking-[0.05em]" style={{ color: "var(--outline)" }}>
+            &copy; 2026 ToolkitX
           </div>
         </div>
       </footer>
@@ -148,15 +134,15 @@ export function TutorialSidebar({
   currentSlug?: string;
 }) {
   return (
-    <aside className="h-[calc(100vh-64px)] w-72 sticky top-16 hidden lg:flex flex-col bg-[var(--terminal-black)] border-r border-[var(--outline-variant)] py-8 overflow-y-auto shrink-0">
+    <aside className="h-[calc(100vh-64px)] w-72 sticky top-16 hidden lg:flex flex-col border-r border-[var(--outline-variant)] py-8 overflow-y-auto shrink-0" style={{ background: "var(--surface-container-lowest)" }}>
       <div className="px-6 mb-8">
         <Link href={`/learn/${category.id}`} className="flex items-center gap-3 mb-2 group">
-          <div className="w-10 h-10 rounded-lg flex items-center justify-center border border-[rgba(0,240,255,0.3)]" style={{ background: "var(--surface-container)" }}>
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center border border-[var(--outline-variant)]" style={{ background: "var(--surface-container)" }}>
             <span className="text-[18px]">{category.icon}</span>
           </div>
           <div>
-            <p className="font-['JetBrains_Mono'] text-[14px] text-[var(--neon-primary)] group-hover:neon-text-glow transition-all">{category.name}</p>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+            <p className="text-[14px] font-semibold transition-all" style={{ color: "var(--secondary)" }}>{category.name}</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] font-['Geist']" style={{ color: "var(--outline)" }}>
               {category.tutorials.length} 个模块
             </p>
           </div>
@@ -164,34 +150,40 @@ export function TutorialSidebar({
       </div>
 
       <div className="flex-1 space-y-0">
-        {category.tutorials.map((tutorial, i) => (
+        {category.tutorials.map((tutorial) => (
           <Link
             key={tutorial.slug}
             href={`/learn/${category.id}/${tutorial.slug}`}
             className={`flex items-center justify-between gap-3 py-3 px-6 transition-all ${
               tutorial.slug === currentSlug
-                ? "sidebar-active bg-[rgba(0,240,255,0.1)] text-[var(--neon-primary)]"
-                : "text-[var(--on-surface-variant)] hover:bg-[rgba(53,52,58,0.5)] border-l-4 border-transparent"
+                ? "border-l-4"
+                : "border-l-4 border-transparent hover:bg-[var(--surface-container-high)]"
             }`}
+            style={{
+              color: tutorial.slug === currentSlug ? "var(--secondary)" : "var(--on-surface-variant)",
+              borderLeftColor: tutorial.slug === currentSlug ? "var(--secondary)" : "transparent",
+              background: tutorial.slug === currentSlug ? "color-mix(in srgb, var(--secondary) 10%, transparent)" : undefined,
+            }}
           >
             <div className="flex items-center gap-3 min-w-0">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
                 {tutorial.slug === currentSlug ? (
-                  <circle cx="12" cy="12" r="10" className="text-[var(--neon-primary)]" fill="currentColor" fillOpacity="0.2" />
+                  <circle cx="12" cy="12" r="10" fill="currentColor" fillOpacity="0.2" />
                 ) : (
                   <path d="M20 6L9 17l-5-5" />
                 )}
               </svg>
-              <span className="font-['JetBrains_Mono'] text-[14px] truncate">{tutorial.title}</span>
+              <span className="text-[13px] truncate font-['Geist']">{tutorial.title}</span>
             </div>
           </Link>
         ))}
       </div>
 
-      <div className="px-6 mt-auto py-4 border-t border-[rgba(59,73,75,0.3)]">
+      <div className="px-6 mt-auto py-4 border-t border-[var(--outline-variant)]">
         <Link
           href={`/learn/${category.id}`}
-          className="w-full flex items-center justify-center gap-2 py-3 border border-[var(--outline-variant)] text-[var(--neon-primary)] font-['JetBrains_Mono'] text-[14px] hover:bg-[rgba(0,240,255,0.1)] transition-all rounded-lg"
+          className="w-full flex items-center justify-center gap-2 py-3 border border-[var(--outline-variant)] font-['Geist'] text-[12px] tracking-[0.05em] hover:bg-[var(--surface-container-high)] transition-all rounded"
+          style={{ color: "var(--secondary)" }}
         >
           返回目录
         </Link>
@@ -200,18 +192,18 @@ export function TutorialSidebar({
   );
 }
 
-// Right Sidebar with telemetry
+// Right Sidebar with quick links
 export function RightSidebar() {
   return (
-    <aside className="w-64 h-[calc(100vh-64px)] sticky top-16 hidden xl:block border-l border-[var(--outline-variant)] p-6 shrink-0" style={{ background: "rgba(14,14,19,0.3)" }}>
-      <h5 className="font-['JetBrains_Mono'] text-[12px] text-[var(--text-muted)] mb-6 tracking-tighter">
-        模拟遥测 (TELEMETRY)
+    <aside className="w-64 h-[calc(100vh-64px)] sticky top-16 hidden xl:block border-l border-[var(--outline-variant)] p-6 shrink-0" style={{ background: "var(--surface-container-lowest)" }}>
+      <h5 className="font-['Geist'] text-[11px] mb-6 tracking-[0.1em] uppercase" style={{ color: "var(--outline)" }}>
+        快速导航
       </h5>
 
       <div className="space-y-6">
         {/* Quick Links */}
         <div>
-          <h6 className="font-['JetBrains_Mono'] text-[11px] text-[var(--neon-primary)] mb-3 uppercase tracking-[0.15em]">
+          <h6 className="font-['Geist'] text-[11px] mb-3 uppercase tracking-[0.15em]" style={{ color: "var(--secondary)" }}>
             在线工具
           </h6>
           <div className="space-y-2">
@@ -226,7 +218,8 @@ export function RightSidebar() {
               <Link
                 key={tool.href}
                 href={tool.href}
-                className="block text-[12px] text-[var(--on-surface-variant)] hover:text-[var(--neon-primary)] transition-colors font-['JetBrains_Mono']"
+                className="block text-[12px] hover:text-[var(--secondary)] transition-colors font-['Geist']"
+                style={{ color: "var(--on-surface-variant)" }}
               >
                 · {tool.name}
               </Link>
@@ -236,7 +229,7 @@ export function RightSidebar() {
 
         {/* Reference Links */}
         <div>
-          <h6 className="font-['JetBrains_Mono'] text-[11px] text-[var(--neon-primary)] mb-3 uppercase tracking-[0.15em]">
+          <h6 className="font-['Geist'] text-[11px] mb-3 uppercase tracking-[0.15em]" style={{ color: "var(--secondary)" }}>
             常用参考
           </h6>
           <div className="space-y-2">
@@ -250,7 +243,8 @@ export function RightSidebar() {
               <Link
                 key={ref.href}
                 href={ref.href}
-                className="block text-[12px] text-[var(--on-surface-variant)] hover:text-[var(--neon-primary)] transition-colors font-['JetBrains_Mono']"
+                className="block text-[12px] hover:text-[var(--secondary)] transition-colors font-['Geist']"
+                style={{ color: "var(--on-surface-variant)" }}
               >
                 · {ref.name}
               </Link>
@@ -258,31 +252,31 @@ export function RightSidebar() {
           </div>
         </div>
 
-        {/* Latest */}
+        {/* Status */}
         <div className="p-4 rounded-lg border border-[var(--outline-variant)]" style={{ background: "var(--surface-container-high)" }}>
-          <h6 className="font-['JetBrains_Mono'] text-[12px] text-[var(--neon-primary)] mb-3 flex items-center gap-2">
+          <h6 className="font-['Geist'] text-[11px] mb-3 flex items-center gap-2 uppercase tracking-[0.1em]" style={{ color: "var(--secondary)" }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
-            最近日志
+            状态
           </h6>
-          <ul className="text-[10px] font-['JetBrains_Mono'] text-[var(--text-muted)] space-y-2">
+          <ul className="text-[10px] font-['Geist'] space-y-2" style={{ color: "var(--outline)" }}>
             <li className="flex items-start gap-2">
-              <span className="text-[var(--neon-tertiary)]">[OK]</span>
-              <span>文库已同步</span>
+              <span style={{ color: "var(--green)" }}>[OK]</span>
+              <span>教程已同步</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-[var(--neon-tertiary)]">[OK]</span>
-              <span>119 个教程就绪</span>
+              <span style={{ color: "var(--green)" }}>[OK]</span>
+              <span>188+ 个教程就绪</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-[var(--neon-primary)]">[..]</span>
+              <span style={{ color: "var(--secondary)" }}>[..]</span>
               <span>在线模式激活</span>
             </li>
           </ul>
         </div>
 
-        <div className="text-[10px] text-[var(--text-muted)] font-['JetBrains_Mono'] space-y-1">
+        <div className="text-[10px] font-['Geist'] space-y-1" style={{ color: "var(--outline)" }}>
           <p>技术支持 ToolkitX</p>
-          <p>© 2026 NEON_LABS</p>
+          <p>&copy; 2026 ToolkitX</p>
         </div>
       </div>
     </aside>
