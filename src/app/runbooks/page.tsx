@@ -185,7 +185,7 @@ export default function RunbooksPage() {
     >
       <div className="flex gap-4 h-full">
         {/* Left: list */}
-        <div className="w-80 shrink-0 border-r border-white/[0.06] pr-4 flex flex-col">
+        <div className="w-80 shrink-0 border-r border-white/15 pr-4 flex flex-col">
           <div className="flex items-center gap-2 mb-4">
             <button
               onClick={() => {
@@ -199,7 +199,7 @@ export default function RunbooksPage() {
           </div>
 
           {showForm && (
-            <div className="mb-4 p-3 rounded-xl border border-white/[0.06] bg-white/[0.02] space-y-2">
+            <div className="mb-4 p-3 rounded-xl border border-white/15 bg-white/5 space-y-2">
               <input
                 type="text"
                 value={form.title}
@@ -248,7 +248,7 @@ export default function RunbooksPage() {
                 className={`p-3 rounded-xl cursor-pointer transition-all ${
                   selected?.id === rb.id
                     ? "bg-[#0a84ff]/10 border border-[#0a84ff]/30"
-                    : "bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04]"
+                    : "bg-white/5 border border-white/15 hover:bg-white/10"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -259,7 +259,7 @@ export default function RunbooksPage() {
                       toggleEnabled(rb.id, !rb.enabled);
                     }}
                     className={`w-8 h-[18px] rounded-full transition-all relative ${
-                      rb.enabled ? "bg-[#30d158]" : "bg-white/[0.1]"
+                      rb.enabled ? "bg-[#30d158]" : "bg-white/25"
                     }`}
                   >
                     <div
@@ -271,7 +271,7 @@ export default function RunbooksPage() {
                 </div>
                 <div className="text-[11px] text-muted-foreground mt-1 truncate">{rb.description}</div>
                 <div className="flex items-center gap-2 mt-1.5">
-                  <span className="px-1.5 py-0.5 text-[10px] bg-white/[0.06] text-muted-foreground rounded-md">
+                  <span className="px-1.5 py-0.5 text-[10px] bg-white/15 text-muted-foreground rounded-md">
                     {triggerLabels[rb.triggerType]}
                   </span>
                   <span className="text-[10px] text-muted-foreground/60">{rb.steps.length} 个步骤</span>
@@ -351,7 +351,7 @@ export default function RunbooksPage() {
                     </button>
                     <button
                       onClick={() => addStep("wait")}
-                      className="px-2.5 py-1 rounded-lg text-[11px] bg-white/[0.06] text-muted-foreground hover:bg-white/[0.1] transition-all"
+                      className="px-2.5 py-1 rounded-lg text-[11px] bg-white/15 text-muted-foreground hover:bg-white/25 transition-all"
                     >
                       + 等待
                     </button>
@@ -359,7 +359,7 @@ export default function RunbooksPage() {
                 </div>
 
                 {selected.steps.length === 0 ? (
-                  <div className="text-[12px] text-muted-foreground py-6 text-center border border-dashed border-white/[0.08] rounded-xl">
+                  <div className="text-[12px] text-muted-foreground py-6 text-center border border-dashed border-white/20 rounded-xl">
                     点击上方按钮添加步骤
                   </div>
                 ) : (
@@ -367,7 +367,7 @@ export default function RunbooksPage() {
                     {selected.steps.map((step, idx) => (
                       <div
                         key={step.id}
-                        className="p-3 rounded-xl border border-white/[0.06] bg-white/[0.02] flex items-start gap-3"
+                        className="p-3 rounded-xl border border-white/15 bg-white/5 flex items-start gap-3"
                       >
                         <div className="text-[11px] text-muted-foreground/40 mt-1 shrink-0 w-5 text-center">
                           {idx + 1}
@@ -380,7 +380,7 @@ export default function RunbooksPage() {
                                   ? "bg-[#0a84ff]/10 text-[#0a84ff]"
                                   : step.type === "confirm"
                                   ? "bg-[#ff9f0a]/10 text-[#ff9f0a]"
-                                  : "bg-white/[0.06] text-muted-foreground"
+                                  : "bg-white/15 text-muted-foreground"
                               }`}
                             >
                               {stepTypeLabels[step.type]}

@@ -57,7 +57,7 @@ export function SubPageLayout({
 
         {/* Tabs */}
         {tabs && (
-          <div className="flex gap-1 p-1 rounded-xl bg-white/[0.04] border border-white/[0.06] mb-6 w-fit animate-fade-in">
+          <div className="flex gap-1 p-1 rounded-xl bg-white/10 border border-white/15 mb-6 w-fit animate-fade-in">
             {tabs}
           </div>
         )}

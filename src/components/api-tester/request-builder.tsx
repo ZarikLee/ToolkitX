@@ -88,7 +88,7 @@ export const RequestBuilder = forwardRef<RequestBuilderRef, RequestBuilderProps>
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="请求名称（可选）"
-          className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[14px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/40 transition-colors"
+          className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[14px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/40 transition-colors"
         />
 
         {/* URL Bar */}
@@ -97,7 +97,7 @@ export const RequestBuilder = forwardRef<RequestBuilderRef, RequestBuilderProps>
             <select
               value={method}
               onChange={(e) => setMethod(e.target.value)}
-              className={`appearance-none px-3 py-2.5 pr-8 rounded-xl bg-white/[0.06] border border-white/[0.08] text-[13px] font-mono font-bold outline-none focus:border-[#0a84ff]/50 ${METHOD_COLORS[method]}`}
+              className={`appearance-none px-3 py-2.5 pr-8 rounded-xl bg-white/15 border border-white/20 text-[13px] font-mono font-bold outline-none focus:border-[#0a84ff]/50 ${METHOD_COLORS[method]}`}
             >
               {METHODS.map((m) => (
                 <option key={m} value={m} className="bg-[#1c1c1e] text-foreground">
@@ -117,7 +117,7 @@ export const RequestBuilder = forwardRef<RequestBuilderRef, RequestBuilderProps>
             onChange={(e) => setUrl(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="https://api.example.com/endpoint"
-            className="flex-1 px-4 py-2.5 rounded-xl bg-white/[0.06] border border-white/[0.08] text-[13px] font-mono text-foreground placeholder:text-muted-foreground/40 outline-none focus:border-[#0a84ff]/50 transition-colors"
+            className="flex-1 px-4 py-2.5 rounded-xl bg-white/15 border border-white/20 text-[13px] font-mono text-foreground placeholder:text-muted-foreground/40 outline-none focus:border-[#0a84ff]/50 transition-colors"
           />
           <button
             onClick={handleSend}
@@ -136,12 +136,12 @@ export const RequestBuilder = forwardRef<RequestBuilderRef, RequestBuilderProps>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 p-1 rounded-lg bg-white/[0.04] border border-white/[0.06] w-fit">
+        <div className="flex gap-1 p-1 rounded-lg bg-white/10 border border-white/15 w-fit">
           <button
             onClick={() => setActiveTab("headers")}
             className={`px-3 py-1.5 rounded-md text-[12px] font-medium transition-all duration-200 ${
               activeTab === "headers"
-                ? "bg-white/[0.1] text-foreground"
+                ? "bg-white/25 text-foreground"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -156,7 +156,7 @@ export const RequestBuilder = forwardRef<RequestBuilderRef, RequestBuilderProps>
             onClick={() => setActiveTab("body")}
             className={`px-3 py-1.5 rounded-md text-[12px] font-medium transition-all duration-200 ${
               activeTab === "body"
-                ? "bg-white/[0.1] text-foreground"
+                ? "bg-white/25 text-foreground"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -174,14 +174,14 @@ export const RequestBuilder = forwardRef<RequestBuilderRef, RequestBuilderProps>
                   value={header.key}
                   onChange={(e) => updateHeader(i, "key", e.target.value)}
                   placeholder="Header name"
-                  className="flex-1 px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-[12px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/40"
+                  className="flex-1 px-3 py-2 rounded-lg bg-white/10 border border-white/15 text-[12px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/40"
                 />
                 <input
                   type="text"
                   value={header.value}
                   onChange={(e) => updateHeader(i, "value", e.target.value)}
                   placeholder="Value"
-                  className="flex-1 px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-[12px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/40"
+                  className="flex-1 px-3 py-2 rounded-lg bg-white/10 border border-white/15 text-[12px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/40"
                 />
                 <button
                   onClick={() => removeHeader(i)}
@@ -193,7 +193,7 @@ export const RequestBuilder = forwardRef<RequestBuilderRef, RequestBuilderProps>
             ))}
             <button
               onClick={addHeader}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] text-muted-foreground hover:text-foreground hover:bg-white/[0.04] transition-all duration-200"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] text-muted-foreground hover:text-foreground hover:bg-white/10 transition-all duration-200"
             >
               <Plus className="h-3.5 w-3.5" />
               添加 Header
@@ -207,7 +207,7 @@ export const RequestBuilder = forwardRef<RequestBuilderRef, RequestBuilderProps>
             value={body}
             onChange={(e) => setBody(e.target.value)}
             placeholder='{\n  "key": "value"\n}'
-            className="w-full h-48 px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/40 resize-none leading-relaxed"
+            className="w-full h-48 px-4 py-3 rounded-xl bg-white/10 border border-white/15 text-[13px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/40 resize-none leading-relaxed"
           />
         )}
 

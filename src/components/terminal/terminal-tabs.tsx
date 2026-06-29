@@ -76,12 +76,12 @@ export function TerminalTabs() {
   return (
     <div className="flex flex-col h-full">
       {/* Tab Bar */}
-      <div className="flex items-center bg-[#1c1c1e] border-b border-white/[0.06]">
+      <div className="flex items-center bg-[#1c1c1e] border-b border-white/15">
         <div className="flex overflow-x-auto">
           {tabs.map((tab) => (
             <div
               key={tab.id}
-              className={`flex items-center gap-2 px-4 py-2.5 cursor-pointer border-r border-white/[0.06] min-w-[140px] transition-colors duration-200 ${
+              className={`flex items-center gap-2 px-4 py-2.5 cursor-pointer border-r border-white/15 min-w-[140px] transition-colors duration-200 ${
                 activeTabId === tab.id
                   ? 'bg-[#2c2c2e]'
                   : 'bg-[#1c1c1e] hover:bg-[#2c2c2e]/50'
@@ -96,7 +96,7 @@ export function TerminalTabs() {
                   e.stopPropagation();
                   removeTab(tab.id);
                 }}
-                className="ml-1 p-0.5 rounded hover:bg-white/[0.06] text-muted-foreground/30 hover:text-foreground transition-colors"
+                className="ml-1 p-0.5 rounded hover:bg-white/15 text-muted-foreground/30 hover:text-foreground transition-colors"
               >
                 <X className="w-3 h-3" />
               </button>
@@ -105,7 +105,7 @@ export function TerminalTabs() {
         </div>
         <button
           onClick={() => setShowConnectDialog(!showConnectDialog)}
-          className="flex items-center gap-1 px-3 py-2.5 hover:bg-white/[0.06] text-muted-foreground/40 hover:text-foreground transition-colors"
+          className="flex items-center gap-1 px-3 py-2.5 hover:bg-white/15 text-muted-foreground/40 hover:text-foreground transition-colors"
         >
           <Plus className="w-4 h-4" />
         </button>
@@ -113,7 +113,7 @@ export function TerminalTabs() {
 
       {/* Quick Connect Panel */}
       {showConnectDialog && tabs.length === 0 && (
-        <div className="border-b border-white/[0.06] bg-[#1c1c1e] p-4">
+        <div className="border-b border-white/15 bg-[#1c1c1e] p-4">
           <div className="max-w-md mx-auto space-y-3">
             <div className="flex items-center gap-2 mb-3">
               <Server className="h-4 w-4 text-muted-foreground/40" />
@@ -216,9 +216,9 @@ function ConnectDialog({ onConnect, onClose }: ConnectDialogProps) {
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" style={{ zIndex: 9999 }} onClick={onClose}>
       <div className="glass-heavy rounded-2xl w-full max-w-md shadow-[0_16px_48px_rgba(0,0,0,0.5)] animate-scale-in" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.06]">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-white/15">
           <h2 className="text-[17px] font-semibold tracking-tight">SSH 连接</h2>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.06] hover:bg-white/[0.1] text-muted-foreground hover:text-foreground transition-all duration-200 text-sm">
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-white/15 hover:bg-white/25 text-muted-foreground hover:text-foreground transition-all duration-200 text-sm">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -226,52 +226,52 @@ function ConnectDialog({ onConnect, onClose }: ConnectDialogProps) {
           <div className="grid grid-cols-3 gap-3">
             <div className="col-span-2">
               <label className="text-[12px] text-muted-foreground/60 uppercase tracking-wider mb-1.5 block">主机地址</label>
-              <input type="text" value={host} onChange={(e) => setHost(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50" placeholder="192.168.1.100" required />
+              <input type="text" value={host} onChange={(e) => setHost(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[13px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50" placeholder="192.168.1.100" required />
             </div>
             <div>
               <label className="text-[12px] text-muted-foreground/60 uppercase tracking-wider mb-1.5 block">端口</label>
-              <input type="number" value={port} onChange={(e) => setPort(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] font-mono text-foreground outline-none focus:border-[#0a84ff]/50" required />
+              <input type="number" value={port} onChange={(e) => setPort(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[13px] font-mono text-foreground outline-none focus:border-[#0a84ff]/50" required />
             </div>
           </div>
           <div>
             <label className="text-[12px] text-muted-foreground/60 uppercase tracking-wider mb-1.5 block">用户名</label>
-            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50" placeholder="root" required />
+            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50" placeholder="root" required />
           </div>
           <div>
             <label className="text-[12px] text-muted-foreground/60 uppercase tracking-wider mb-1.5 block">认证方式</label>
-            <div className="flex gap-1 p-1 rounded-lg bg-white/[0.04] border border-white/[0.06] mb-2">
-              <button type="button" onClick={() => setAuthType('password')} className={`flex-1 px-3 py-1.5 rounded-md text-[12px] font-medium transition-all duration-200 ${authType === 'password' ? 'bg-white/[0.1] text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
+            <div className="flex gap-1 p-1 rounded-lg bg-white/10 border border-white/15 mb-2">
+              <button type="button" onClick={() => setAuthType('password')} className={`flex-1 px-3 py-1.5 rounded-md text-[12px] font-medium transition-all duration-200 ${authType === 'password' ? 'bg-white/25 text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
                 密码
               </button>
-              <button type="button" onClick={() => setAuthType('key')} className={`flex-1 px-3 py-1.5 rounded-md text-[12px] font-medium transition-all duration-200 ${authType === 'key' ? 'bg-white/[0.1] text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
+              <button type="button" onClick={() => setAuthType('key')} className={`flex-1 px-3 py-1.5 rounded-md text-[12px] font-medium transition-all duration-200 ${authType === 'key' ? 'bg-white/25 text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
                 私钥
               </button>
             </div>
             {authType === 'password' ? (
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50" placeholder="SSH 密码（可选）" />
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50" placeholder="SSH 密码（可选）" />
             ) : (
-              <textarea className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[12px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 resize-none h-24" placeholder="-----BEGIN RSA PRIVATE KEY-----" />
+              <textarea className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[12px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 resize-none h-24" placeholder="-----BEGIN RSA PRIVATE KEY-----" />
             )}
           </div>
 
           {/* Jump Host */}
-          <div className="border-t border-white/[0.06] pt-3">
+          <div className="border-t border-white/15 pt-3">
             <label className="flex items-center gap-2 cursor-pointer mb-2">
-              <input type="checkbox" checked={useJumpHost} onChange={(e) => setUseJumpHost(e.target.checked)} className="w-4 h-4 rounded border-white/[0.1] bg-white/[0.04] accent-[#0a84ff]" />
+              <input type="checkbox" checked={useJumpHost} onChange={(e) => setUseJumpHost(e.target.checked)} className="w-4 h-4 rounded border-white/25 bg-white/10 accent-[#0a84ff]" />
               <span className="text-[12px] text-foreground/70">使用跳板机 / 堡垒机</span>
             </label>
             {useJumpHost && (
               <div className="space-y-2 pl-5 border-l-2 border-[#0a84ff]/20">
                 <div className="grid grid-cols-3 gap-2">
                   <div className="col-span-2">
-                    <input type="text" value={jumpHost} onChange={(e) => setJumpHost(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50" placeholder="bastion.company.com" required={useJumpHost} />
+                    <input type="text" value={jumpHost} onChange={(e) => setJumpHost(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[13px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50" placeholder="bastion.company.com" required={useJumpHost} />
                   </div>
                   <div>
-                    <input type="number" value={jumpPort} onChange={(e) => setJumpPort(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] font-mono text-foreground outline-none focus:border-[#0a84ff]/50" required={useJumpHost} />
+                    <input type="number" value={jumpPort} onChange={(e) => setJumpPort(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[13px] font-mono text-foreground outline-none focus:border-[#0a84ff]/50" required={useJumpHost} />
                   </div>
                 </div>
-                <input type="text" value={jumpUsername} onChange={(e) => setJumpUsername(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50" placeholder="跳板机用户名" required={useJumpHost} />
-                <input type="password" value={jumpPassword} onChange={(e) => setJumpPassword(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50" placeholder="跳板机密码" required={useJumpHost} />
+                <input type="text" value={jumpUsername} onChange={(e) => setJumpUsername(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50" placeholder="跳板机用户名" required={useJumpHost} />
+                <input type="password" value={jumpPassword} onChange={(e) => setJumpPassword(e.target.value)} className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50" placeholder="跳板机密码" required={useJumpHost} />
               </div>
             )}
           </div>

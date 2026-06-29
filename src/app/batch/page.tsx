@@ -97,7 +97,7 @@ export default function BatchPage() {
     >
       <div className="space-y-4">
         {/* Server selector */}
-        <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+        <div className="p-4 rounded-xl border border-white/15 bg-white/5">
           <div className="text-[12px] text-muted-foreground/60 uppercase tracking-wider mb-2">目标服务器</div>
           <ServerManager
             onSelect={toggleServer}
@@ -126,7 +126,7 @@ export default function BatchPage() {
         </div>
 
         {/* Command input */}
-        <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+        <div className="p-4 rounded-xl border border-white/15 bg-white/5">
           <div className="text-[12px] text-muted-foreground/60 uppercase tracking-wider mb-2">执行命令</div>
           <textarea
             value={command}
@@ -166,7 +166,7 @@ export default function BatchPage() {
                       ? "border-[#30d158]/20 bg-[#30d158]/[0.04]"
                       : result.status === "error"
                       ? "border-[#ff453a]/20 bg-[#ff453a]/[0.04]"
-                      : "border-white/[0.06] bg-white/[0.02]"
+                      : "border-white/15 bg-white/5"
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
@@ -210,7 +210,7 @@ export default function BatchPage() {
                 <div className="text-[12px] text-muted-foreground py-4 text-center">暂无历史记录</div>
               ) : (
                 history.map((h) => (
-                  <div key={h.id} className="p-3 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+                  <div key={h.id} className="p-3 rounded-xl border border-white/15 bg-white/5">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <span className="font-mono text-[12px] text-muted-foreground">{h.command}</span>

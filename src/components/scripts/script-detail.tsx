@@ -36,7 +36,7 @@ export function ScriptDetail({ script, onClose }: ScriptDetailProps) {
         className="glass-heavy rounded-2xl w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col shadow-[0_16px_48px_rgba(0,0,0,0.5)] animate-scale-in mx-4"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/15">
           <div className="flex items-center gap-3">
             <div>
               <h2 className="text-[16px] font-semibold tracking-tight">
@@ -58,7 +58,7 @@ export function ScriptDetail({ script, onClose }: ScriptDetailProps) {
           </div>
           <button
             onClick={onClose}
-            className="w-7 h-7 flex items-center justify-center rounded-full bg-white/[0.06] hover:bg-white/[0.1] text-muted-foreground hover:text-foreground transition-all duration-200 text-xs"
+            className="w-7 h-7 flex items-center justify-center rounded-full bg-white/15 hover:bg-white/25 text-muted-foreground hover:text-foreground transition-all duration-200 text-xs"
           >
             ✕
           </button>
@@ -66,7 +66,7 @@ export function ScriptDetail({ script, onClose }: ScriptDetailProps) {
 
         {/* Help Panel */}
         {showHelp && script.help && (
-          <div className="px-6 py-4 bg-[#0a84ff]/[0.04] border-b border-white/[0.06]">
+          <div className="px-6 py-4 bg-[#0a84ff]/[0.04] border-b border-white/15">
             <div className="flex gap-6">
               {script.help.map((section, i) => (
                 <div key={i} className="flex-1">
@@ -96,14 +96,14 @@ export function ScriptDetail({ script, onClose }: ScriptDetailProps) {
             {script.tags.map((tag) => (
               <span
                 key={tag}
-                className="px-2 py-0.5 text-[11px] bg-white/[0.06] text-muted-foreground rounded-md"
+                className="px-2 py-0.5 text-[11px] bg-white/15 text-muted-foreground rounded-md"
               >
                 {tag}
               </span>
             ))}
           </div>
 
-          <pre className="p-4 bg-black/40 rounded-xl text-[13px] font-mono overflow-x-auto border border-white/[0.04] leading-relaxed">
+          <pre className="p-4 bg-black/40 rounded-xl text-[13px] font-mono overflow-x-auto border border-white/10 leading-relaxed">
             {script.code}
           </pre>
         </div>

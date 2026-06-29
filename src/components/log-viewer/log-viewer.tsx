@@ -166,7 +166,7 @@ export function LogViewer({ server, logFile, search, levelFilter, paused }: LogV
   return (
     <div
       ref={containerRef}
-      className="h-[calc(100vh-22rem)] overflow-auto rounded-xl bg-black/40 border border-white/[0.04] font-mono text-[12px] leading-relaxed"
+      className="h-[calc(100vh-22rem)] overflow-auto rounded-xl bg-black/40 border border-white/10 font-mono text-[12px] leading-relaxed"
     >
       {filteredLines.length === 0 ? (
         <div className="flex items-center justify-center h-full text-muted-foreground/20">
@@ -177,7 +177,7 @@ export function LogViewer({ server, logFile, search, levelFilter, paused }: LogV
           {filteredLines.map((line) => (
             <div
               key={line.id}
-              className={`flex gap-2 hover:bg-white/[0.02] px-2 py-0.5 rounded ${getLevelStyle(line.level)}`}
+              className={`flex gap-2 hover:bg-white/5 px-2 py-0.5 rounded ${getLevelStyle(line.level)}`}
             >
               <span className="text-muted-foreground/20 shrink-0 select-none">
                 {String(line.id + 1).padStart(4, "0")}

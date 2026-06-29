@@ -105,7 +105,7 @@ export default function ScriptsPage() {
               className={`p-4 rounded-xl border cursor-pointer transition-all duration-200 animate-fade-in ${
                 selectedScript === script.id
                   ? "border-[#0a84ff]/40 bg-[#0a84ff]/[0.06] shadow-[0_0_0_1px_rgba(10,132,255,0.1)]"
-                  : "border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/[0.1]"
+                  : "border-white/15 bg-white/5 hover:bg-white/12 hover:border-white/25"
               }`}
               style={{ animationDelay: `${i * 30}ms` }}
             >
@@ -119,7 +119,7 @@ export default function ScriptsPage() {
                 {script.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="px-2 py-0.5 text-[11px] bg-white/[0.06] text-muted-foreground rounded-md"
+                    className="px-2 py-0.5 text-[11px] bg-white/15 text-muted-foreground rounded-md"
                   >
                     {tag}
                   </span>

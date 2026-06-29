@@ -151,12 +151,12 @@ export default function LoginPage() {
           <h2 className="text-[16px] font-semibold mb-5">登录 / 注册</h2>
 
           {/* Login mode switch */}
-          <div className="flex gap-1 p-1 rounded-xl bg-white/[0.04] border border-white/[0.06] mb-5">
+          <div className="flex gap-1 p-1 rounded-xl bg-white/10 border border-white/15 mb-5">
             <button
               onClick={() => { setLoginMode("code"); setError(""); }}
               className={`flex-1 py-2 rounded-lg text-[13px] font-medium transition-all ${
                 loginMode === "code"
-                  ? "bg-white/[0.1] text-foreground"
+                  ? "bg-white/25 text-foreground"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -166,7 +166,7 @@ export default function LoginPage() {
               onClick={() => { setLoginMode("password"); setError(""); }}
               className={`flex-1 py-2 rounded-lg text-[13px] font-medium transition-all ${
                 loginMode === "password"
-                  ? "bg-white/[0.1] text-foreground"
+                  ? "bg-white/25 text-foreground"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -264,7 +264,7 @@ export default function LoginPage() {
 
           <div className="relative my-5">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/[0.06]" />
+              <div className="w-full border-t border-white/15" />
             </div>
             <div className="relative flex justify-center text-[12px]">
               <span className="px-3 text-muted-foreground/40">或</span>

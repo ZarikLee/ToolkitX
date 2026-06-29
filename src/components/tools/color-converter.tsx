@@ -106,7 +106,7 @@ export function ColorConverter() {
 
       <div className="flex items-center gap-4">
         <div
-          className="w-24 h-24 rounded-xl border border-white/[0.06]"
+          className="w-24 h-24 rounded-xl border border-white/15"
           style={{ backgroundColor: hex }}
         />
         <div className="font-mono text-lg">{hex}</div>

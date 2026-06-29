@@ -84,7 +84,7 @@ export default function LogViewerPage() {
     >
       <div className="space-y-4">
         {/* Server + Log File Selection */}
-        <div className="p-4 rounded-2xl border border-white/[0.06] bg-white/[0.02] space-y-3">
+        <div className="p-4 rounded-2xl border border-white/15 bg-white/5 space-y-3">
           <h3 className="text-[12px] font-medium text-muted-foreground/60 uppercase tracking-wider">
             选择服务器和日志文件
           </h3>
@@ -101,7 +101,7 @@ export default function LogViewerPage() {
               <button
                 onClick={() => !connected && setShowLogDropdown(!showLogDropdown)}
                 disabled={connected}
-                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-left transition-colors hover:bg-white/[0.06] disabled:opacity-50"
+                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-white/10 border border-white/15 text-[13px] text-left transition-colors hover:bg-white/15 disabled:opacity-50"
               >
                 <span className={logFile ? "text-foreground truncate" : "text-muted-foreground/40"}>
                   {logFile || "选择日志文件"}
@@ -121,7 +121,7 @@ export default function LogViewerPage() {
                           setCustomLog("");
                           setShowLogDropdown(false);
                         }}
-                        className="w-full flex items-center justify-between px-4 py-2.5 text-[13px] text-left hover:bg-white/[0.06] transition-colors"
+                        className="w-full flex items-center justify-between px-4 py-2.5 text-[13px] text-left hover:bg-white/15 transition-colors"
                       >
                         <span className="text-foreground font-mono text-[12px] truncate">{log.path}</span>
                         <span className="text-muted-foreground/40 text-[11px] shrink-0 ml-2">{log.name}</span>
@@ -138,7 +138,7 @@ export default function LogViewerPage() {
               onChange={(e) => setCustomLog(e.target.value)}
               placeholder="自定义路径..."
               disabled={connected}
-              className="flex-1 px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[12px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/40 disabled:opacity-50"
+              className="flex-1 px-3 py-2.5 rounded-xl bg-white/10 border border-white/15 text-[12px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/40 disabled:opacity-50"
             />
 
             {!connected ? (
@@ -187,7 +187,7 @@ export default function LogViewerPage() {
 
         {/* Placeholder */}
         {!connected && (
-          <div className="flex flex-col items-center justify-center h-64 rounded-2xl border border-dashed border-white/[0.06] text-muted-foreground/20 text-[13px] gap-2">
+          <div className="flex flex-col items-center justify-center h-64 rounded-2xl border border-dashed border-white/15 text-muted-foreground/20 text-[13px] gap-2">
             <p>选择服务器和日志文件后点击「开始查看」</p>
             <p className="text-[11px] text-muted-foreground/15">或点击上方 + 添加新服务器</p>
           </div>

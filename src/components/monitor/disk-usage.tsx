@@ -12,7 +12,7 @@ export function DiskUsage({ disks }: DiskUsageProps) {
   };
 
   return (
-    <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+    <div className="p-4 rounded-xl border border-white/15 bg-white/5">
       <h3 className="text-[11px] text-muted-foreground/50 uppercase tracking-wider mb-3">
         磁盘使用
       </h3>
@@ -34,7 +34,7 @@ export function DiskUsage({ disks }: DiskUsageProps) {
                   {disk.used} / {disk.size}
                 </span>
               </div>
-              <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+              <div className="h-1.5 rounded-full bg-white/15 overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all duration-500 ease-out"
                   style={{

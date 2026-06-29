@@ -70,7 +70,7 @@ export default function SettingsPage() {
 
   return (
     <div className="flex-1 overflow-hidden flex flex-col">
-      <div className="flex items-center gap-3 px-8 py-3 border-b border-white/[0.06] shrink-0">
+      <div className="flex items-center gap-3 px-8 py-3 border-b border-white/15 shrink-0">
         <Link
           href="/"
           className="btn-close shrink-0"

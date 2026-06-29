@@ -117,7 +117,7 @@ export default function DriftPage() {
     >
       <div className="flex gap-4 h-full">
         {/* Left: file list */}
-        <div className="w-80 shrink-0 border-r border-white/[0.06] pr-4 flex flex-col">
+        <div className="w-80 shrink-0 border-r border-white/15 pr-4 flex flex-col">
           <div className="flex items-center gap-2 mb-4">
             <button
               onClick={() => setShowAdd(true)}
@@ -135,7 +135,7 @@ export default function DriftPage() {
           </div>
 
           {showAdd && (
-            <div className="mb-4 p-3 rounded-xl border border-white/[0.06] bg-white/[0.02] space-y-2">
+            <div className="mb-4 p-3 rounded-xl border border-white/15 bg-white/5 space-y-2">
               <input
                 type="text"
                 value={filePath}
@@ -173,7 +173,7 @@ export default function DriftPage() {
                 className={`p-3 rounded-xl cursor-pointer transition-all ${
                   selected?.id === b.id
                     ? "bg-[#0a84ff]/10 border border-[#0a84ff]/30"
-                    : "bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04]"
+                    : "bg-white/5 border border-white/15 hover:bg-white/10"
                 }`}
               >
                 <div className="flex items-center gap-2">
@@ -222,7 +222,7 @@ export default function DriftPage() {
                 </div>
               </div>
 
-              <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+              <div className="p-4 rounded-xl border border-white/15 bg-white/5">
                 <div className="text-[12px] text-muted-foreground mb-1">状态</div>
                 <div className="flex items-center gap-2">
                   <div
@@ -245,7 +245,7 @@ export default function DriftPage() {
                     {drifts.map((d) => (
                       <div
                         key={d.id}
-                        className="p-3 rounded-xl border border-white/[0.06] bg-white/[0.02]"
+                        className="p-3 rounded-xl border border-white/15 bg-white/5"
                       >
                         <div className="text-[12px] text-muted-foreground">
                           {new Date(d.detectedAt).toLocaleString()}

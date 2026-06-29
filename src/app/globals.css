@@ -1,28 +1,28 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: "SF Mono", "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
 
-  --color-background: #000000;
-  --color-foreground: #f5f5f7;
+  --color-background: #131313;
+  --color-foreground: #e4e2e1;
   --color-card: rgba(255, 255, 255, 0.05);
-  --color-card-foreground: #f5f5f7;
-  --color-popover: #1c1c1e;
-  --color-popover-foreground: #f5f5f7;
-  --color-primary: #0a84ff;
-  --color-primary-foreground: #ffffff;
+  --color-card-foreground: #e4e2e1;
+  --color-popover: #1f2020;
+  --color-popover-foreground: #e4e2e1;
+  --color-primary: #e9c349;
+  --color-primary-foreground: #131313;
   --color-secondary: rgba(255, 255, 255, 0.08);
-  --color-secondary-foreground: #f5f5f7;
+  --color-secondary-foreground: #e4e2e1;
   --color-muted: rgba(255, 255, 255, 0.06);
-  --color-muted-foreground: #8e8e93;
+  --color-muted-foreground: #8e9192;
   --color-accent: rgba(255, 255, 255, 0.08);
-  --color-accent-foreground: #f5f5f7;
-  --color-destructive: #ff453a;
-  --color-destructive-foreground: #ffffff;
+  --color-accent-foreground: #e4e2e1;
+  --color-destructive: #ffb4ab;
+  --color-destructive-foreground: #131313;
   --color-border: rgba(255, 255, 255, 0.08);
   --color-input: rgba(255, 255, 255, 0.08);
-  --color-ring: rgba(10, 132, 255, 0.4);
+  --color-ring: rgba(233, 195, 73, 0.4);
 
   --color-surface-1: rgba(255, 255, 255, 0.03);
   --color-surface-2: rgba(255, 255, 255, 0.06);
@@ -37,17 +37,17 @@
   --color-teal: #40c8e0;
   --color-indigo: #5e5ce6;
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
   --radius-full: 9999px;
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
   --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
-  --shadow-glow: 0 0 20px rgba(10, 132, 255, 0.15);
+  --shadow-glow: 0 0 20px rgba(233, 195, 73, 0.15);
 }
 
 * {
@@ -56,8 +56,8 @@
 }
 
 *::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
 }
 
 *::-webkit-scrollbar-track {
@@ -66,71 +66,32 @@
 
 *::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.12);
-  border-radius: 3px;
+  border-radius: 2px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* ============ 亮色主题变量 ============ */
-.light {
-  --color-background: #f5f5f7;
-  --color-foreground: #1d1d1f;
-  --color-card: rgba(0, 0, 0, 0.04);
-  --color-card-foreground: #1d1d1f;
-  --color-popover: #ffffff;
-  --color-popover-foreground: #1d1d1f;
-  --color-primary: #0071e3;
-  --color-primary-foreground: #ffffff;
-  --color-secondary: rgba(0, 0, 0, 0.06);
-  --color-secondary-foreground: #1d1d1f;
-  --color-muted: rgba(0, 0, 0, 0.06);
-  --color-muted-foreground: #6e6e73;
-  --color-accent: rgba(0, 0, 0, 0.06);
-  --color-accent-foreground: #1d1d1f;
-  --color-destructive: #ff3b30;
-  --color-destructive-foreground: #ffffff;
-  --color-border: rgba(0, 0, 0, 0.12);
-  --color-input: rgba(0, 0, 0, 0.1);
-  --color-ring: rgba(0, 113, 227, 0.4);
-  --color-surface-1: rgba(0, 0, 0, 0.02);
-  --color-surface-2: rgba(0, 0, 0, 0.04);
-  --color-surface-3: rgba(0, 0, 0, 0.06);
-  --color-blue: #0071e3;
-  --color-green: #34c759;
-  --color-purple: #af52de;
-  --color-orange: #ff9500;
-  --color-cyan: #5ac8fa;
-  --color-pink: #ff2d55;
-  --color-teal: #5ac8fa;
-  --color-indigo: #5856d6;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.15);
-  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.18);
-  --shadow-glow: 0 0 20px rgba(0, 113, 227, 0.15);
+  background: rgba(233, 195, 73, 0.4);
 }
 
 body {
-  background-color: var(--color-background);
-  color: var(--color-foreground);
-  font-family: var(--font-sans);
+  background-color: #131313;
+  color: #e4e2e1;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  transition: background-color 1.3s ease, color 1.3s ease;
 }
 
 html {
-  transition: background-color 1.3s ease;
+  background: #131313;
 }
 
 ::selection {
-  background: rgba(10, 132, 255, 0.3);
-  color: #ffffff;
+  background: rgba(233, 195, 73, 0.3);
+  color: #e4e2e1;
 }
 
+/* ============ Animations ============ */
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
@@ -156,16 +117,6 @@ html {
   to { opacity: 1; transform: scale(1); }
 }
 
-@keyframes shimmer {
-  from { background-position: -200% 0; }
-  to { background-position: 200% 0; }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(10, 132, 255, 0); }
-  50% { box-shadow: 0 0 16px 4px rgba(10, 132, 255, 0.15); }
-}
-
 .animate-fade-in {
   animation: fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -186,247 +137,166 @@ html {
   animation: scale-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* ============ Glass ============ */
 .glass {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: background 1.3s ease, border-color 1.3s ease, box-shadow 1.3s ease;
+  background: rgba(31, 32, 32, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(68, 71, 72, 0.5);
 }
 
 .glass-heavy {
-  background: rgba(28, 28, 30, 0.85);
-  backdrop-filter: blur(40px) saturate(200%);
-  -webkit-backdrop-filter: blur(40px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(14, 14, 14, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(68, 71, 72, 0.5);
 }
 
 .glass-subtle {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(31, 32, 32, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(68, 71, 72, 0.3);
 }
 
-/* ============ 亮色主题覆盖 ============ */
-.light .glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+/* ============ Buttons ============ */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  background: #e9c349;
+  color: #131313;
+  border: none;
+  transition: all 0.2s;
+  cursor: pointer;
+  user-select: none;
+}
+.btn-primary:hover {
+  filter: brightness(1.1);
+}
+.btn-primary:active {
+  transform: scale(0.97);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-.light .glass-heavy {
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.06);
+  color: #e4e2e1;
+  border: 1px solid rgba(68, 71, 72, 0.5);
+  transition: all 0.2s;
+  cursor: pointer;
+  user-select: none;
+}
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.btn-secondary:active {
+  transform: scale(0.97);
 }
 
-.light .glass-subtle {
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  background: transparent;
+  color: #c4c7c7;
+  border: 1px solid rgba(68, 71, 72, 0.5);
+  transition: all 0.2s;
+  cursor: pointer;
+  user-select: none;
+}
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.06);
 }
 
-.light .card-apple {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+.btn-close {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #8e9192;
+  border: none;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.btn-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #e4e2e1;
 }
 
-.light .card-apple:hover {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(0, 0, 0, 0.15);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+/* ============ Input ============ */
+.input-apple {
+  background: rgba(31, 32, 32, 0.8);
+  border: 1px solid rgba(68, 71, 72, 0.5);
+  border-radius: 4px;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #e4e2e1;
+  transition: all 0.2s;
+  outline: none;
+  width: 100%;
 }
 
-.light .input-apple {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  color: #1d1d1f;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+.input-apple:focus {
+  border-color: #e9c349;
+  box-shadow: 0 0 0 2px rgba(233, 195, 73, 0.15);
 }
 
-.light .input-apple:focus {
-  border-color: rgba(0, 113, 227, 0.5);
-  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12), 0 1px 4px rgba(0, 0, 0, 0.05);
-  background: #ffffff;
+.input-apple::placeholder {
+  color: #8e9192;
 }
 
-/* 亮色主题下 inline help 面板 */
-.light .inline-help,
-.light [class*="inline-flex"] > div:last-child {
-  background: rgba(255, 255, 255, 0.95) !important;
-  border: 1px solid rgba(0, 0, 0, 0.1) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12) !important;
+/* ============ Card ============ */
+.card-apple {
+  background: rgba(31, 32, 32, 0.6);
+  border: 1px solid rgba(68, 71, 72, 0.4);
+  border-radius: 6px;
+  transition: all 0.2s;
 }
 
-/* 主题切换按钮 */
+.card-apple:hover {
+  background: rgba(42, 42, 42, 0.6);
+  border-color: rgba(68, 71, 72, 0.6);
+}
+
+/* ============ Theme Toggle ============ */
 .theme-toggle-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #8e8e93;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(68, 71, 72, 0.5);
+  color: #8e9192;
+  border-radius: 4px;
 }
 
 .theme-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.14);
-  color: #f5f5f7;
+  background: rgba(255, 255, 255, 0.1);
+  color: #e4e2e1;
 }
 
-.light .theme-toggle-btn {
-  background: rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  color: #6e6e73;
-}
-
-.light .theme-toggle-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
-  color: #1d1d1f;
-}
-
-/* ============ 亮色主题全局覆盖 (白色背景/边框 → 可见) ============ */
-
-/* 用属性选择器匹配所有包含 white 的 Tailwind 类 —— 更可靠 */
-.light [class*="border-white"] {
-  border-color: rgba(0, 0, 0, 0.1) !important;
-}
-
-.light [class*="border-dashed"][class*="border-white"] {
-  border-color: rgba(0, 0, 0, 0.15) !important;
-}
-
-.light [class*="bg-white/[0.02]"],
-.light [class*="bg-white/[0.03]"] {
-  background: rgba(255, 255, 255, 0.6) !important;
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
-}
-
-.light [class*="bg-white/[0.04]"] {
-  background: #fff !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-.light [class*="bg-white/[0.06]"] {
-  background: #fff !important;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-}
-
-.light [class*="bg-white/[0.08]"] {
-  background: #fff !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.light [class*="bg-white/[0.1]"] {
-  background: #fff !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-}
-
-/* hover 状态 - 需要额外规则因为 Tailwind 生成不同选择器 */
-.light a[class*="hover:bg-white"],
-.light button[class*="hover:bg-white"],
-.light div[class*="hover:bg-white"] {
-  --tw-bg-opacity: 1;
-}
-
-/* 遮罩层 bg-black/xx → 亮色下保持 */
-.light [class*="bg-black/40"] { background: rgba(0, 0, 0, 0.4) !important; }
-.light [class*="bg-black/30"] { background: rgba(0, 0, 0, 0.3) !important; }
-.light [class*="bg-black/70"] { background: rgba(0, 0, 0, 0.5) !important; }
-.light [class*="bg-black/50"] { background: rgba(0, 0, 0, 0.4) !important; }
-
-/* 亮色下 tab-button 活跃/非活跃 */
-.light [class*="bg-white/[0.1]"][class*="shadow"] {
-  background: #fff !important;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* 亮色下 sidebar active 项 */
-.light [class*="bg-white/[0.08]"][class*="shadow-[inset"] {
-  background: #fff !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
-}
-
-/* bg-white/5 和 bg-white/10 覆盖（非括号语法）→ 白色+阴影 */
-.light [class*="bg-white/5"] {
-  background: #fff !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-.light [class*="bg-white/10"] {
-  background: #fff !important;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* 亮色下低对比度颜色 → 加深 */
-.light .text-green-400 { color: #16a34a !important; }
-.light .text-red-400 { color: #dc2626 !important; }
-.light .text-yellow-400 { color: #ca8a04 !important; }
-.light .text-blue-400 { color: #2563eb !important; }
-.light .text-yellow-200 { color: #854d0e !important; }
-.light .text-green-500 { color: #16a34a !important; }
-.light .text-red-500 { color: #dc2626 !important; }
-.light .bg-green-400 { background-color: #16a34a !important; }
-.light .bg-yellow-500/30 { background-color: rgba(234, 179, 8, 0.4) !important; }
-
-/* 亮色下减轻弹窗/下拉框阴影 */
-.light [class*="shadow-[0_16px_48px"] {
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12) !important;
-}
-.light [class*="shadow-[0_8px_32px"] {
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
-}
-.light [class*="shadow-[0_4px_24px"] {
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08) !important;
-}
-
-/* 亮色下去掉按钮发光阴影 */
-.light [class*="shadow-lg"][class*="shadow-primary"] {
-  box-shadow: none !important;
-}
-
-/* 亮色下去掉 tab 按钮阴影 */
-.light [class*="shadow-[0_1px_2px_rgba(0,0,0"] {
-  box-shadow: none !important;
-}
-
-/* 亮色下 select 元素 */
-.light select {
-  background: rgba(255, 255, 255, 0.8) !important;
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
-  color: #1d1d1f !important;
-}
-
-/* ============ 亮色 hover 状态覆盖 ============ */
-/* hover:bg-white/[0.04] */
-.light a:hover[class*="hover:bg-white/[0.04]"],
-.light button:hover[class*="hover:bg-white/[0.04]"],
-.light div:hover[class*="hover:bg-white/[0.04]"],
-.light span:hover[class*="hover:bg-white/[0.04]"] {
-  background: rgba(0, 0, 0, 0.04) !important;
-}
-
-/* hover:bg-white/[0.06] */
-.light a:hover[class*="hover:bg-white/[0.06]"],
-.light button:hover[class*="hover:bg-white/[0.06]"],
-.light div:hover[class*="hover:bg-white/[0.06]"],
-.light span:hover[class*="hover:bg-white/[0.06]"] {
-  background: rgba(0, 0, 0, 0.06) !important;
-}
-
-/* hover:bg-white/[0.1] */
-.light a:hover[class*="hover:bg-white/[0.1]"],
-.light button:hover[class*="hover:bg-white/[0.1]"],
-.light div:hover[class*="hover:bg-white/[0.1]"],
-.light span:hover[class*="hover:bg-white/[0.1]"] {
-  background: rgba(0, 0, 0, 0.1) !important;
-}
-
-/* hover:border-white/[0.1] */
-.light a:hover[class*="hover:border-white/[0.1]"],
-.light div:hover[class*="hover:border-white/[0.1]"] {
-  border-color: rgba(0, 0, 0, 0.15) !important;
-}
-
-/* hover:text-[#ff453a] 等 - 保持不变，亮色下红色仍然可见 */
-
+/* ============ Hover Lift ============ */
 .hover-lift {
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
               box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -437,194 +307,15 @@ html {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-.card-apple {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.card-apple:hover {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.12);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
-.btn-apple {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px 20px;
-  border-radius: 980px;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  cursor: pointer;
-  user-select: none;
-}
-
-.btn-apple:active {
-  transform: scale(0.97);
-}
-
-/* Primary button: Apple-style, works in both light and dark modes */
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px 20px;
-  border-radius: 980px;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  background: rgba(255, 255, 255, 0.12);
-  color: var(--color-foreground);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  cursor: pointer;
-  user-select: none;
-}
-.btn-primary:hover {
-  background: rgba(255, 255, 255, 0.18);
-}
-.btn-primary:active {
-  transform: scale(0.97);
-}
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-.light .btn-primary {
-  background: #fff;
-  color: #1d1d1f;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-.light .btn-primary:hover {
-  background: #fff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-}
-
-/* Secondary button: white bg + shadow in light, translucent in dark */
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 500;
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--color-foreground);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: all 0.2s ease;
-  cursor: pointer;
-  user-select: none;
-}
-.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-.btn-secondary:active {
-  transform: scale(0.97);
-}
-.light .btn-secondary {
-  background: #fff;
-  border-color: rgba(0, 0, 0, 0.08);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-.light .btn-secondary:hover {
-  background: #fff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-}
-
-/* Small secondary button */
-.btn-ghost {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 500;
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--color-foreground);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: all 0.2s ease;
-  cursor: pointer;
-  user-select: none;
-}
-.btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-.light .btn-ghost {
-  background: #fff;
-  border-color: rgba(0, 0, 0, 0.08);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-}
-.light .btn-ghost:hover {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Close button: round, small, white+shadow */
-.btn-close {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--color-muted-foreground);
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-.btn-close:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--color-foreground);
-}
-.light .btn-close {
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-.light .btn-close:hover {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-}
-
-.input-apple {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 10px 14px;
-  font-size: 14px;
-  color: var(--color-foreground);
-  transition: all 0.2s ease;
-  outline: none;
-  width: 100%;
-}
-
-.input-apple:focus {
-  border-color: rgba(10, 132, 255, 0.5);
-  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.12);
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.input-apple::placeholder {
-  color: var(--color-muted-foreground);
-}
-
+/* ============ Text Gradient ============ */
 .text-gradient {
-  background: linear-gradient(135deg, #0a84ff 0%, #bf5af2 50%, #ff375f 100%);
+  background: linear-gradient(135deg, #e9c349 0%, #c8c6c5 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
+/* ============ Stagger ============ */
 .stagger-1 { animation-delay: 0.05s; }
 .stagger-2 { animation-delay: 0.1s; }
 .stagger-3 { animation-delay: 0.15s; }
@@ -632,131 +323,12 @@ html {
 .stagger-5 { animation-delay: 0.25s; }
 .stagger-6 { animation-delay: 0.3s; }
 
-/* ============ 水墨晕染动画 ============ */
-@keyframes ink-drift-1 {
-  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 0.4; }
-  33% { transform: translate(60px, -40px) scale(1.1) rotate(5deg); opacity: 0.55; }
-  66% { transform: translate(-30px, 50px) scale(0.95) rotate(-3deg); opacity: 0.45; }
-}
-
-@keyframes ink-drift-2 {
-  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 0.35; }
-  33% { transform: translate(-50px, 30px) scale(1.08) rotate(-4deg); opacity: 0.5; }
-  66% { transform: translate(40px, -60px) scale(0.96) rotate(3deg); opacity: 0.4; }
-}
-
-@keyframes ink-drift-3 {
-  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 0.3; }
-  33% { transform: translate(30px, 50px) scale(1.06) rotate(3deg); opacity: 0.48; }
-  66% { transform: translate(-50px, -30px) scale(0.94) rotate(-2deg); opacity: 0.38; }
-}
-
-@keyframes ink-breathe {
-  0%, 100% { transform: scale(1); opacity: 0.4; }
-  50% { transform: scale(1.15); opacity: 0.55; }
-}
-
-.aurora-bg {
+/* ============ Noise Overlay ============ */
+.grain-overlay {
+  pointer-events: none;
   position: fixed;
   inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
-  transition: opacity 1.3s ease;
-}
-
-.aurora-blob {
-  position: absolute;
-  will-change: transform, opacity;
-  transition: background 1.3s ease, opacity 1.3s ease;
-}
-
-/* ============ 暗色主题 · 水墨蓝紫 ============ */
-.dark .aurora-blob-1 {
-  width: 700px;
-  height: 700px;
-  border-radius: 60% 40% 55% 45% / 50% 60% 40% 50%;
-  background: radial-gradient(ellipse at 30% 40%, rgba(94, 92, 230, 0.5) 0%, rgba(94, 92, 230, 0.2) 40%, transparent 70%);
-  filter: blur(80px);
-  top: -15%;
-  right: -8%;
-  animation: ink-drift-1 35s ease-in-out infinite;
-}
-
-.dark .aurora-blob-2 {
-  width: 650px;
-  height: 650px;
-  border-radius: 45% 55% 40% 60% / 55% 45% 55% 45%;
-  background: radial-gradient(ellipse at 60% 50%, rgba(10, 132, 255, 0.45) 0%, rgba(10, 132, 255, 0.18) 40%, transparent 70%);
-  filter: blur(75px);
-  bottom: -10%;
-  left: -5%;
-  animation: ink-drift-2 40s ease-in-out infinite;
-}
-
-.dark .aurora-blob-3 {
-  width: 550px;
-  height: 550px;
-  border-radius: 50% 50% 45% 55% / 45% 55% 50% 50%;
-  background: radial-gradient(ellipse at 50% 50%, rgba(191, 90, 242, 0.38) 0%, rgba(191, 90, 242, 0.15) 40%, transparent 70%);
-  filter: blur(70px);
-  top: 35%;
-  left: 30%;
-  animation: ink-drift-3 32s ease-in-out infinite;
-}
-
-.dark .aurora-blob-4 {
-  width: 400px;
-  height: 400px;
-  border-radius: 55% 45% 50% 50% / 50% 50% 55% 45%;
-  background: radial-gradient(ellipse at 40% 60%, rgba(10, 132, 255, 0.3) 0%, rgba(94, 92, 230, 0.12) 40%, transparent 70%);
-  filter: blur(60px);
-  top: 15%;
-  right: 25%;
-  animation: ink-breathe 28s ease-in-out infinite;
-}
-
-/* ============ 亮色主题 · 水墨橙黄红 ============ */
-.light .aurora-blob-1 {
-  width: 700px;
-  height: 700px;
-  border-radius: 55% 45% 60% 40% / 45% 55% 45% 55%;
-  background: radial-gradient(ellipse at 35% 45%, rgba(255, 159, 10, 0.42) 0%, rgba(255, 159, 10, 0.16) 40%, transparent 70%);
-  filter: blur(80px);
-  top: -15%;
-  right: -8%;
-  animation: ink-drift-1 35s ease-in-out infinite;
-}
-
-.light .aurora-blob-2 {
-  width: 650px;
-  height: 650px;
-  border-radius: 50% 50% 45% 55% / 55% 45% 50% 50%;
-  background: radial-gradient(ellipse at 55% 55%, rgba(255, 55, 95, 0.38) 0%, rgba(255, 55, 95, 0.15) 40%, transparent 70%);
-  filter: blur(75px);
-  bottom: -10%;
-  left: -5%;
-  animation: ink-drift-2 40s ease-in-out infinite;
-}
-
-.light .aurora-blob-3 {
-  width: 550px;
-  height: 550px;
-  border-radius: 45% 55% 50% 50% / 50% 50% 45% 55%;
-  background: radial-gradient(ellipse at 50% 50%, rgba(255, 214, 10, 0.36) 0%, rgba(255, 214, 10, 0.14) 40%, transparent 70%);
-  filter: blur(70px);
-  top: 35%;
-  left: 30%;
-  animation: ink-drift-3 32s ease-in-out infinite;
-}
-
-.light .aurora-blob-4 {
-  width: 400px;
-  height: 400px;
-  border-radius: 50% 50% 55% 45% / 45% 55% 50% 50%;
-  background: radial-gradient(ellipse at 45% 55%, rgba(255, 120, 50, 0.32) 0%, rgba(255, 159, 10, 0.12) 40%, transparent 70%);
-  filter: blur(60px);
-  top: 15%;
-  right: 25%;
-  animation: ink-breathe 28s ease-in-out infinite;
+  z-index: 50;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
 }

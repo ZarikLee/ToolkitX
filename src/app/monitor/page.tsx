@@ -282,14 +282,14 @@ export default function MonitorPage() {
           </div>
 
           {/* Interval Selector */}
-          <div className="flex gap-1 p-1 rounded-lg bg-white/[0.04] border border-white/[0.06]">
+          <div className="flex gap-1 p-1 rounded-lg bg-white/10 border border-white/15">
             {INTERVALS.map((item) => (
               <button
                 key={item.value}
                 onClick={() => setInterval_(item.value)}
                 className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all duration-200 ${
                   interval === item.value
-                    ? "bg-white/[0.1] text-foreground"
+                    ? "bg-white/25 text-foreground"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -302,7 +302,7 @@ export default function MonitorPage() {
           <button
             onClick={() => server && fetchStats(server)}
             disabled={!server || loading}
-            className="p-2 rounded-xl text-muted-foreground/40 hover:text-foreground hover:bg-white/[0.06] disabled:opacity-30 transition-all duration-200"
+            className="p-2 rounded-xl text-muted-foreground/40 hover:text-foreground hover:bg-white/15 disabled:opacity-30 transition-all duration-200"
             title="手动刷新"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
@@ -338,7 +338,7 @@ export default function MonitorPage() {
 
         {/* Placeholder */}
         {!server && (
-          <div className="flex flex-col items-center justify-center h-64 rounded-2xl border border-dashed border-white/[0.06] text-muted-foreground/20 text-[13px] gap-2">
+          <div className="flex flex-col items-center justify-center h-64 rounded-2xl border border-dashed border-white/15 text-muted-foreground/20 text-[13px] gap-2">
             <p>选择服务器后开始监控</p>
             <p className="text-[11px] text-muted-foreground/15">或点击上方 + 添加新服务器</p>
           </div>

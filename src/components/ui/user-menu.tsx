@@ -145,9 +145,9 @@ export function UserMenu() {
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setShowDropdown(!showDropdown)}
-          className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-white/[0.06] transition-all duration-200 relative"
+          className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-white/15 transition-all duration-200 relative"
         >
-          <div className={`w-8 h-8 rounded-full ${isGuest ? "bg-white/[0.08]" : "bg-gradient-to-br from-[#0a84ff] to-[#bf5af2]"} flex items-center justify-center text-white text-[13px] font-semibold shrink-0`}>
+          <div className={`w-8 h-8 rounded-full ${isGuest ? "bg-white/20" : "bg-gradient-to-br from-[#0a84ff] to-[#bf5af2]"} flex items-center justify-center text-white text-[13px] font-semibold shrink-0`}>
             {user?.avatar ? (
               <img src={user.avatar} alt="" className="w-full h-full rounded-full object-cover" />
             ) : (
@@ -164,7 +164,7 @@ export function UserMenu() {
 
         {showDropdown && (
           <div className="absolute right-0 top-full mt-2 w-72 glass-heavy rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] overflow-hidden animate-scale-in z-50">
-            <div className="px-4 py-3 border-b border-white/[0.06]">
+            <div className="px-4 py-3 border-b border-white/15">
               <div className="flex items-center gap-2">
                 <p className="text-[13px] font-medium truncate">{isGuest ? "游客" : user?.name || "用户"}</p>
                 {!isGuest && user?.role === "admin" && (
@@ -184,7 +184,7 @@ export function UserMenu() {
                 <>
                   <button
                     onClick={() => { setShowMessages(true); setShowDropdown(false); }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/[0.06] hover:text-foreground transition-all duration-200"
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/15 hover:text-foreground transition-all duration-200"
                   >
                     <div className="relative">
                       <Bell className="h-3.5 w-3.5 text-muted-foreground/50" />
@@ -199,14 +199,14 @@ export function UserMenu() {
                   </button>
                   <button
                     onClick={() => { setShowFeedback(true); setShowDropdown(false); }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/[0.06] hover:text-foreground transition-all duration-200"
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/15 hover:text-foreground transition-all duration-200"
                   >
                     <MessageSquare className="h-3.5 w-3.5 text-muted-foreground/50" />
                     意见反馈
                   </button>
                   <button
                     onClick={() => { setShowProfile(true); setShowDropdown(false); }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/[0.06] hover:text-foreground transition-all duration-200"
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/15 hover:text-foreground transition-all duration-200"
                   >
                     <User className="h-3.5 w-3.5 text-muted-foreground/50" />
                     个人资料
@@ -216,7 +216,7 @@ export function UserMenu() {
               {isGuest && (
                 <button
                   onClick={() => { setShowFeedback(true); setShowDropdown(false); }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/[0.06] hover:text-foreground transition-all duration-200"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/15 hover:text-foreground transition-all duration-200"
                 >
                   <MessageSquare className="h-3.5 w-3.5 text-muted-foreground/50" />
                   意见反馈
@@ -226,7 +226,7 @@ export function UserMenu() {
                 <Link
                   href="/settings"
                   onClick={() => setShowDropdown(false)}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/[0.06] hover:text-foreground transition-all duration-200"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-foreground/80 hover:bg-white/15 hover:text-foreground transition-all duration-200"
                 >
                   <Settings className="h-3.5 w-3.5 text-muted-foreground/50" />
                   设置
@@ -244,7 +244,7 @@ export function UserMenu() {
               )}
             </div>
 
-            <div className="p-2 pt-1 border-t border-white/[0.06]">
+            <div className="p-2 pt-1 border-t border-white/15">
               <button
                 onClick={handleLogout}
                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] text-[#ff453a]/80 hover:bg-[#ff453a]/10 hover:text-[#ff453a] transition-all duration-200"
@@ -321,7 +321,7 @@ function MessagesPanel({ messages, isAdmin, onClose, onRead, onRefresh, onOpenDe
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
       <div className="glass-heavy rounded-2xl w-[400px] shadow-[0_16px_48px_rgba(0,0,0,0.5)] animate-scale-in flex flex-col" style={{ height: "min(75vh, 580px)" }}>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06] shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/15 shrink-0">
           <h3 className="text-[17px] font-semibold tracking-tight">消息中心</h3>
           <div className="flex items-center gap-2">
             <button
@@ -349,9 +349,9 @@ function MessagesPanel({ messages, isAdmin, onClose, onRead, onRefresh, onOpenDe
             messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border cursor-pointer transition-all duration-150 hover:bg-white/[0.04] ${
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border cursor-pointer transition-all duration-150 hover:bg-white/10 ${
                   msg.read
-                    ? "border-white/[0.04] bg-white/[0.01]"
+                    ? "border-white/10 bg-white/3"
                     : msg.isFeedback
                       ? "border-[#ff9f0a]/20 bg-[#ff9f0a]/[0.04]"
                       : "border-[#0a84ff]/20 bg-[#0a84ff]/[0.04]"
@@ -437,7 +437,7 @@ function MessageDetailModal({ message, isAdmin, onClose, onRefresh }: {
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" style={{ zIndex: 10000 }}>
       <div className="glass-heavy rounded-2xl w-full max-w-md shadow-[0_16px_48px_rgba(0,0,0,0.5)] animate-scale-in flex flex-col max-h-[85vh]">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06] shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/15 shrink-0">
           <div className="flex items-center gap-2 min-w-0">
             <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${typeInfo.bg} ${typeInfo.color}`}>
               {typeInfo.label}
@@ -482,7 +482,7 @@ function MessageDetailModal({ message, isAdmin, onClose, onRefresh }: {
                   <textarea
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors resize-none h-20"
+                    className="w-full px-3 py-2.5 rounded-xl bg-white/10 border border-white/15 text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors resize-none h-20"
                     placeholder="输入回复内容..."
                   />
                 </div>
@@ -492,7 +492,7 @@ function MessageDetailModal({ message, isAdmin, onClose, onRefresh }: {
         </div>
 
         {isAdmin && message.isFeedback && !message.reply && (
-          <div className="px-6 py-3 border-t border-white/[0.06] shrink-0">
+          <div className="px-6 py-3 border-t border-white/15 shrink-0">
             <button
               onClick={handleReply}
               disabled={replying || !replyText.trim()}
@@ -562,7 +562,7 @@ function FeedbackModal({ onClose, isGuest }: { onClose: () => void; isGuest: boo
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
       <div className="glass-heavy rounded-2xl w-full max-w-md shadow-[0_16px_48px_rgba(0,0,0,0.5)] animate-scale-in max-h-[90vh] flex flex-col">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.06] shrink-0">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-white/15 shrink-0">
           <h3 className="text-[17px] font-semibold tracking-tight">意见反馈</h3>
           <button
             onClick={onClose}
@@ -588,7 +588,7 @@ function FeedbackModal({ onClose, isGuest }: { onClose: () => void; isGuest: boo
                   className={`px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all duration-200 ${
                     type === t.value
                       ? "bg-[#0a84ff] text-white"
-                      : "bg-white/[0.04] border border-white/[0.06] text-muted-foreground hover:text-foreground"
+                      : "bg-white/10 border border-white/15 text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {t.label}
@@ -602,7 +602,7 @@ function FeedbackModal({ onClose, isGuest }: { onClose: () => void; isGuest: boo
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
+              className="w-full px-3 py-2.5 rounded-xl bg-white/10 border border-white/15 text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
               placeholder="简要描述"
             />
           </div>
@@ -611,13 +611,13 @@ function FeedbackModal({ onClose, isGuest }: { onClose: () => void; isGuest: boo
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors resize-none h-28"
+              className="w-full px-3 py-2.5 rounded-xl bg-white/10 border border-white/15 text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors resize-none h-28"
               placeholder="请详细描述您遇到的问题或建议..."
             />
           </div>
         </div>
 
-        <div className="px-6 py-4 border-t border-white/[0.06] shrink-0">
+        <div className="px-6 py-4 border-t border-white/15 shrink-0">
           <button
             onClick={handleSubmit}
             disabled={loading}

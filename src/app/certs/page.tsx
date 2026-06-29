@@ -123,7 +123,7 @@ export default function CertsPage() {
 
         {/* Add form */}
         {showAdd && (
-          <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02] space-y-3">
+          <div className="p-4 rounded-xl border border-white/15 bg-white/5 space-y-3">
             <div className="grid grid-cols-3 gap-3">
               <input
                 type="text"
@@ -168,7 +168,7 @@ export default function CertsPage() {
             {certs.map((cert) => (
               <div
                 key={cert.id}
-                className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] transition-all"
+                className="p-4 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 transition-all"
               >
                 <div className="flex items-start justify-between mb-3">
                   <div>

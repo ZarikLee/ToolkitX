@@ -140,7 +140,7 @@ export function ChmodCalculator() {
         </div>
       </div>
 
-      <div className="border-t border-white/[0.06] pt-6">
+      <div className="border-t border-white/15 pt-6">
         <h3 className="text-sm font-medium mb-3">反向计算</h3>
         <div className="flex gap-2">
           <input

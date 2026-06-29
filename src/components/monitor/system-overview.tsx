@@ -11,7 +11,7 @@ interface SystemOverviewProps {
 
 function GaugeBar({ percent, color }: { percent: number; color: string }) {
   return (
-    <div className="h-2 rounded-full bg-white/[0.06] overflow-hidden">
+    <div className="h-2 rounded-full bg-white/15 overflow-hidden">
       <div
         className="h-full rounded-full transition-all duration-500 ease-out"
         style={{
@@ -37,7 +37,7 @@ function StatCard({
   color: string;
 }) {
   return (
-    <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+    <div className="p-4 rounded-xl border border-white/15 bg-white/5">
       <div className="flex items-center justify-between mb-2">
         <span className="text-[11px] text-muted-foreground/50 uppercase tracking-wider">
           {label}
@@ -106,7 +106,7 @@ export function SystemOverview({
         sub={load.length >= 3 ? `${load[0].toFixed(1)} / ${load[1].toFixed(1)} / ${load[2].toFixed(1)}` : ""}
         color="#bf5af2"
       />
-      <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+      <div className="p-4 rounded-xl border border-white/15 bg-white/5">
         <div className="flex items-center justify-between mb-2">
           <span className="text-[11px] text-muted-foreground/50 uppercase tracking-wider">
             系统

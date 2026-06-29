@@ -54,7 +54,7 @@ export function HelpButton({ title, content }: HelpButtonProps) {
         onClick={handleOpen}
         className={`relative flex items-center justify-center w-7 h-7 rounded-full transition-all duration-200 ${
           hasSeenHelp
-            ? "text-muted-foreground/50 hover:text-muted-foreground hover:bg-white/[0.06]"
+            ? "text-muted-foreground/50 hover:text-muted-foreground hover:bg-white/15"
             : "text-[#0a84ff] hover:bg-[#0a84ff]/10"
         }`}
         title="使用帮助"
@@ -74,7 +74,7 @@ export function HelpButton({ title, content }: HelpButtonProps) {
             className="glass-heavy rounded-2xl w-full max-w-lg shadow-[0_16px_48px_rgba(0,0,0,0.5)] animate-scale-in max-h-[85vh] flex flex-col"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.06]">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-white/15">
               <h3 className="text-[17px] font-semibold tracking-tight">
                 {title}
               </h3>

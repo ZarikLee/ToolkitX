@@ -112,7 +112,7 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
       style={{ zIndex: 9999 }}
     >
       <div className="glass-heavy rounded-2xl w-full max-w-md shadow-[0_16px_48px_rgba(0,0,0,0.5)] animate-scale-in max-h-[90vh] flex flex-col">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.06] shrink-0">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-white/15 shrink-0">
           <h3 className="text-[17px] font-semibold tracking-tight">个人资料</h3>
           <button
             onClick={onClose}
@@ -130,7 +130,7 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
           <p className="text-[12px] text-muted-foreground/50">{user?.email}</p>
         </div>
 
-        <div className="flex border-b border-white/[0.06] shrink-0">
+        <div className="flex border-b border-white/15 shrink-0">
           <button
             onClick={() => setActiveTab("profile")}
             className={`flex-1 py-2.5 text-[13px] font-medium transition-colors ${
@@ -164,7 +164,7 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
+                  className="w-full px-3 py-2.5 rounded-xl bg-white/10 border border-white/15 text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
                   placeholder="你的名字"
                 />
               </div>
@@ -176,7 +176,7 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
+                  className="w-full px-3 py-2.5 rounded-xl bg-white/10 border border-white/15 text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
                   placeholder="email@example.com"
                 />
               </div>
@@ -184,7 +184,7 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
                 <label className="text-[12px] text-muted-foreground/60 uppercase tracking-wider mb-1.5 block">
                   注册时间
                 </label>
-                <div className="px-3 py-2.5 rounded-xl bg-white/[0.02] border border-white/[0.04] text-[13px] text-muted-foreground/50">
+                <div className="px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 text-[13px] text-muted-foreground/50">
                   {user?.id ? new Date().toLocaleDateString("zh-CN") : "-"}
                 </div>
               </div>
@@ -203,7 +203,7 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
                     type={showCurrent ? "text" : "password"}
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
-                    className="w-full px-3 py-2.5 pr-10 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
+                    className="w-full px-3 py-2.5 pr-10 rounded-xl bg-white/10 border border-white/15 text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
                     placeholder="输入当前密码"
                   />
                   <button
@@ -224,7 +224,7 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
                     type={showNew ? "text" : "password"}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full px-3 py-2.5 pr-10 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
+                    className="w-full px-3 py-2.5 pr-10 rounded-xl bg-white/10 border border-white/15 text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
                     placeholder="至少 6 个字符"
                   />
                   <button
@@ -244,7 +244,7 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
+                  className="w-full px-3 py-2.5 rounded-xl bg-white/10 border border-white/15 text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
                   placeholder="再次输入新密码"
                 />
               </div>
@@ -252,7 +252,7 @@ export function ProfileModal({ user, onClose, onUpdate }: ProfileModalProps) {
           )}
         </div>
 
-        <div className="px-6 py-4 border-t border-white/[0.06] shrink-0">
+        <div className="px-6 py-4 border-t border-white/15 shrink-0">
           <button
             onClick={activeTab === "profile" ? handleSaveProfile : handleChangePassword}
             disabled={loading}

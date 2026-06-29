@@ -74,7 +74,7 @@ export default function DiagnosticsPage() {
         </>
       }
     >
-      <div className="p-6 rounded-2xl border border-white/[0.06] bg-white/[0.02]">
+      <div className="p-6 rounded-2xl border border-white/15 bg-white/5">
         {ActiveComponent && <ActiveComponent />}
       </div>
     </SubPageLayout>

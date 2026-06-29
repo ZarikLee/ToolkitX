@@ -173,7 +173,7 @@ export default function KnowledgePage() {
               className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[13px] font-medium transition-all ${
                 activeTab === t.key
                   ? "bg-[#0a84ff] text-white shadow-sm"
-                  : "bg-white/[0.04] text-muted-foreground hover:bg-white/[0.08] border border-white/[0.06]"
+                  : "bg-white/10 text-muted-foreground hover:bg-white/20 border border-white/15"
               }`}
             >
               <t.icon className="h-3.5 w-3.5" />
@@ -181,16 +181,16 @@ export default function KnowledgePage() {
             </button>
           ))}
           <div className="flex-1" />
-          <div className="flex bg-white/[0.04] border border-white/[0.06] rounded-xl overflow-hidden">
+          <div className="flex bg-white/10 border border-white/15 rounded-xl overflow-hidden">
             <button
               onClick={() => setMode("learn")}
-              className={`px-4 py-2 text-[13px] font-medium transition-all ${mode === "learn" ? "bg-white/[0.1] text-foreground" : "text-muted-foreground"}`}
+              className={`px-4 py-2 text-[13px] font-medium transition-all ${mode === "learn" ? "bg-white/25 text-foreground" : "text-muted-foreground"}`}
             >
               知识点
             </button>
             <button
               onClick={() => { setMode("practice"); resetPractice(); }}
-              className={`px-4 py-2 text-[13px] font-medium transition-all ${mode === "practice" ? "bg-white/[0.1] text-foreground" : "text-muted-foreground"}`}
+              className={`px-4 py-2 text-[13px] font-medium transition-all ${mode === "practice" ? "bg-white/25 text-foreground" : "text-muted-foreground"}`}
             >
               模拟练习
             </button>
@@ -208,7 +208,7 @@ export default function KnowledgePage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="搜索知识点..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/10 border border-white/15 text-[13px] placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
             />
           </div>
 
@@ -217,7 +217,7 @@ export default function KnowledgePage() {
             {filteredKnowledge.map((item) => (
               <div
                 key={item.id}
-                className="glass rounded-xl overflow-hidden cursor-pointer hover:bg-white/[0.04] transition-all"
+                className="glass rounded-xl overflow-hidden cursor-pointer hover:bg-white/10 transition-all"
                 onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
               >
                 <div className="flex items-center justify-between px-4 py-3">
@@ -229,14 +229,14 @@ export default function KnowledgePage() {
                   </div>
                   <div className="flex gap-1">
                     {item.tags.slice(0, 3).map((tag) => (
-                      <span key={tag} className="px-2 py-0.5 text-[10px] bg-white/[0.06] rounded-md text-muted-foreground/60">
+                      <span key={tag} className="px-2 py-0.5 text-[10px] bg-white/15 rounded-md text-muted-foreground/60">
                         {tag}
                       </span>
                     ))}
                   </div>
                 </div>
                 {expandedId === item.id && (
-                  <div className="px-4 pb-4 border-t border-white/[0.04]">
+                  <div className="px-4 pb-4 border-t border-white/10">
                     <pre className="mt-3 p-3 rounded-lg bg-[#0a0a0a] text-[12px] font-mono text-foreground/80 overflow-x-auto whitespace-pre-wrap leading-relaxed">
                       {item.content}
                     </pre>
@@ -291,7 +291,7 @@ export default function KnowledgePage() {
                 </span>
               </div>
 
-              <div className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] mb-4">
+              <div className="p-4 rounded-xl bg-white/8 border border-white/15 mb-4">
                 <p className="text-[13px] text-foreground/80 leading-relaxed mb-2">
                   <span className="text-muted-foreground/50 font-medium">场景：</span>
                   {questions[currentQ].scenario}
@@ -311,7 +311,7 @@ export default function KnowledgePage() {
                     checkAnswer();
                   }
                 }}
-                className="w-full p-3 rounded-xl bg-[#0a0a0a] border border-white/[0.06] text-[13px] font-mono text-foreground placeholder:text-muted-foreground/20 outline-none focus:border-[#0a84ff]/50 resize-none h-20 mb-3"
+                className="w-full p-3 rounded-xl bg-[#0a0a0a] border border-white/15 text-[13px] font-mono text-foreground placeholder:text-muted-foreground/20 outline-none focus:border-[#0a84ff]/50 resize-none h-20 mb-3"
                 placeholder="输入你的命令或答案..."
                 disabled={result !== null}
               />

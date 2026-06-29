@@ -179,7 +179,7 @@ export function DiagnosticReport() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] transition-all ${
                   selected.includes(t.id)
                     ? "bg-[#0a84ff]/15 text-[#0a84ff] border border-[#0a84ff]/30"
-                    : "bg-white/[0.04] text-muted-foreground border border-white/[0.06] hover:bg-white/[0.08]"
+                    : "bg-white/10 text-muted-foreground border border-white/15 hover:bg-white/20"
                 }`}
               >
                 <span>{t.icon}</span>
@@ -209,7 +209,7 @@ export function DiagnosticReport() {
             {results.map((r, i) => (
               <div
                 key={i}
-                className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02] space-y-2"
+                className="p-4 rounded-xl border border-white/15 bg-white/5 space-y-2"
               >
                 <div className="flex items-center gap-2 text-[13px] font-medium">
                   <span>{diagnosticTypes.find((t) => t.id === r.type)?.icon}</span>

@@ -130,7 +130,7 @@ export default function AuditPage() {
           <button
             onClick={() => setAutoRefresh(!autoRefresh)}
             className={`px-3 py-1.5 rounded-lg text-[12px] transition-all ${
-              autoRefresh ? "bg-[#30d158]/10 text-[#30d158]" : "bg-white/[0.06] text-muted-foreground"
+              autoRefresh ? "bg-[#30d158]/10 text-[#30d158]" : "bg-white/15 text-muted-foreground"
             }`}
           >
             {autoRefresh ? "自动刷新中" : "自动刷新"}
@@ -146,10 +146,10 @@ export default function AuditPage() {
           <div className="text-[13px] text-muted-foreground py-8 text-center">暂无审计记录</div>
         )}
         {!loading && logs.length > 0 && (
-          <div className="rounded-xl border border-white/[0.06] overflow-hidden">
+          <div className="rounded-xl border border-white/15 overflow-hidden">
             <table className="w-full text-[13px]">
               <thead>
-                <tr className="bg-white/[0.04] border-b border-white/[0.06]">
+                <tr className="bg-white/10 border-b border-white/15">
                   <th className="text-left px-4 py-2.5 text-[11px] text-muted-foreground/60 uppercase tracking-wider font-medium">
                     时间
                   </th>
@@ -169,13 +169,13 @@ export default function AuditPage() {
               </thead>
               <tbody>
                 {logs.map((log) => (
-                  <tr key={log.id} className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors">
+                  <tr key={log.id} className="border-b border-white/10 hover:bg-white/5 transition-colors">
                     <td className="px-4 py-2.5 text-muted-foreground whitespace-nowrap">
                       {new Date(log.createdAt).toLocaleString()}
                     </td>
                     <td className="px-4 py-2.5 font-medium">{log.userId || "-"}</td>
                     <td className="px-4 py-2.5">
-                      <span className="px-1.5 py-0.5 text-[11px] bg-white/[0.06] rounded-md">
+                      <span className="px-1.5 py-0.5 text-[11px] bg-white/15 rounded-md">
                         {log.action}
                       </span>
                     </td>

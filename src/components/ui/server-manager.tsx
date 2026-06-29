@@ -140,7 +140,7 @@ export function ServerManager({
           <div className="relative flex-1">
             <button
               onClick={() => setShowDropdown(!showDropdown)}
-              className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-left transition-colors hover:bg-white/[0.06]"
+              className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-white/10 border border-white/15 text-[13px] text-left transition-colors hover:bg-white/15"
             >
               <div className="flex items-center gap-2 min-w-0">
                 <Server className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0" />
@@ -179,7 +179,7 @@ export function ServerManager({
                           onSelect?.(server);
                           setShowDropdown(false);
                         }}
-                        className="flex-1 flex items-center gap-2 px-4 py-2.5 text-[13px] text-left hover:bg-white/[0.06] transition-colors"
+                        className="flex-1 flex items-center gap-2 px-4 py-2.5 text-[13px] text-left hover:bg-white/15 transition-colors"
                       >
                         <Server className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0" />
                         <span className="truncate text-foreground">{server.name}</span>
@@ -224,7 +224,7 @@ export function ServerManager({
               setEditingServer(null);
               setShowModal(true);
             }}
-            className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[12px] text-muted-foreground hover:text-foreground hover:bg-white/[0.06] transition-all duration-200"
+            className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-white/10 border border-white/15 text-[12px] text-muted-foreground hover:text-foreground hover:bg-white/15 transition-all duration-200"
           >
             <Plus className="h-3.5 w-3.5" />
             {!compact && "添加"}
@@ -245,7 +245,7 @@ export function ServerManager({
                 className={`flex items-center justify-between p-3 rounded-xl border transition-all duration-200 cursor-pointer ${
                   selectedId === server.id
                     ? "border-[#0a84ff]/40 bg-[#0a84ff]/[0.06]"
-                    : "border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04]"
+                    : "border-white/15 bg-white/5 hover:bg-white/10"
                 }`}
                 onClick={() => onSelect?.(server)}
               >
@@ -284,7 +284,7 @@ export function ServerManager({
               setEditingServer(null);
               setShowModal(true);
             }}
-            className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-dashed border-white/[0.08] text-[12px] text-muted-foreground/40 hover:text-foreground hover:bg-white/[0.02] hover:border-white/[0.12] transition-all duration-200"
+            className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-dashed border-white/20 text-[12px] text-muted-foreground/40 hover:text-foreground hover:bg-white/5 hover:border-white/[0.12] transition-all duration-200"
           >
             <Plus className="h-3.5 w-3.5" />
             添加服务器
@@ -365,7 +365,7 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
       <div
         className="glass-heavy rounded-2xl w-full max-w-md shadow-[0_16px_48px_rgba(0,0,0,0.5)] animate-scale-in max-h-[90vh] flex flex-col"
       >
-        <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.06] shrink-0">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-white/15 shrink-0">
           <h3 className="text-[17px] font-semibold tracking-tight">
             {server ? "编辑服务器" : "添加服务器"}
           </h3>
@@ -386,7 +386,7 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
               type="text"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
+              className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
               placeholder="生产服务器"
               required
             />
@@ -401,7 +401,7 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
                 type="text"
                 value={form.host}
                 onChange={(e) => setForm({ ...form, host: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
+                className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[13px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
                 placeholder="192.168.1.100"
                 required
               />
@@ -416,7 +416,7 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
                 onChange={(e) =>
                   setForm({ ...form, port: parseInt(e.target.value) || 22 })
                 }
-                className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] font-mono text-foreground outline-none focus:border-[#0a84ff]/50 transition-colors"
+                className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[13px] font-mono text-foreground outline-none focus:border-[#0a84ff]/50 transition-colors"
                 required
               />
             </div>
@@ -430,7 +430,7 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
               type="text"
               value={form.username}
               onChange={(e) => setForm({ ...form, username: e.target.value })}
-              className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
+              className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
               placeholder="root"
               required
             />
@@ -440,13 +440,13 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
             <label className="text-[12px] text-muted-foreground/60 uppercase tracking-wider mb-1.5 block">
               认证方式
             </label>
-            <div className="flex gap-1 p-1 rounded-lg bg-white/[0.04] border border-white/[0.06] mb-2">
+            <div className="flex gap-1 p-1 rounded-lg bg-white/10 border border-white/15 mb-2">
               <button
                 type="button"
                 onClick={() => setAuthType("password")}
                 className={`flex-1 px-3 py-1.5 rounded-md text-[12px] font-medium transition-all duration-200 ${
                   authType === "password"
-                    ? "bg-white/[0.1] text-foreground"
+                    ? "bg-white/25 text-foreground"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -457,7 +457,7 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
                 onClick={() => setAuthType("key")}
                 className={`flex-1 px-3 py-1.5 rounded-md text-[12px] font-medium transition-all duration-200 ${
                   authType === "key"
-                    ? "bg-white/[0.1] text-foreground"
+                    ? "bg-white/25 text-foreground"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -470,27 +470,27 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
                 type="password"
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
+                className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
                 placeholder="SSH 密码（可选）"
               />
             ) : (
               <textarea
                 value={form.privateKey}
                 onChange={(e) => setForm({ ...form, privateKey: e.target.value })}
-                className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[12px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors resize-none h-24"
+                className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[12px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors resize-none h-24"
                 placeholder="-----BEGIN RSA PRIVATE KEY-----"
               />
             )}
           </div>
 
           {/* Jump Host Section */}
-          <div className="border-t border-white/[0.06] pt-4">
+          <div className="border-t border-white/15 pt-4">
             <label className="flex items-center gap-2 cursor-pointer mb-3">
               <input
                 type="checkbox"
                 checked={useJumpHost}
                 onChange={(e) => setUseJumpHost(e.target.checked)}
-                className="w-4 h-4 rounded border-white/[0.1] bg-white/[0.04] accent-[#0a84ff]"
+                className="w-4 h-4 rounded border-white/25 bg-white/10 accent-[#0a84ff]"
               />
               <span className="text-[13px] text-foreground/80">使用跳板机 / 堡垒机</span>
             </label>
@@ -504,7 +504,7 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
                       type="text"
                       value={form.jumpHost}
                       onChange={(e) => setForm({ ...form, jumpHost: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
+                      className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[13px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
                       placeholder="bastion.company.com"
                       required={useJumpHost}
                     />
@@ -515,7 +515,7 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
                       type="number"
                       value={form.jumpPort}
                       onChange={(e) => setForm({ ...form, jumpPort: parseInt(e.target.value) || 22 })}
-                      className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] font-mono text-foreground outline-none focus:border-[#0a84ff]/50 transition-colors"
+                      className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[13px] font-mono text-foreground outline-none focus:border-[#0a84ff]/50 transition-colors"
                       required={useJumpHost}
                     />
                   </div>
@@ -526,19 +526,19 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
                     type="text"
                     value={form.jumpUsername}
                     onChange={(e) => setForm({ ...form, jumpUsername: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
+                    className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
                     placeholder="jumpuser"
                     required={useJumpHost}
                   />
                 </div>
                 <div>
                   <label className="text-[11px] text-muted-foreground/50 mb-1 block">认证方式</label>
-                  <div className="flex gap-1 p-1 rounded-lg bg-white/[0.04] border border-white/[0.06] mb-2">
+                  <div className="flex gap-1 p-1 rounded-lg bg-white/10 border border-white/15 mb-2">
                     <button
                       type="button"
                       onClick={() => setJumpAuthType("password")}
                       className={`flex-1 px-3 py-1.5 rounded-md text-[11px] font-medium transition-all duration-200 ${
-                        jumpAuthType === "password" ? "bg-white/[0.1] text-foreground" : "text-muted-foreground hover:text-foreground"
+                        jumpAuthType === "password" ? "bg-white/25 text-foreground" : "text-muted-foreground hover:text-foreground"
                       }`}
                     >
                       密码
@@ -547,7 +547,7 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
                       type="button"
                       onClick={() => setJumpAuthType("key")}
                       className={`flex-1 px-3 py-1.5 rounded-md text-[11px] font-medium transition-all duration-200 ${
-                        jumpAuthType === "key" ? "bg-white/[0.1] text-foreground" : "text-muted-foreground hover:text-foreground"
+                        jumpAuthType === "key" ? "bg-white/25 text-foreground" : "text-muted-foreground hover:text-foreground"
                       }`}
                     >
                       私钥
@@ -558,7 +558,7 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
                       type="password"
                       value={form.jumpPassword}
                       onChange={(e) => setForm({ ...form, jumpPassword: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
+                      className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
                       placeholder="跳板机密码"
                       required={useJumpHost}
                     />
@@ -566,7 +566,7 @@ function ServerFormModal({ server, onSave, onClose }: ServerFormModalProps) {
                     <textarea
                       value={form.jumpPrivateKey}
                       onChange={(e) => setForm({ ...form, jumpPrivateKey: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[11px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors resize-none h-20"
+                      className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[11px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors resize-none h-20"
                       placeholder="-----BEGIN RSA PRIVATE KEY-----"
                       required={useJumpHost}
                     />

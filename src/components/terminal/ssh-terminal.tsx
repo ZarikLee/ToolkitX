@@ -165,7 +165,7 @@ export function SSHTerminal({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between px-3 py-2 bg-[#1c1c1e] border-b border-white/[0.06]">
+      <div className="flex items-center justify-between px-3 py-2 bg-[#1c1c1e] border-b border-white/15">
         <div className="flex items-center gap-2">
           <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-[#30d158] shadow-[0_0_6px_rgba(48,209,88,0.4)]' : 'bg-muted-foreground/20'}`} />
           <span className="text-[12px] font-mono text-foreground/60">

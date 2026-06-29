@@ -194,8 +194,8 @@ export default function ApiTesterPage() {
     >
       <div className="flex gap-4 min-h-[calc(100vh-12rem)]">
         {/* History Sidebar */}
-        <div className="w-72 shrink-0 rounded-2xl border border-white/[0.06] bg-white/[0.02] overflow-hidden flex flex-col">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+        <div className="w-72 shrink-0 rounded-2xl border border-white/15 bg-white/5 overflow-hidden flex flex-col">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-white/15">
             <span className="text-[12px] font-medium text-muted-foreground/60 uppercase tracking-wider">
               历史记录
             </span>
@@ -222,8 +222,8 @@ export default function ApiTesterPage() {
                     onClick={() => handleSelectHistory(entry)}
                     className={`w-full text-left px-3 py-2.5 rounded-xl transition-all duration-200 group ${
                       selectedHistory?.id === entry.id
-                        ? "bg-white/[0.08] border border-white/[0.08]"
-                        : "hover:bg-white/[0.04] border border-transparent"
+                        ? "bg-white/20 border border-white/20"
+                        : "hover:bg-white/10 border border-transparent"
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-1">
@@ -252,7 +252,7 @@ export default function ApiTesterPage() {
 
         {/* Main Content */}
         <div className="flex-1 space-y-4 min-w-0">
-          <div className="p-5 rounded-2xl border border-white/[0.06] bg-white/[0.02]">
+          <div className="p-5 rounded-2xl border border-white/15 bg-white/5">
             <RequestBuilder
               ref={builderRef}
               onSend={handleSend}
@@ -265,7 +265,7 @@ export default function ApiTesterPage() {
             />
           </div>
 
-          <div className="p-5 rounded-2xl border border-white/[0.06] bg-white/[0.02]">
+          <div className="p-5 rounded-2xl border border-white/15 bg-white/5">
             <h3 className="text-[12px] font-medium text-muted-foreground/60 uppercase tracking-wider mb-4">
               响应
             </h3>

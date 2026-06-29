@@ -39,7 +39,7 @@ export function InlineHelp({ content }: InlineHelpProps) {
       <button
         ref={btnRef}
         onClick={() => setOpen(!open)}
-        className="flex items-center justify-center w-5 h-5 rounded-full text-muted-foreground hover:bg-white/[0.06] transition-all duration-200"
+        className="flex items-center justify-center w-5 h-5 rounded-full text-muted-foreground hover:bg-white/15 transition-all duration-200"
         title="使用帮助"
       >
         <span className="text-[10px] font-semibold">?</span>

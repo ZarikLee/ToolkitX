@@ -13,7 +13,7 @@ export function NetworkStats({ network }: NetworkStatsProps) {
   };
 
   return (
-    <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+    <div className="p-4 rounded-xl border border-white/15 bg-white/5">
       <h3 className="text-[11px] text-muted-foreground/50 uppercase tracking-wider mb-3">
         网络流量
       </h3>

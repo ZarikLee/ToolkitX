@@ -72,12 +72,12 @@ export function ResponseViewer({ response, error }: ResponseViewerProps) {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 p-1 rounded-lg bg-white/[0.04] border border-white/[0.06] w-fit">
+      <div className="flex gap-1 p-1 rounded-lg bg-white/10 border border-white/15 w-fit">
         <button
           onClick={() => setActiveTab("body")}
           className={`px-3 py-1.5 rounded-md text-[12px] font-medium transition-all duration-200 ${
             activeTab === "body"
-              ? "bg-white/[0.1] text-foreground"
+              ? "bg-white/25 text-foreground"
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
@@ -87,7 +87,7 @@ export function ResponseViewer({ response, error }: ResponseViewerProps) {
           onClick={() => setActiveTab("headers")}
           className={`px-3 py-1.5 rounded-md text-[12px] font-medium transition-all duration-200 ${
             activeTab === "headers"
-              ? "bg-white/[0.1] text-foreground"
+              ? "bg-white/25 text-foreground"
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
@@ -104,7 +104,7 @@ export function ResponseViewer({ response, error }: ResponseViewerProps) {
           <div className="absolute top-2 right-2 z-10">
             <CopyButton text={response.body} />
           </div>
-          <pre className="p-4 pr-20 rounded-xl bg-black/30 border border-white/[0.04] text-[12px] font-mono text-foreground/80 overflow-auto max-h-[400px] leading-relaxed">
+          <pre className="p-4 pr-20 rounded-xl bg-black/30 border border-white/10 text-[12px] font-mono text-foreground/80 overflow-auto max-h-[400px] leading-relaxed">
             {formatJson(response.body)}
           </pre>
         </div>
@@ -112,7 +112,7 @@ export function ResponseViewer({ response, error }: ResponseViewerProps) {
 
       {/* Headers */}
       {activeTab === "headers" && (
-        <div className="p-4 rounded-xl bg-black/30 border border-white/[0.04]">
+        <div className="p-4 rounded-xl bg-black/30 border border-white/10">
           <div className="space-y-1.5">
             {Object.entries(response.headers).map(([key, value]) => (
               <div key={key} className="flex gap-2 text-[12px] font-mono">

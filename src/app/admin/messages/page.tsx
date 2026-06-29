@@ -100,7 +100,7 @@ export default function AdminMessagesPage() {
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all duration-200 ${
                         type === t.value
                           ? "bg-[#0a84ff] text-white"
-                          : "bg-white/[0.04] border border-white/[0.06] text-muted-foreground hover:text-foreground"
+                          : "bg-white/10 border border-white/15 text-muted-foreground hover:text-foreground"
                       }`}
                     >
                       <Icon className={`h-3 w-3 ${type === t.value ? "text-white" : t.color}`} />
@@ -116,7 +116,7 @@ export default function AdminMessagesPage() {
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
+                className="w-full px-3 py-2.5 rounded-xl bg-white/10 border border-white/15 text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors"
                 placeholder="消息标题"
               />
             </div>
@@ -125,7 +125,7 @@ export default function AdminMessagesPage() {
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors resize-none h-32"
+                className="w-full px-3 py-2.5 rounded-xl bg-white/10 border border-white/15 text-[13px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/50 transition-colors resize-none h-32"
                 placeholder="消息内容..."
               />
             </div>
@@ -147,7 +147,7 @@ export default function AdminMessagesPage() {
               <p className="text-[13px] text-muted-foreground/30 py-8 text-center">暂无消息</p>
             ) : (
               messages.map((m) => (
-                <div key={m.id} className="flex items-center justify-between px-4 py-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                <div key={m.id} className="flex items-center justify-between px-4 py-3 rounded-xl bg-white/5 border border-white/10">
                   <div className="flex items-center gap-3">
                     <span className={`w-2 h-2 rounded-full ${m.type === "info" ? "bg-[#0a84ff]" : m.type === "warning" ? "bg-[#ff9f0a]" : "bg-[#30d158]"}`} />
                     <span className="text-[13px]">{m.title}</span>

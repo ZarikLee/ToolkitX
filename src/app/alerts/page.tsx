@@ -183,13 +183,13 @@ export default function AlertsPage() {
           </div>
 
           {/* Filter */}
-          <div className="flex gap-1 p-1 rounded-lg bg-white/[0.04] border border-white/[0.06] w-fit">
+          <div className="flex gap-1 p-1 rounded-lg bg-white/10 border border-white/15 w-fit">
             {(["all", "active", "resolved"] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
                 className={`px-3 py-1 rounded-md text-[12px] transition-all ${
-                  filter === f ? "bg-white/[0.1] text-foreground" : "text-muted-foreground hover:text-foreground"
+                  filter === f ? "bg-white/25 text-foreground" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {f === "all" ? "全部" : f === "active" ? "活跃" : "已解决"}
@@ -208,8 +208,8 @@ export default function AlertsPage() {
             {filteredAlerts.map((alert) => (
               <div
                 key={alert.id}
-                className={`p-4 rounded-xl border bg-white/[0.02] transition-all ${
-                  alert.resolved ? "border-white/[0.04] opacity-60" : "border-white/[0.06]"
+                className={`p-4 rounded-xl border bg-white/5 transition-all ${
+                  alert.resolved ? "border-white/10 opacity-60" : "border-white/15"
                 }`}
               >
                 <div className="flex items-start justify-between">
@@ -237,7 +237,7 @@ export default function AlertsPage() {
                     )}
                     <button
                       onClick={() => deleteAlert(alert.id)}
-                      className="px-2.5 py-1 rounded-lg text-[11px] bg-white/[0.04] text-muted-foreground hover:bg-white/[0.08] transition-all"
+                      className="px-2.5 py-1 rounded-lg text-[11px] bg-white/10 text-muted-foreground hover:bg-white/20 transition-all"
                     >
                       删除
                     </button>
@@ -259,7 +259,7 @@ export default function AlertsPage() {
           </button>
 
           {showAddRule && (
-            <div className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02] space-y-3">
+            <div className="p-4 rounded-xl border border-white/15 bg-white/5 space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <input
                   type="text"
@@ -319,7 +319,7 @@ export default function AlertsPage() {
 
           <div className="space-y-2">
             {rules.map((rule) => (
-              <div key={rule.id} className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+              <div key={rule.id} className="p-4 rounded-xl border border-white/15 bg-white/5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div
@@ -339,14 +339,14 @@ export default function AlertsPage() {
                       className={`px-2.5 py-1 rounded-lg text-[11px] transition-all ${
                         rule.enabled
                           ? "bg-[#30d158]/10 text-[#30d158]"
-                          : "bg-white/[0.04] text-muted-foreground"
+                          : "bg-white/10 text-muted-foreground"
                       }`}
                     >
                       {rule.enabled ? "启用" : "禁用"}
                     </button>
                     <button
                       onClick={() => deleteRule(rule.id)}
-                      className="px-2.5 py-1 rounded-lg text-[11px] bg-white/[0.04] text-muted-foreground hover:bg-white/[0.08] transition-all"
+                      className="px-2.5 py-1 rounded-lg text-[11px] bg-white/10 text-muted-foreground hover:bg-white/20 transition-all"
                     >
                       删除
                     </button>

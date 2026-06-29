@@ -49,8 +49,8 @@ export function CodeEditor({
   };
 
   return (
-    <div className="rounded-xl border border-white/[0.06] overflow-hidden bg-black/20">
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.06]">
+    <div className="rounded-xl border border-white/15 overflow-hidden bg-black/20">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/15">
         <span className="text-[11px] text-muted-foreground/60 uppercase tracking-wider font-medium">
           {language}
         </span>

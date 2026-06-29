@@ -53,7 +53,7 @@ export function ServerPicker({
       <div className="relative">
         <button
           onClick={() => setShowDropdown(!showDropdown)}
-          className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] transition-colors hover:bg-white/[0.06]"
+          className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[13px] transition-colors hover:bg-white/15"
         >
           <Server className="h-3.5 w-3.5 text-muted-foreground/40" />
           {selected ? (
@@ -80,7 +80,7 @@ export function ServerPicker({
                       onSelect(server);
                       setShowDropdown(false);
                     }}
-                    className="w-full flex items-center gap-2 px-4 py-2.5 text-[13px] text-left hover:bg-white/[0.06] transition-colors"
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-[13px] text-left hover:bg-white/15 transition-colors"
                   >
                     <Server className="h-3.5 w-3.5 text-muted-foreground/40" />
                     <span className="text-foreground">{server.name}</span>
@@ -93,14 +93,14 @@ export function ServerPicker({
       </div>
 
       {/* Interval Selector */}
-      <div className="flex gap-1 p-1 rounded-lg bg-white/[0.04] border border-white/[0.06]">
+      <div className="flex gap-1 p-1 rounded-lg bg-white/10 border border-white/15">
         {INTERVALS.map((item) => (
           <button
             key={item.value}
             onClick={() => onIntervalChange(item.value)}
             className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all duration-200 ${
               interval === item.value
-                ? "bg-white/[0.1] text-foreground"
+                ? "bg-white/25 text-foreground"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -113,7 +113,7 @@ export function ServerPicker({
       <button
         onClick={onRefresh}
         disabled={!selected || loading}
-        className="p-2 rounded-xl text-muted-foreground/40 hover:text-foreground hover:bg-white/[0.06] disabled:opacity-30 transition-all duration-200"
+        className="p-2 rounded-xl text-muted-foreground/40 hover:text-foreground hover:bg-white/15 disabled:opacity-30 transition-all duration-200"
         title="手动刷新"
       >
         <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />

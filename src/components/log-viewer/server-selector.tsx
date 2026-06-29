@@ -52,7 +52,7 @@ export function ServerSelector({ onSelect, disabled }: ServerSelectorProps) {
   };
 
   return (
-    <div className="p-4 rounded-2xl border border-white/[0.06] bg-white/[0.02] space-y-3">
+    <div className="p-4 rounded-2xl border border-white/15 bg-white/5 space-y-3">
       <h3 className="text-[12px] font-medium text-muted-foreground/60 uppercase tracking-wider">
         选择服务器和日志文件
       </h3>
@@ -62,7 +62,7 @@ export function ServerSelector({ onSelect, disabled }: ServerSelectorProps) {
         <button
           onClick={() => !disabled && setShowServerDropdown(!showServerDropdown)}
           disabled={disabled}
-          className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-left transition-colors hover:bg-white/[0.06] disabled:opacity-50"
+          className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[13px] text-left transition-colors hover:bg-white/15 disabled:opacity-50"
         >
           <div className="flex items-center gap-2">
             <Server className="h-3.5 w-3.5 text-muted-foreground/40" />
@@ -96,7 +96,7 @@ export function ServerSelector({ onSelect, disabled }: ServerSelectorProps) {
                       setSelectedServer(server);
                       setShowServerDropdown(false);
                     }}
-                    className="w-full flex items-center gap-2 px-4 py-2.5 text-[13px] text-left hover:bg-white/[0.06] transition-colors"
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-[13px] text-left hover:bg-white/15 transition-colors"
                   >
                     <Server className="h-3.5 w-3.5 text-muted-foreground/40" />
                     <span className="text-foreground">{server.name}</span>
@@ -116,7 +116,7 @@ export function ServerSelector({ onSelect, disabled }: ServerSelectorProps) {
         <button
           onClick={() => !disabled && setShowLogDropdown(!showLogDropdown)}
           disabled={disabled}
-          className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[13px] text-left transition-colors hover:bg-white/[0.06] disabled:opacity-50"
+          className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[13px] text-left transition-colors hover:bg-white/15 disabled:opacity-50"
         >
           <span className={selectedLog ? "text-foreground" : "text-muted-foreground/40"}>
             {selectedLog || "选择日志文件"}
@@ -139,7 +139,7 @@ export function ServerSelector({ onSelect, disabled }: ServerSelectorProps) {
                     setCustomLog("");
                     setShowLogDropdown(false);
                   }}
-                  className="w-full flex items-center justify-between px-4 py-2.5 text-[13px] text-left hover:bg-white/[0.06] transition-colors"
+                  className="w-full flex items-center justify-between px-4 py-2.5 text-[13px] text-left hover:bg-white/15 transition-colors"
                 >
                   <span className="text-foreground font-mono text-[12px]">
                     {log.path}
@@ -161,7 +161,7 @@ export function ServerSelector({ onSelect, disabled }: ServerSelectorProps) {
         onChange={(e) => setCustomLog(e.target.value)}
         placeholder="或输入自定义日志路径..."
         disabled={disabled}
-        className="w-full px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-[12px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/40 disabled:opacity-50"
+        className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-[12px] font-mono text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/40 disabled:opacity-50"
       />
 
       {/* Connect Button */}

@@ -41,19 +41,19 @@ export function LogFilters({
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="搜索日志内容..."
-          className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-[12px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/40"
+          className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-white/10 border border-white/15 text-[12px] text-foreground placeholder:text-muted-foreground/30 outline-none focus:border-[#0a84ff]/40"
         />
       </div>
 
       {/* Level Filter */}
-      <div className="flex gap-1 p-1 rounded-lg bg-white/[0.04] border border-white/[0.06]">
+      <div className="flex gap-1 p-1 rounded-lg bg-white/10 border border-white/15">
         {LEVELS.map((level) => (
           <button
             key={level.value}
             onClick={() => onLevelFilterChange(level.value)}
             className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all duration-200 ${
               levelFilter === level.value
-                ? "bg-white/[0.1] text-foreground"
+                ? "bg-white/25 text-foreground"
                 : level.color || "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -69,7 +69,7 @@ export function LogFilters({
           className={`p-1.5 rounded-lg transition-all duration-200 ${
             paused
               ? "text-[#ff9f0a] hover:bg-[#ff9f0a]/10"
-              : "text-muted-foreground/40 hover:text-foreground hover:bg-white/[0.06]"
+              : "text-muted-foreground/40 hover:text-foreground hover:bg-white/15"
           }`}
           title={paused ? "继续" : "暂停"}
         >
