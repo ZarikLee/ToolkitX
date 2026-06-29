@@ -3,60 +3,34 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, Menu, X } from "lucide-react";
+import { Search, Wrench } from "lucide-react";
 import { categories, type TutorialCategory } from "@/data/tutorials";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 
 export default function LearnLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <div className="min-h-screen">
-      {/* TopNavBar */}
-      <nav className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-[var(--outline-variant)]" style={{ background: "color-mix(in srgb, var(--background) 80%, transparent)" }}>
-        <div className="flex justify-between items-center w-full px-6 h-16 max-w-[1440px] mx-auto">
-          <div className="flex items-center gap-8">
-            <Link href="/" className="text-[24px] font-bold tracking-tighter" style={{ color: "var(--secondary)" }}>
-              ToolkitX
-            </Link>
-            <div className="hidden md:flex gap-6 items-center">
-              <Link
-                href="/learn"
-                className={`font-['Geist'] text-[12px] font-medium border-b-2 pb-1 transition-colors tracking-[0.05em] ${
-                  pathname === "/learn"
-                    ? "border-[var(--secondary)]"
-                    : "border-transparent hover:text-[var(--on-surface)]"
-                }`}
-                style={{ color: pathname === "/learn" ? "var(--secondary)" : "var(--on-surface-variant)" }}
-              >
-                文库
-              </Link>
-              <Link
-                href="/tools"
-                className="font-['Geist'] text-[12px] tracking-[0.05em] transition-colors hover:text-[var(--on-surface)]"
-                style={{ color: "var(--on-surface-variant)" }}
-              >
-                工具箱
-              </Link>
-              <Link
-                href="/"
-                className="font-['Geist'] text-[12px] tracking-[0.05em] transition-colors hover:text-[var(--on-surface)]"
-                style={{ color: "var(--on-surface-variant)" }}
-              >
-                首页
-              </Link>
+    <div className="min-h-screen" style={{ background: "var(--background)", color: "var(--foreground)" }}>
+      {/* Header */}
+      <header className="border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
+        <div className="max-w-[1200px] mx-auto px-4 py-3 flex items-center justify-between gap-4">
+          <Link href="/" className="flex items-center gap-2 shrink-0">
+            <div className="w-8 h-8 flex items-center justify-center rounded" style={{ background: "var(--secondary)", color: "var(--on-secondary)" }}>
+              <Wrench className="w-4 h-4" />
             </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded border border-[var(--outline-variant)] transition-all focus-within:border-[var(--secondary)]" style={{ background: "var(--surface-container-low)" }}>
-              <Search className="h-4 w-4" style={{ color: "var(--on-surface-variant)" }} />
+            <span className="text-lg font-bold" style={{ color: "var(--on-surface)" }}>ToolkitX</span>
+          </Link>
+          <div className="flex-1 max-w-md">
+            <div className="flex items-center gap-2 px-3 py-2 rounded border" style={{ background: "var(--surface-container-low)", borderColor: "var(--outline-variant)" }}>
+              <Search className="w-4 h-4 shrink-0" style={{ color: "var(--outline)" }} />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="搜索教程..."
-                className="bg-transparent border-none text-[12px] w-48 outline-none font-['Geist']"
+                className="bg-transparent border-none outline-none w-full text-sm"
                 style={{ color: "var(--on-surface)" }}
                 onKeyDown={e => {
                   if (e.key === "Enter" && searchQuery.trim()) {
@@ -64,68 +38,91 @@ export default function LearnLayout({ children }: { children: React.ReactNode })
                   }
                 }}
               />
-              <kbd className="text-[10px] px-1.5 py-0.5 rounded border border-[var(--outline-variant)] font-['Geist']" style={{ color: "var(--outline)", background: "var(--surface-container)" }}>
-                ⌘K
-              </kbd>
             </div>
           </div>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+          </div>
+        </div>
+      </header>
+
+      {/* Navigation */}
+      <nav className="border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
+        <div className="max-w-[1200px] mx-auto px-4 flex items-center gap-1 overflow-x-auto">
+          <Link href="/" className="px-3 py-2.5 text-sm font-medium shrink-0 border-b-2 border-transparent hover:opacity-80" style={{ color: "var(--on-surface-variant)" }}>
+            首页
+          </Link>
+          <Link href="/learn" className="px-3 py-2.5 text-sm font-medium shrink-0 border-b-2" style={{ color: "var(--secondary)", borderColor: "var(--secondary)" }}>
+            教程
+          </Link>
+          <Link href="/tools" className="px-3 py-2.5 text-sm font-medium shrink-0 border-b-2 border-transparent hover:opacity-80" style={{ color: "var(--on-surface-variant)" }}>
+            工具箱
+          </Link>
+          <Link href="/terminal" className="px-3 py-2.5 text-sm font-medium shrink-0 border-b-2 border-transparent hover:opacity-80" style={{ color: "var(--on-surface-variant)" }}>
+            终端
+          </Link>
+          <Link href="/monitor" className="px-3 py-2.5 text-sm font-medium shrink-0 border-b-2 border-transparent hover:opacity-80" style={{ color: "var(--on-surface-variant)" }}>
+            监控
+          </Link>
         </div>
       </nav>
 
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-40 lg:hidden">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setMobileMenuOpen(false)} />
-          <div className="absolute left-0 top-16 bottom-0 w-72 border-r border-[var(--outline-variant)] p-6 overflow-y-auto" style={{ background: "var(--surface-container-lowest)" }}>
-            <div className="space-y-1">
+      {/* Main Content */}
+      <div className="max-w-[1200px] mx-auto px-4 py-4 flex gap-4">
+        {/* Left Sidebar */}
+        <aside className="w-44 shrink-0 hidden lg:block">
+          <div className="sticky top-4 rounded-lg border overflow-hidden" style={{ background: "var(--surface-container-lowest)", borderColor: "var(--outline-variant)" }}>
+            <div className="px-3 py-2.5 text-sm font-semibold border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-low)", color: "var(--on-surface)" }}>
+              全部教程
+            </div>
+            <div className="py-1">
               {categories.map(cat => (
                 <Link
                   key={cat.id}
                   href={`/learn/${cat.id}`}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-4 py-3 text-[13px] transition-all rounded ${
-                    pathname.startsWith(`/learn/${cat.id}`)
-                      ? "font-semibold"
-                      : "hover:bg-[var(--surface-container-high)]"
-                  }`}
+                  className="flex items-center gap-2 px-3 py-2 text-[13px] transition-colors border-l-3 border-transparent"
                   style={{
                     color: pathname.startsWith(`/learn/${cat.id}`) ? "var(--secondary)" : "var(--on-surface-variant)",
+                    background: pathname.startsWith(`/learn/${cat.id}`) ? "color-mix(in srgb, var(--secondary) 8%, transparent)" : "transparent",
+                    borderLeftColor: pathname.startsWith(`/learn/${cat.id}`) ? "var(--secondary)" : "transparent",
+                    fontWeight: pathname.startsWith(`/learn/${cat.id}`) ? 600 : 400,
                   }}
                 >
-                  {cat.icon} {cat.name}
+                  <span className="text-base">{cat.icon}</span>
+                  <span className="truncate">{cat.name}</span>
                 </Link>
               ))}
             </div>
           </div>
-        </div>
-      )}
+        </aside>
 
-      {/* Main Content */}
-      <main className="pt-16">{children}</main>
+        {/* Content */}
+        <main className="flex-1 min-w-0">
+          {children}
+        </main>
+      </div>
 
       {/* Footer */}
-      <footer className="mt-[80px] border-t border-[var(--outline-variant)]" style={{ background: "var(--background)" }}>
-        <div className="flex flex-col md:flex-row justify-between items-center px-6 py-8 max-w-[1440px] mx-auto gap-8">
-          <div className="mb-4 md:mb-0">
-            <span className="font-['Geist'] text-[14px] font-bold" style={{ color: "var(--secondary)" }}>
-              ToolkitX
-            </span>
+      <footer className="border-t mt-8" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
+        <div className="max-w-[1200px] mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs" style={{ color: "var(--outline)" }}>
+          <div className="flex items-center gap-2">
+            <span className="font-semibold" style={{ color: "var(--secondary)" }}>ToolkitX</span>
+            <span>·</span>
+            <span>技术知识库 & 运维工具箱</span>
           </div>
-          <div className="flex gap-8">
-            <Link href="/learn" className="hover:text-[var(--secondary)] font-['Geist'] text-[12px] tracking-[0.05em] transition-colors" style={{ color: "var(--outline)" }}>文库</Link>
-            <Link href="/tools" className="hover:text-[var(--secondary)] font-['Geist'] text-[12px] tracking-[0.05em] transition-colors" style={{ color: "var(--outline)" }}>工具箱</Link>
-            <Link href="/" className="hover:text-[var(--secondary)] font-['Geist'] text-[12px] tracking-[0.05em] transition-colors" style={{ color: "var(--outline)" }}>首页</Link>
+          <div className="flex items-center gap-4">
+            <Link href="/learn" className="hover:opacity-80">教程</Link>
+            <Link href="/tools" className="hover:opacity-80">工具</Link>
+            <Link href="/terminal" className="hover:opacity-80">终端</Link>
           </div>
-          <div className="text-[10px] font-['Geist'] tracking-[0.05em]" style={{ color: "var(--outline)" }}>
-            &copy; 2026 ToolkitX
-          </div>
+          <div>&copy; 2026 ToolkitX</div>
         </div>
       </footer>
     </div>
   );
 }
 
-// Left Sidebar for tutorial pages
+// Left Sidebar for tutorial detail pages
 export function TutorialSidebar({
   category,
   currentSlug,
@@ -134,149 +131,33 @@ export function TutorialSidebar({
   currentSlug?: string;
 }) {
   return (
-    <aside className="h-[calc(100vh-64px)] w-72 sticky top-16 hidden lg:flex flex-col border-r border-[var(--outline-variant)] py-8 overflow-y-auto shrink-0" style={{ background: "var(--surface-container-lowest)" }}>
-      <div className="px-6 mb-8">
-        <Link href={`/learn/${category.id}`} className="flex items-center gap-3 mb-2 group">
-          <div className="w-10 h-10 rounded-lg flex items-center justify-center border border-[var(--outline-variant)]" style={{ background: "var(--surface-container)" }}>
-            <span className="text-[18px]">{category.icon}</span>
-          </div>
-          <div>
-            <p className="text-[14px] font-semibold transition-all" style={{ color: "var(--secondary)" }}>{category.name}</p>
-            <p className="text-[10px] uppercase tracking-[0.2em] font-['Geist']" style={{ color: "var(--outline)" }}>
-              {category.tutorials.length} 个模块
-            </p>
-          </div>
+    <aside className="w-56 shrink-0 hidden lg:block">
+      <div className="sticky top-4 rounded-lg border overflow-hidden" style={{ background: "var(--surface-container-lowest)", borderColor: "var(--outline-variant)" }}>
+        <Link href={`/learn/${category.id}`} className="flex items-center gap-2 px-3 py-2.5 border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-low)" }}>
+          <span className="text-base">{category.icon}</span>
+          <span className="text-sm font-semibold" style={{ color: "var(--on-surface)" }}>{category.name}</span>
         </Link>
-      </div>
-
-      <div className="flex-1 space-y-0">
-        {category.tutorials.map((tutorial) => (
-          <Link
-            key={tutorial.slug}
-            href={`/learn/${category.id}/${tutorial.slug}`}
-            className={`flex items-center justify-between gap-3 py-3 px-6 transition-all ${
-              tutorial.slug === currentSlug
-                ? "border-l-4"
-                : "border-l-4 border-transparent hover:bg-[var(--surface-container-high)]"
-            }`}
-            style={{
-              color: tutorial.slug === currentSlug ? "var(--secondary)" : "var(--on-surface-variant)",
-              borderLeftColor: tutorial.slug === currentSlug ? "var(--secondary)" : "transparent",
-              background: tutorial.slug === currentSlug ? "color-mix(in srgb, var(--secondary) 10%, transparent)" : undefined,
-            }}
-          >
-            <div className="flex items-center gap-3 min-w-0">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
-                {tutorial.slug === currentSlug ? (
-                  <circle cx="12" cy="12" r="10" fill="currentColor" fillOpacity="0.2" />
-                ) : (
-                  <path d="M20 6L9 17l-5-5" />
-                )}
-              </svg>
-              <span className="text-[13px] truncate font-['Geist']">{tutorial.title}</span>
-            </div>
+        <div className="py-1 max-h-[calc(100vh-120px)] overflow-y-auto">
+          {category.tutorials.map(tutorial => (
+            <Link
+              key={tutorial.slug}
+              href={`/learn/${category.id}/${tutorial.slug}`}
+              className="flex items-center gap-2 px-3 py-2 text-[13px] transition-colors"
+              style={{
+                color: tutorial.slug === currentSlug ? "var(--secondary)" : "var(--on-surface-variant)",
+                background: tutorial.slug === currentSlug ? "color-mix(in srgb, var(--secondary) 8%, transparent)" : "transparent",
+                fontWeight: tutorial.slug === currentSlug ? 600 : 400,
+              }}
+            >
+              <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: tutorial.slug === currentSlug ? "var(--secondary)" : "var(--outline-variant)" }} />
+              <span className="truncate">{tutorial.title}</span>
+            </Link>
+          ))}
+        </div>
+        <div className="px-3 py-2 border-t" style={{ borderColor: "var(--outline-variant)" }}>
+          <Link href={`/learn/${category.id}`} className="text-[12px] hover:opacity-80" style={{ color: "var(--secondary)" }}>
+            返回目录 →
           </Link>
-        ))}
-      </div>
-
-      <div className="px-6 mt-auto py-4 border-t border-[var(--outline-variant)]">
-        <Link
-          href={`/learn/${category.id}`}
-          className="w-full flex items-center justify-center gap-2 py-3 border border-[var(--outline-variant)] font-['Geist'] text-[12px] tracking-[0.05em] hover:bg-[var(--surface-container-high)] transition-all rounded"
-          style={{ color: "var(--secondary)" }}
-        >
-          返回目录
-        </Link>
-      </div>
-    </aside>
-  );
-}
-
-// Right Sidebar with quick links
-export function RightSidebar() {
-  return (
-    <aside className="w-64 h-[calc(100vh-64px)] sticky top-16 hidden xl:block border-l border-[var(--outline-variant)] p-6 shrink-0" style={{ background: "var(--surface-container-lowest)" }}>
-      <h5 className="font-['Geist'] text-[11px] mb-6 tracking-[0.1em] uppercase" style={{ color: "var(--outline)" }}>
-        快速导航
-      </h5>
-
-      <div className="space-y-6">
-        {/* Quick Links */}
-        <div>
-          <h6 className="font-['Geist'] text-[11px] mb-3 uppercase tracking-[0.15em]" style={{ color: "var(--secondary)" }}>
-            在线工具
-          </h6>
-          <div className="space-y-2">
-            {[
-              { name: "JSON 格式化", href: "/tools?tool=json" },
-              { name: "Base64 编解码", href: "/tools?tool=encoding" },
-              { name: "正则表达式测试", href: "/tools?tool=regex" },
-              { name: "时间戳转换", href: "/tools?tool=timestamp" },
-              { name: "密码生成器", href: "/tools?tool=password" },
-              { name: "QR 码生成", href: "/tools?tool=qr" },
-            ].map(tool => (
-              <Link
-                key={tool.href}
-                href={tool.href}
-                className="block text-[12px] hover:text-[var(--secondary)] transition-colors font-['Geist']"
-                style={{ color: "var(--on-surface-variant)" }}
-              >
-                · {tool.name}
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* Reference Links */}
-        <div>
-          <h6 className="font-['Geist'] text-[11px] mb-3 uppercase tracking-[0.15em]" style={{ color: "var(--secondary)" }}>
-            常用参考
-          </h6>
-          <div className="space-y-2">
-            {[
-              { name: "Linux 命令大全", href: "/learn/linux" },
-              { name: "SQL 语法速查", href: "/learn/sql" },
-              { name: "Docker 命令参考", href: "/learn/docker" },
-              { name: "Git 常用命令", href: "/learn/git" },
-              { name: "Nginx 配置参考", href: "/learn/nginx" },
-            ].map(ref => (
-              <Link
-                key={ref.href}
-                href={ref.href}
-                className="block text-[12px] hover:text-[var(--secondary)] transition-colors font-['Geist']"
-                style={{ color: "var(--on-surface-variant)" }}
-              >
-                · {ref.name}
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* Status */}
-        <div className="p-4 rounded-lg border border-[var(--outline-variant)]" style={{ background: "var(--surface-container-high)" }}>
-          <h6 className="font-['Geist'] text-[11px] mb-3 flex items-center gap-2 uppercase tracking-[0.1em]" style={{ color: "var(--secondary)" }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
-            状态
-          </h6>
-          <ul className="text-[10px] font-['Geist'] space-y-2" style={{ color: "var(--outline)" }}>
-            <li className="flex items-start gap-2">
-              <span style={{ color: "var(--green)" }}>[OK]</span>
-              <span>教程已同步</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span style={{ color: "var(--green)" }}>[OK]</span>
-              <span>188+ 个教程就绪</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span style={{ color: "var(--secondary)" }}>[..]</span>
-              <span>在线模式激活</span>
-            </li>
-          </ul>
-        </div>
-
-        <div className="text-[10px] font-['Geist'] space-y-1" style={{ color: "var(--outline)" }}>
-          <p>技术支持 ToolkitX</p>
-          <p>&copy; 2026 ToolkitX</p>
         </div>
       </div>
     </aside>

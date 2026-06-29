@@ -10,7 +10,7 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
-import LearnLayout, { TutorialSidebar, RightSidebar } from "@/components/learn/layout";
+import LearnLayout, { TutorialSidebar } from "@/components/learn/layout";
 import { getCategoryById } from "@/data/tutorials";
 import { getTutorialContent } from "@/data/tutorials/content";
 
@@ -141,9 +141,6 @@ export default function TutorialPage({
             ) : <div />}
           </div>
         </main>
-
-        {/* Right Sidebar */}
-        <RightSidebar />
       </div>
     </LearnLayout>
   );

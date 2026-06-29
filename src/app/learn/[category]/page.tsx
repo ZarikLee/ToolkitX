@@ -2,7 +2,7 @@
 
 import { use } from "react";
 import Link from "next/link";
-import LearnLayout, { TutorialSidebar, RightSidebar } from "@/components/learn/layout";
+import LearnLayout, { TutorialSidebar } from "@/components/learn/layout";
 import { getCategoryById } from "@/data/tutorials";
 import { notFound } from "next/navigation";
 
@@ -88,9 +88,6 @@ export default function CategoryPage({ params }: { params: Promise<{ category: s
             })}
           </article>
         </main>
-
-        {/* Right Sidebar */}
-        <RightSidebar />
       </div>
     </LearnLayout>
   );
