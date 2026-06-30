@@ -3180,50 +3180,630 @@ test("异步操作", async () => {
     },
   },
   network: {
+    "network-osi": {
+      slug: "network-osi",
+      sections: [
+        {
+          title: "OSI 七层模型",
+          content: `咱们来聊聊网络世界的「地图」——OSI 七层模型。你可以把它想象成一栋七层的办公楼，数据就像文件一样，从七楼一步步传到一楼，每一层都会被「包装」一下，加上该层专属的信息。
+
+从上往下：
+应用层——你跟电脑交互的地方，说白了就是浏览器、微信这些软件在的这一层
+表示层——负责「翻译」，数据加解密、格式转换都在这，相当于同声传译
+会话层——管对话的节奏，啥时候开聊、啥时候挂断
+传输层——保证数据完整送到，TCP 和 UDP 就在这干活，相当于快递分拣配送中心
+网络层——管寻址和路由，IP 地址住在这里，相当于快递单上的收货地址
+数据链路层——把数据打包成帧，在同一条网线里传输
+物理层——最实在的一层，网线、光纤、无线电波这些看得见摸得着的东西`,
+        },
+        {
+          title: "为啥要分层？就跟盖楼一样",
+          content: `你可能会纳闷，传个数据为啥要搞这么复杂？分层的好处跟盖楼一样——每层只管自己的活。
+
+说白了就是「各管各的」：应用层不用管底下用铜缆还是光纤，物理层也不用理解你在看什么网页。改一层不影响其他层，替换也方便。
+
+打个比方——寄快递：你把东西交给快递员（应用层），他帮你打包封箱（表示层），贴上运单号跟踪（会话层），快递公司分拣配送（传输层+网络层），卡车运输（数据链路层），靠公路送到（物理层）。`,
+        },
+        {
+          title: "TCP/IP 模型——现实中的四层楼",
+          content: `OSI 七层是教科书的理想模型，实际大家用的都是 TCP/IP 四层模型。OSI 是理论标准答案，TCP/IP 是实践打磨出的最佳方案。
+
+TCP/IP 把七层并成四层：
+应用层 = OSI 的应用层 + 表示层 + 会话层
+传输层 = OSI 的传输层
+网际层 = OSI 的网络层
+网络接口层 = OSI 的数据链路层 + 物理层`,
+        },
+        {
+          title: "数据封装——俄罗斯套娃",
+          content: `数据从你电脑发出去就像俄罗斯套娃一层套一层：
+应用层数据 → 传输层加 TCP 头 → 网络层加 IP 头 → 数据链路层加 MAC 头和尾 → 变成 0 和 1 从网线飞出去。接收端反过来一层层拆开。`,
+        },
+      ],
+      quiz: [
+        { question: "OSI 七层里负责寻址和路由的是哪一层？", options: ["传输层", "网络层", "数据链路层", "应用层"], answer: 1, explanation: "网络层管 IP 寻址和路由选择，决定数据包走哪条路。" },
+        { question: "TCP 干活在 OSI 的哪一层？", options: ["应用层", "会话层", "传输层", "网络层"], answer: 2, explanation: "TCP 在传输层，负责端到端的可靠传输。" },
+        { question: "传输层在数据前面加什么？", options: ["IP 头", "MAC 头", "TCP 头", "HTTP 头"], answer: 2, explanation: "传输层加上 TCP 头（源端口和目标端口等信息），然后传给网络层。" },
+      ],
+    },
     "tcp-ip": {
       slug: "tcp-ip",
       sections: [
         {
-          title: "TCP 三次握手",
-          content: `TCP 连接建立过程（三次握手）：
+          title: "TCP 三次握手——先确认再干活",
+          content: `TCP 三次握手就像打电话确认线路通不通。你拨号（发 SYN：「我想跟你连」），对方接起来说「喂？听得到吗？」（回 SYN-ACK：「收到了，我也要连」），然后你说「能听清，开聊」（回 ACK）——好了，连接建立。
 
-1. SYN：客户端发送 SYN=1, seq=x
-2. SYN-ACK：服务器回复 SYN=1, ACK=1, seq=y, ack=x+1
-3. ACK：客户端发送 ACK=1, seq=x+1, ack=y+1`,
-          code: `# 使用 tcpdump 抓包观察三次握手
+技术细节：
+第一步：客户端发 SYN=1，带起始序列号 x
+第二步：服务端回复 SYN=1, ACK=1，确认号 x+1，自己带序列号 y
+第三步：客户端回 ACK=1，确认号 y+1，连接建立
+
+说白了就是双方互相确认收发能力都没问题，然后才正经传数据。`,
+          code: `# 抓包看三次握手
 sudo tcpdump -i eth0 port 80 -nn
 
-# 使用 ss 查看连接状态
+# 看当前建立的连接
 ss -tn state established`,
           language: "bash",
         },
         {
-          title: "TCP 四次挥手",
-          content: `TCP 连接断开过程（四次挥手）：
+          title: "TCP 四次挥手——好聚好散",
+          content: `断开连接要四次挥手，就像朋友分别：
+A 说「我先走了」（发 FIN）
+B 说「好我知道了，但让我把剩下的话说完」（先回 ACK）
+B 说完后说「那我也走了」（发 FIN）
+A 最后回「好的拜拜」（回 ACK），再默默等一会儿才彻底走
 
-1. FIN：主动方发送 FIN=1, seq=u
-2. ACK：被动方回复 ACK=1, ack=u+1
-3. FIN：被动方发送 FIN=1, seq=w
-4. ACK：主动方回复 ACK=1, ack=w+1`,
+为啥比握手多一次？因为 TCP 是全双工的——两边同时在发数据，断开时必须各自说「我不发了」，没法合并。`,
         },
         {
-          title: "TCP 状态机",
-          content: `TCP 连接的 11 种状态：
-- LISTEN：监听
-- SYN_SENT：已发送 SYN
-- SYN_RCVD：已收到 SYN
-- ESTABLISHED：已建立连接
-- FIN_WAIT_1：已发送 FIN
-- FIN_WAIT_2：已收到 ACK
-- TIME_WAIT：等待确保对方收到
-- CLOSE_WAIT：被动关闭
-- LAST_ACK：最后确认
-- CLOSING：双方同时关闭
-- CLOSED：已关闭`,
+          title: "TCP 的 11 种状态——连接的心情日记",
+          content: `TCP 连接在不同阶段有不同的状态：
+LISTEN——等别人来连我，像开店等客人
+SYN_SENT——我发出连接请求了，在等回复
+SYN_RCVD——收到别人的请求并回复了，等他最后确认
+ESTABLISHED——连上了，正常通信中
+FIN_WAIT_1——我先提出要断开
+FIN_WAIT_2——对方说知道了，我在等他那边也关
+TIME_WAIT——两边都关了但多等一会儿确保最后 ACK 被收到
+CLOSE_WAIT——对方要断了我收到了但还没回应（多半是你代码忘了 close！）
+LAST_ACK——我也准备关了，等最后确认
+CLOSING——巧了，两边同时说断开
+CLOSED——彻底结束
+
+TIME_WAIT 太多→短连接太频繁。CLOSE_WAIT 太多→代码忘了 close()。`,
+        },
+        {
+          title: "UDP——TCP 的闪电侠兄弟",
+          content: `TCP 可靠但慢，UDP 快但不可靠。UDP 不确认、不重传、不排序，像往河里扔漂流瓶，到了就到了没到拉倒。
+
+UDP 适合：视频通话和直播（丢几帧无所谓但延迟高了卡顿）、在线游戏（操作必须实时）、DNS 查询（小包丢了重问）。
+
+结论：在乎数据完整用 TCP，在乎速度用 UDP。`,
         },
       ],
       quiz: [
-        { question: "TCP 三次握手中第二步服务器回复什么？", options: ["SYN", "ACK", "SYN-ACK", "FIN"], answer: 2, explanation: "第二步服务器回复 SYN-ACK，同时确认客户端的 SYN 并发送自己的 SYN。" },
+        { question: "TCP 三次握手第二步服务器回复什么？", options: ["SYN", "ACK", "SYN-ACK", "FIN"], answer: 2, explanation: "第二步服务器回复 SYN-ACK，既确认收到了客户端的 SYN，也发了自己的 SYN。" },
+        { question: "服务器 TIME_WAIT 状态特别多说明什么？", options: ["CPU 不够", "频繁建连又断开短连接", "网络太慢", "端口不够"], answer: 1, explanation: "TIME_WAIT 是主动关闭方等对方收最后 ACK，过多说明短连接反复创建销毁。" },
+      ],
+    },
+    "http-protocol": {
+      slug: "http-protocol",
+      sections: [
+        {
+          title: "HTTP 是什么？",
+          content: `HTTP 全称超文本传输协议，说白了就是浏览器和服务器之间聊天的规矩。你输入网址、点按钮、看视频，背后全是它在干活。
+
+HTTP 最大的特点是「无状态」——服务器记不住你上次来过没有，就像无人便利店，每次结账都当你是个新客。那怎么记住你呢？靠 Cookie、Session 这些「小本本」帮你记。`,
+        },
+        {
+          title: "HTTP 请求长啥样？",
+          content: `一个 HTTP 请求就像寄一封信，包含几个部分：
+请求行——告诉服务器你要干啥（GET？POST？）和找谁
+请求头——附加信息，比如你用什么浏览器、能接什么格式
+一个空行作为分隔
+请求体——你提交的具体数据（比如填的表单）
+
+服务器看完会回你一封信（响应），里面有状态码（200 成功、404 找不着等等）、响应头、响应体。`,
+          code: `# 用 curl 看 HTTP 请求响应的完整过程
+curl -v https://httpbin.org/get
+
+# 发 POST 请求
+curl -X POST https://httpbin.org/post \\
+  -H "Content-Type: application/json" \\
+  -d '{"name": "张三"}'
+
+# 只想要状态码
+curl -o /dev/null -s -w "%{http_code}" https://example.com`,
+          language: "bash",
+        },
+        {
+          title: "GET、POST 和其他「动词」",
+          content: `GET 就像去图书馆查书——参数跟在 URL 后面，谁都能看到，适合获取数据和搜索。
+POST 像寄快递——数据藏在请求体里，外面看不见，适合提交表单、登录。
+
+另外还有 PUT（整个替换资源）、PATCH（局部修改）、DELETE（删掉），合在一起就是 RESTful API 那一套。`,
+        },
+        {
+          title: "HTTP 状态码速记法",
+          content: `状态码就是服务器给你的「反馈」：
+
+200 —— OK，一切正常
+301 —— 我搬家了，以后去新地址
+302 —— 临时换个地方
+304 —— 内容没变，用你缓存的就行
+400 —— 你的请求有问题，我看不懂
+401 —— 没登录呢，先去认证
+402 —— 
+403 —— 登了但没权限
+404 —— 你要的东西不存在
+500 —— 我出 bug 了
+502 —— 上游服务器挂了
+503 —— 我太忙，过会再来
+
+口诀：2 开头是好事，3 开头要跳转，4 开头你的锅，5 开头服务器的锅。`,
+          tip: "304 配合缓存能省大量带宽，是优化利器。",
+        },
+        {
+          title: "HTTP/1.1、HTTP/2、HTTP/3 的进化",
+          content: `HTTP/1.1 用了二十多年，最大的痛点是「队头阻塞」——前面请求没完成，后面的得排队等，跟单车道堵车一样。
+
+HTTP/2 支持多路复用，多个请求在同一连接上齐头并进。还能头部压缩、服务器主动推送。
+
+HTTP/3 更进一步，底层从 TCP 换成 QUIC（基于 UDP），建连更快，彻底消灭了 TCP 层面的队头阻塞。现在主流网站基本都上 HTTP/2 了。`,
+        },
+      ],
+      quiz: [
+        { question: "HTTP 状态码 404 表示什么？", options: ["服务器挂了", "没权限", "资源不存在", "请求格式错了"], answer: 2, explanation: "404 Not Found——服务器找不到你要的那个资源。" },
+        { question: "HTTP/2 相比 HTTP/1.1 最大改进是什么？", options: ["支持 GET", "多路复用", "支持 POST", "增加状态码"], answer: 1, explanation: "HTTP/2 通过多路复用允许多请求/响应在一条 TCP 连接上并行传输。" },
+      ],
+    },
+    "https-tls": {
+      slug: "https-tls",
+      sections: [
+        {
+          title: "HTTPS 为啥要有？",
+          content: `HTTP 是明文的——就像寄明信片，中间每个邮局都能看见你写了啥。在咖啡馆蹭公共 WiFi，旁边的人可能正在偷看你的密码和银行卡号。
+
+HTTPS 就是 HTTP + TLS/SSL 加密，相当于把明信片装进保险箱。即使中间人截到了数据包，看到的也是一堆乱码。`,
+        },
+        {
+          title: "TLS 握手机制——在不安全的地方安全地商量密码",
+          content: `TLS 握手做的事就一件：双方在别人都能偷听的通道上，安全地商量出一个只有他俩知道的「秘密钥匙」。
+
+简化版流程：
+客户端先说「嗨，我支持这些加密方式，这是我的随机数 A」
+服务器回「好，选这个方式，这是我的随机数 B 和我的证书（里面有公钥）」
+客户端验证证书（确认对面不是假网站），生成随机数 C，用服务器公钥加密发过去
+现在双方手里都有 A、B、C 三个随机数，各自算出同一个会话密钥，之后就用这个加密
+
+关键点——就算有人全程偷听，也算不出这个密钥，因为随机数 C 是用公钥加密的，只有服务器的私钥能解开。`,
+        },
+        {
+          title: "证书和 CA 体系——网站的「身份证」",
+          content: `HTTPS 证书就是网站的「身份证」。你访问 bank.com，怎么确定对面真是银行不是钓鱼网站？靠 CA（证书颁发机构）。
+
+CA 就像公安局——核实完网站身份后签发证书。你的浏览器里预置了可信 CA 的名单，只有经这些 CA 签发的证书才会被信任。
+
+证书里面装着：网站域名、公钥、签发机构、有效期。证书过期、域名不匹配、或被吊销，浏览器就会弹出红色的「不安全」警告。`,
+        },
+        {
+          title: "给网站加 HTTPS",
+          content: `把网站从 HTTP 升级到 HTTPS 的基本步骤：
+1. 去 CA 申请证书（Let's Encrypt 免费且支持自动化）
+2. 把证书配到 Nginx 或 Apache 上
+3. 设置 HTTP 自动跳转到 HTTPS
+4. 把站内所有资源链接从 http:// 改成 https://
+
+用 Let's Encrypt + Certbot 基本可以一键搞定，还能自动续期。`,
+          code: `# Nginx HTTPS 配置
+server {
+    listen 443 ssl http2;
+    server_name example.com;
+    ssl_certificate     /etc/letsencrypt/live/example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+    location / { proxy_pass http://127.0.0.1:3000; }
+}
+# HTTP 自动跳 HTTPS
+server {
+    listen 80;
+    server_name example.com;
+    return 301 https://$host$request_uri;
+}`,
+          language: "nginx",
+          tip: "Let's Encrypt 证书 90 天过期，务必配好自动续期：certbot renew --dry-run",
+        },
+      ],
+      quiz: [
+        { question: "HTTPS 用什么来加密通信？", options: ["HTTP", "TCP", "TLS/SSL", "DNS"], answer: 2, explanation: "HTTPS = HTTP + TLS/SSL，TLS 在 HTTP 下层把数据加密了再传。" },
+        { question: "TLS 握手时证书的作用是什么？", options: ["加快速度", "验证服务器身份", "加密每条数据", "压缩内容"], answer: 1, explanation: "证书用来证明服务器的身份，客户端通过 CA 签名确认对面确实是声称的那个网站。" },
+      ],
+    },
+    "dns-deep": {
+      slug: "dns-deep",
+      sections: [
+        {
+          title: "DNS——互联网的电话本",
+          content: `DNS 就是互联网的「电话本」。你输入 google.com，电脑根本不认识这个名字，得去问 DNS 服务器：「google.com 的 IP 是多少？」DNS 查完了告诉你 142.250.x.x，然后浏览器才去连接它。
+
+没有 DNS 的话，你得把全世界网站的 IP 地址都背下来——那画面太美不敢想。`,
+        },
+        {
+          title: "DNS 查询的完整旅程",
+          content: `DNS 查询的过程，就像在一个巨大的公司里找人：
+
+你的电脑先翻自己的「备忘录」（浏览器缓存、系统 hosts 文件）
+找不到就去问「前台」——本地 DNS 服务器（通常是路由器或运营商提供的）
+本地 DNS 也没有，就一层层往上问：
+  先问根域名服务器：「谁是管 .com 的？」
+  再问 .com 的域名服务器：「谁是管 google.com 的？」
+  最后问 google.com 的权威 DNS，它才给答案：「IP 是 xxx」
+
+整个链路可能七八跳，但因为到处都有缓存，常用的域名秒级就能解析出来。`,
+          code: `# 追踪 DNS 查询全过程
+dig +trace google.com
+
+# 查不同类型的记录
+dig google.com A        # IPv4 地址（最常用）
+dig google.com AAAA     # IPv6 地址
+dig google.com MX       # 邮件服务器
+dig google.com NS       # 这个域名归谁管
+dig google.com CNAME    # 别名
+dig google.com TXT      # 文本记录（验证、SPF 等）`,
+          language: "bash",
+        },
+        {
+          title: "DNS 记录类型速查",
+          content: `各种 DNS 记录类型，各干各的事：
+
+A 记录——域名映射到 IPv4 地址，最常用
+AAAA 记录——域名映射到 IPv6 地址
+CNAME 记录——别名，比如 www 指向主域名
+MX 记录——指定谁来处理这个域名的邮件
+NS 记录——指定这个域名由哪些 DNS 服务器管理
+TXT 记录——存一段文本，常用于 SPF 防垃圾邮件、域名验证
+SRV 记录——指定某服务用哪个端口`,
+        },
+        {
+          title: "DNS 常见的坑",
+          content: `DNS 也会出各种问题：
+DNS 劫持——你的 DNS 查询被中间人偷偷改掉，想去淘宝结果去了钓鱼网站
+DNS 污染——某些查询被「投毒」了，返回虚假结果
+DNS 缓存——改了 DNS 记录后因为缓存没刷新，部分用户还是访问旧地址
+DNS 延迟——DNS 服务器在国外，每次查询几百毫秒
+
+解决方案：换靠谱的 DNS（Cloudflare 1.1.1.1、阿里云 DNS、114DNS），或者开启 DoH/DoT 把 DNS 查询也加密。`,
+          tip: "推荐把备用 DNS 设成 1.1.1.1 (Cloudflare) 或 8.8.8.8 (Google)，速度快还能防劫持。",
+        },
+      ],
+      quiz: [
+        { question: "DNS 的 A 记录是干嘛的？", options: ["管邮件的", "域名映射到 IPv4 地址", "别名功能", "存文本的"], answer: 1, explanation: "A 记录把域名映射到 IPv4 地址，是最基础的 DNS 记录。" },
+        { question: "DNS 劫持是什么意思？", options: ["DNS 服务器宕机", "DNS 查询结果被恶意篡改", "缓存过期了", "域名注册过期"], answer: 1, explanation: "DNS 劫持是攻击者在 DNS 查询过程中篡改结果，把用户引向恶意网站。" },
+      ],
+    },
+    "load-balancing": {
+      slug: "load-balancing",
+      sections: [
+        {
+          title: "负载均衡——银行柜台原理",
+          content: `负载均衡就是把流量「匀开」给多台服务器。就像银行开了好几个窗口——十个顾客来办事，只开一个窗口大家排长队，开五个窗口效率就高了。
+
+网站流量一大，单台服务器扛不住，就需要多台一起干活。负载均衡器就是那个「大堂经理」，把每个请求合理分配到某台服务器上。`,
+        },
+        {
+          title: "分配策略——不同的「派活」方式",
+          content: `几种分配策略各有千秋：
+
+轮询——一人一个轮流来，最简单公平
+加权轮询——配置高的机器多分点活，能者多劳
+最少连接——谁当前最闲就把请求发谁，比较智能
+IP 哈希——同一客户端 IP 固定到同一台服务器，保证「回头客」找原来那台
+随机——纯凭运气
+
+选哪种取决于场景。服务器配置一样就用轮询。有好有差用加权。需要会话保持就用 IP 哈希。`,
+          code: `# Nginx 负载均衡
+upstream backend {
+    server 192.168.1.10:3000 weight=3;   # 加权轮询
+    server 192.168.1.11:3000 weight=2;
+    server 192.168.1.12:3000 weight=1;
+    keepalive 32;
+}
+server {
+    listen 80;
+    location / {
+        proxy_pass http://backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}`,
+          language: "nginx",
+        },
+        {
+          title: "四层 vs 七层——在哪一层分流",
+          content: `负载均衡可以在不同「海拔」干活：
+
+四层（L4）——只看 IP 和端口做分发，简单粗暴速度快，相当于看快递单地址就派送
+七层（L7）——能看到 HTTP 的具体内容（URL、Cookie、Header），可以做更精细的分流
+
+比如根据 URL 把 /api 请求发到后端组 A，把 /static 发到组 B，这就是七层的活儿。Nginx、HAProxy 两者都支持。`,
+        },
+        {
+          title: "健康检查——「你还活着吗？」",
+          content: `负载均衡器需要知道后端哪些服务器还活着。健康检查就是定期去「敲门」——发探测请求看有没有正常回应。
+
+某台服务器连续几次没回应，负载均衡就把它从可用列表踢出去，流量不再发它。等恢复了再自动加回来。整个过程对用户完全透明。`,
+          code: `# Nginx 健康检查
+upstream backend {
+    server 192.168.1.10:3000 max_fails=3 fail_timeout=30s;
+    server 192.168.1.11:3000 max_fails=3 fail_timeout=30s;
+    server 192.168.1.12:3000 backup;  # 备用
+}`,
+          language: "nginx",
+          tip: "加一台 backup 当后手——平时不参与分流，只有其他全挂时才顶上。",
+        },
+      ],
+      quiz: [
+        { question: "四层和七层负载均衡最关键的区别？", options: ["速度不同", "四层看 IP/端口，七层能看 HTTP 内容", "协议不同", "价格不同"], answer: 1, explanation: "四层基于传输层（IP+端口）分发，七层可以按 URL、Cookie 等做更精细策略。" },
+        { question: "IP 哈希策略主要用来干嘛？", options: ["提速度", "会话保持", "省内存", "加并发"], answer: 1, explanation: "IP 哈希保证同一客户端请求始终发到同一服务器，用于保持登录状态等。", },
+      ],
+    },
+    "cdn-principles": {
+      slug: "cdn-principles",
+      sections: [
+        {
+          title: "CDN——全国连锁便利店",
+          content: `CDN（内容分发网络）就是把你的网站内容「复制」到世界各地的节点上，让用户从离自己最近的节点拿数据。就像连锁便利店——不需要跑到总部买东西，家门口就有一家。
+
+比如你服务器在北京，纽约用户要访问，数据跨半个地球几百毫秒。有了 CDN，纽约当地就有缓存的副本，几毫秒拿到。`,
+        },
+        {
+          title: "CDN 怎么干活？",
+          content: `CDN 的工作流程出乎意料地简单：
+你的域名解析不指向源站 IP，而是指向 CDN 厂商。用户访问时，DNS 智能解析返回离他最近的 CDN 节点 IP。
+
+CDN 节点收到请求，看自己有没有缓存这个内容：
+有（命中）→ 直接返回，快如闪电
+没有（未命中）→ 回源站拿一份，自己缓存起来，再返回用户
+
+静态资源（图片、CSS、JS、视频）是 CDN 最佳队友，缓存命中率能做到 99% 以上。`,
+        },
+        {
+          title: "CDN 不止是加速",
+          content: `CDN 的好处远不止加速：
+抗 DDoS——流量打在遍布全球的 CDN 节点上，很难集中打垮
+省带宽——大部分请求被 CDN 挡住了，源站压力骤降
+提高可用性——源站短暂宕机，CDN 缓存还能继续提供服务
+HTTPS 加速——用户和就近 CDN 节点做 TLS 握手，回源走长连接
+
+说白了就是把脏活累活甩给 CDN，源站专心做核心业务。`,
+          tip: "图片、字体这种基本不变的资源可以缓存一年，配合文件名 hash 策略做到「永久缓存、秒级更新」。",
+        },
+        {
+          title: "缓存策略——什么缓存多久",
+          content: `CDN 缓存的精髓在于「存多久」：
+强缓存——Cache-Control: max-age=xxx，告诉 CDN「这段时间内不用来找我」
+协商缓存——用 ETag 或 Last-Modified 让 CDN 来问「变没变？」
+
+图片字体这种基本不变的缓存一年都行，HTML 页面可能几分钟就更新，缓存时间设短点。`,
+          code: `# Nginx 静态资源缓存
+location ~* \\.(jpg|png|gif|ico|css|js|svg|woff|woff2)$ {
+    expires 30d;
+    add_header Cache-Control "public, immutable";
+}
+location / {
+    add_header Cache-Control "public, max-age=300";  # HTML 5分钟
+}`,
+          language: "nginx",
+        },
+      ],
+      quiz: [
+        { question: "CDN 最核心的原理是什么？", options: ["压缩数据", "就近缓存和分发内容", "加密传输", "负载均衡"], answer: 1, explanation: "CDN 把内容缓存到全球各地节点上，用户从最近的节点获取数据，极大降低延迟。" },
+        { question: "Cache-Control: max-age 属于什么策略？", options: ["协商缓存", "强缓存", "不缓存", "永久缓存"], answer: 1, explanation: "max-age 是强缓存，告诉浏览器/CDN 在这个时间内直接用缓存别来问我。" },
+      ],
+    },
+    "web-security": {
+      slug: "web-security",
+      sections: [
+        {
+          title: "XSS——往你网页里塞广告",
+          content: `XSS 就是攻击者往你的网页里「塞」一段恶意脚本，别的用户打开时就中招了。就像有人在留言板上贴诈骗广告，其他人都能看到。
+
+三种类型：
+反射型——恶意脚本藏在 URL 参数里，服务器没过滤就输出到页面
+存储型——恶意脚本存进了数据库，每个访问用户都中招
+DOM 型——纯前端问题，JS 把用户输入直接插到页面里
+
+防 XSS 核心就一条：永远别相信用户输入，输出到页面时必须转义。`,
+          code: `// 千万别这样！
+element.innerHTML = userInput;  // 极度危险
+
+// 安全做法
+element.textContent = userInput;  // 不会执行 HTML
+
+// 自己转义
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}`,
+          language: "javascript",
+          tip: "React、Vue 默认会转义输出，但用了 dangerouslySetInnerHTML 或 v-html 时要特别留神。",
+        },
+        {
+          title: "CSRF——借你的手干坏事",
+          content: `CSRF 就是攻击者诱骗你在不知情时发出了你本不想发的请求。你登录了银行然后点了个恶意链接——那个链接在背后偷偷往银行发转账请求，因为浏览器还带着你银行的登录 Cookie。
+
+防御措施：
+CSRF Token——服务器每次给一个随机 Token，提交时必须带上，攻击者猜不到
+SameSite Cookie——给 Cookie 标上 SameSite=Strict/Lax，禁止跨站携带
+验证 Referer/Origin——看请求是不是从你自己的网站发起的`,
+          code: `// Express 中 CSRF Token
+const csrf = require('csurf');
+app.use(csrf({ cookie: true }));
+app.get('/form', (req, res) => {
+    res.render('send', { csrfToken: req.csrfToken() });
+});
+
+// SameSite Cookie
+res.cookie('session', token, {
+    httpOnly: true, secure: true, sameSite: 'strict'
+});`,
+          language: "javascript",
+        },
+        {
+          title: "SQL 注入——最经典的漏洞",
+          content: `SQL 注入就是把用户输入直接拼进 SQL 语句造成的漏洞。比如：
+"SELECT * FROM users WHERE name = '" + userInput + "'"
+
+如果有人输入 ' OR '1'='1，SQL 就变成：
+"SELECT * FROM users WHERE name = '' OR '1'='1'"
+结果——所有用户数据全被拖出来。
+
+防御极简单：永远用参数化查询（Prepared Statements），不要拼字符串。所有主流数据库驱动和 ORM 都内置这个能力。`,
+        },
+        {
+          title: "CORS 跨域——浏览器的门禁",
+          content: `浏览器的同源策略禁止一个网站随意访问另一个网站的数据——这是在保护你。但前后端分离时（API 在 api.example.com，页面在 www.example.com），需要跨域。
+
+CORS 就是服务端告诉浏览器：「我允许这些域名来访问」。通过 Access-Control-Allow-Origin 等响应头控制。
+
+注意：CORS 只是浏览器限制，curl 或 Postman 发请求不受此限制。`,
+        },
+      ],
+      quiz: [
+        { question: "XSS 攻击的本质是什么？", options: ["偷 Cookie", "往网页里注入恶意脚本", "伪造请求", "破解密码"], answer: 1, explanation: "XSS 在网页中注入恶意脚本，当其他用户访问时执行这些脚本。" },
+        { question: "防 SQL 注入最有效的方法？", options: ["过滤特殊字符", "参数化查询", "用 HTTPS", "缩短 SQL"], answer: 1, explanation: "参数化查询从根源上杜绝了字符串拼接带来的注入风险。" },
+      ],
+    },
+    "websocket-intro": {
+      slug: "websocket-intro",
+      sections: [
+        {
+          title: "WebSocket——从写信到打电话",
+          content: `HTTP 像写信——你问一句我答一句，我不能主动开口。WebSocket 像打电话——建立连接后双方随时能说话。
+
+最适合的场景：实时聊天、股票行情、在线协作、在线游戏。`,
+        },
+        {
+          title: "WebSocket 连接建立——先借 HTTP 的门进",
+          content: `WebSocket 建连的方式挺有意思——先「伪装」成 HTTP 请求，然后升级成 WebSocket 协议。
+
+客户端发 HTTP 请求带 Upgrade 头：「嘿服务器，我要升级成 WebSocket」
+服务器回 101：「行，升级完成」
+之后这个 TCP 连接就不再走 HTTP 了，变成全双工的 WebSocket 通道。`,
+          code: `// 前端 WebSocket
+const ws = new WebSocket('ws://localhost:3000');
+ws.onopen = () => {
+    console.log('连上了！');
+    ws.send('你好，服务器！');
+};
+ws.onmessage = (event) => console.log('收到：', event.data);
+ws.onclose = () => console.log('断了');
+ws.onerror = (err) => console.error('出错', err);`,
+          language: "javascript",
+        },
+        {
+          title: "WebSocket vs SSE vs 轮询",
+          content: `实时推送有好几种方案：
+短轮询——每隔几秒发 HTTP 请求「有新消息没？」（最笨但最简单）
+长轮询——发请求后服务器先 hold 住，有消息再回
+SSE——服务器主动推事件，但只支持服务器→客户端单向
+WebSocket——真正全双工，双向随便发
+
+服务器推通知用 SSE 就够了，双向实时通信（聊天、游戏）必须 WebSocket。`,
+          code: `// Node.js 服务端 WebSocket
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({ port: 8080 });
+wss.on('connection', (ws) => {
+    ws.on('message', (data) => {
+        wss.clients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(data.toString());
+            }
+        });
+    });
+    ws.on('close', () => console.log('客户端走了'));
+});`,
+          language: "javascript",
+          tip: "生产环境务必处理断线重连——网络波动导致 WebSocket 断开很常见。",
+        },
+      ],
+      quiz: [
+        { question: "WebSocket 和 HTTP 最大区别？", options: ["没区别", "WebSocket 全双工，服务器可主动推送", "WebSocket 更快", "HTTP 更安全"], answer: 1, explanation: "WebSocket 建立连接后支持双向全双工通信，不像 HTTP 只能一问一答。" },
+        { question: "WebSocket 怎么建立连接的？", options: ["直连 TCP", "HTTP 协议升级", "UDP", "FTP"], answer: 1, explanation: "WebSocket 借 HTTP 发起，通过 Upgrade 头升级协议。" },
+      ],
+    },
+    "network-tools": {
+      slug: "network-tools",
+      sections: [
+        {
+          title: "ping——排障起手式",
+          content: `ping 是你排查网络问题的第一招。发 ICMP 包看能不能收到回复。能通说明网络层没问题，不通往下查。就像喊一声「喂——」看对方回不回。`,
+          code: `# 基础
+ping -c 4 google.com        # 发 4 个包
+ping -i 0.2 google.com      # 快速模式
+
+# 关注：time（延迟，越小越好）、packet loss（丢包率，必须 0%）`,
+          language: "bash",
+        },
+        {
+          title: "traceroute / mtr——追踪路径",
+          content: `ping 只告诉你通不通，traceroute 告诉你「怎么通的」——经过哪些路由器，每跳花多久。mtr 是增强版，实时持续追踪。`,
+          code: `traceroute google.com
+mtr google.com              # 实时交互式追踪
+
+# 关注：每跳 IP 和延迟，* * * 可能被防火墙屏蔽`,
+          language: "bash",
+        },
+        {
+          title: "curl——HTTP 瑞士军刀",
+          content: `curl 是你跟 HTTP 打交道最常用的兵器。调试 API、测试接口、分析耗时全用它。`,
+          code: `# 详细看全过程
+curl -v https://httpbin.org/get
+
+# POST JSON
+curl -X POST https://httpbin.org/post \\
+  -H "Content-Type: application/json" \\
+  -d '{"key": "value"}'
+
+# 分析各环节耗时（定位瓶颈）
+curl -o /dev/null -s -w \\
+  "DNS: %{time_namelookup}s\\nTCP: %{time_connect}s\\nTLS: %{time_appconnect}s\\n首字节: %{time_starttransfer}s\\n总: %{time_total}s\\n" \\
+  https://example.com`,
+          language: "bash",
+          tip: "curl -w 能抽出各个环节的耗时，帮你精准定位是 DNS 慢、TLS 握手慢还是服务器处理慢。",
+        },
+        {
+          title: "tcpdump / Wireshark——抓包大法",
+          content: `当问题找不到头绪时，抓包是最后的手段。tcpdump 命令行版，Wireshark 图形化分析。能看到每个包的完整细节。`,
+          code: `# tcpdump 常用
+sudo tcpdump -i eth0 port 80 -nn
+sudo tcpdump -i eth0 host 192.168.1.1
+sudo tcpdump -i eth0 -w capture.pcap  # 存文件给 Wireshark`,
+          language: "bash",
+          tip: "生产环境抓包注意加过滤和 -c 限数，不然几秒就能撑爆磁盘。",
+        },
+        {
+          title: "ss——看端口和连接",
+          content: `ss 是 netstat 的继任者，又快又好用。`,
+          code: `# 看所有监听
+ss -tlnp                    # TCP 监听
+ss -ulnp                    # UDP 监听
+ss -s                       # 连接统计
+
+# 谁占着端口
+lsof -i :80
+
+# Nginx 用了哪些端口
+lsof -i -P -n | grep nginx`,
+          language: "bash",
+        },
+      ],
+      quiz: [
+        { question: "ping 用的是什么协议？", options: ["TCP", "UDP", "ICMP", "HTTP"], answer: 2, explanation: "ping 使用 ICMP (Internet Control Message Protocol) 发送回显请求。" },
+        { question: "curl -w 参数主要用来干嘛？", options: ["写入文件", "输出各环节耗时等指标", "显示响应头", "跳过 SSL"], answer: 1, explanation: "-w (write-out) 在请求完成后输出自定义时间指标和变量。" },
       ],
     },
   },
@@ -3232,20 +3812,19 @@ ss -tn state established`,
       slug: "redis-basics",
       sections: [
         {
-          title: "Redis 简介",
-          content: `Redis（Remote Dictionary Server）是一个开源的内存数据结构存储系统，可用作数据库、缓存和消息中间件。
+          title: "Redis 是什么？",
+          content: `Redis 全称 Remote Dictionary Server，你可以把它理解成一个「超级快的内存记事本」。数据全在内存里，读写轻松过 10 万次每秒。不光能当缓存用，还能当数据库、消息队列使。
 
-Redis 的特点：
-- 极高的性能（10万+ QPS）
-- 丰富的数据结构
-- 支持持久化
-- 支持主从复制和集群
-- 原子操作`,
+它的核心特点就是快、结构多、够简单：
+极速——数据在内存，比 MySQL 快几十上百倍
+数据结构丰富——字符串、哈希、列表、集合、有序集合，你想要的结构它都有
+支持持久化——虽然数据在内存，但能定期存到硬盘，重启不丢
+原子操作——一个命令要么全执行、要么全不执行，不会半路被插队`,
         },
         {
-          title: "安装与基本操作",
-          content: "",
-          code: `# 安装
+          title: "安装和上手",
+          content: `装 Redis 特别简单，Linux 下一条命令搞定。`,
+          code: `# 安装（Ubuntu/Debian）
 sudo apt-get install redis-server
 
 # 启动
@@ -3254,47 +3833,685 @@ redis-server
 # 连接
 redis-cli
 
-# 基本操作
-PING                    # PONG
-SET name "Alice"        # 设置键值
-GET name                # "Alice"
-DEL name                # 删除键
-EXISTS name             # 是否存在
-EXPIRE name 30          # 设置过期时间（秒）
-TTL name                # 查看剩余时间`,
+# 试试手
+PING                    # → PONG，说明连上了
+SET name "小刚"         # 存一个
+GET name                # → "小刚"
+DEL name                # 删掉
+EXISTS name             # 还在吗？→ 0
+EXPIRE code 60          # 60 秒后自动过期
+TTL code                # 还剩多少秒`,
           language: "bash",
+          tip: "Redis 默认端口 6379，记不住没关系，反正常用命令就那几个。",
         },
         {
-          title: "数据类型",
-          content: "",
+          title: "五种核心数据类型速览",
+          content: `Redis 比普通缓存强在哪？数据类型丰富啊：
+
+String——键值对，能存数字还能原子自增，计数器、限流器首选
+Hash——键值对里再套键值对，存对象特别方便
+List——有序列表，两头都能推入弹出，天然消息队列
+Set——无序不重复，去重、交集、并集一把梭
+Sorted Set——每个元素带分数自动排序，排行榜不二之选`,
           code: `# String
 SET counter 0
-INCR counter            # 1
-INCRBY counter 10       # 11
+INCR counter            # → 1
+INCRBY counter 10       # → 11
 
 # Hash
-HSET user:1 name "Alice" age 25
-HGET user:1 name
-HGETALL user:1
+HSET user:1 name "小红" age 25
+HGET user:1 name        # → "小红"
+HGETALL user:1          # 全拿
 
 # List
-LPUSH queue "task1" "task2"
-RPOP queue              # "task1"
-LRANGE queue 0 -1       # 所有元素
+LPUSH queue "a" "b"
+RPOP queue               # → "a"（先进先出）
+LRANGE queue 0 -1        # 全看
 
 # Set
 SADD tags "python" "redis" "docker"
 SMEMBERS tags
-SISMEMBER tags "python"  # 1
+SISMEMBER tags "python"  # → 1（存在）
 
 # Sorted Set
-ZADD leaderboard 100 "player1" 200 "player2"
-ZRANGE leaderboard 0 -1 WITHSCORES`,
+ZADD rank 100 "张三" 200 "李四"
+ZRANGE rank 0 -1 WITHSCORES`,
           language: "bash",
         },
       ],
       quiz: [
-        { question: "Redis 默认端口号是？", options: ["3306", "5432", "6379", "8080"], answer: 2, explanation: "Redis 默认监听 6379 端口。" },
+        { question: "Redis 默认端口号是多少？", options: ["3306", "5432", "6379", "8080"], answer: 2, explanation: "Redis 默认监听 6379 端口。" },
+        { question: "以下哪个不是 Redis 内置的数据类型？", options: ["String", "Hash", "Table", "Sorted Set"], answer: 2, explanation: "Table 不是 Redis 的内置类型，核心五种是 String、Hash、List、Set、Sorted Set。" },
+      ],
+    },
+    "redis-data-types": {
+      slug: "redis-data-types",
+      sections: [
+        {
+          title: "String——不止是字符串",
+          content: `String 是 Redis 最基础的类型，但别看名字叫「字符串」，它其实万能。能存文本、JSON、数字，甚至二进制。
+
+最大亮点是原子自增——多个客户端同时 INCR 同一个 key，绝不会出现竞态条件。计数器、分布式 ID 生成全靠它。`,
+          code: `# String 花式用法
+SET page:home "首页内容"
+GET page:home
+
+# 原子数字操作
+SET views 0
+INCR views              # → 1
+INCRBY views 100        # → 101
+DECR views              # → 100
+
+# 带过期
+SETEX token 3600 "abc123"  # 3600 秒后自动删
+
+# 条件设置（不存在才设，分布式锁基础）
+SETNX lock:resource "1"`,
+          language: "bash",
+          tip: "SETNX + EXPIRE 是 Redis 分布式锁的经典套路，生产环境建议用 Redlock 算法或 Redisson 等成熟库。",
+        },
+        {
+          title: "Hash——存对象利器",
+          content: `Hash 是「键值对里的键值对」，特别适合存对象。跟用 String 存 JSON 相比，Hash 可以单独读写某个字段，不用每次序列化反序列化整个对象。`,
+          code: `HSET user:100 name "小明" age 25 city "北京"
+HGET user:100 name          # → "小明"
+HMGET user:100 name age     # 一次拿多个
+HGETALL user:100            # 全拿出来
+
+HSET user:100 age 26        # 只改一个
+HDEL user:100 city           # 删一个
+HINCRBY user:100 age 1      # age 自增 → 27
+HEXISTS user:100 email      # → 0`,
+          language: "bash",
+        },
+        {
+          title: "List——天然消息队列",
+          content: `List 是有序列表，两头都能操作，天然队列结构。LPUSH + RPOP = 先进先出队列，LPUSH + LPOP = 后进先出栈。`,
+          code: `LPUSH news "消息1" "消息2"
+RPUSH news "消息3"
+LRANGE news 0 -1             # 全看
+LPOP news                    # 左弹
+RPOP news                    # 右弹
+LLEN news                    # 长度
+
+# 裁剪只留前 N 条
+LTRIM news 0 99
+
+# 阻塞弹出——消息队列神器
+BLPOP queue 5                # 等 5 秒，有数据弹出`,
+          language: "bash",
+          tip: "BLPOP/BRPOP 是 Redis 做消息队列的核心，配合多消费者实现简单任务分发。",
+        },
+        {
+          title: "Set——去重和集合运算",
+          content: `Set 无序不重复，最大用处是去重以及交集、并集、差集运算。适合标签系统、共同关注。`,
+          code: `SADD user:1:tags "python" "redis" "mysql"
+SADD user:2:tags "python" "mongodb" "docker"
+
+SINTER user:1:tags user:2:tags   # 交集 → 共同标签 "python"
+SUNION user:1:tags user:2:tags   # 并集
+SDIFF user:1:tags user:2:tags    # 差集
+
+SRANDMEMBER user:1:tags          # 随机抽一个
+SPOP user:1:tags                 # 弹出一个`,
+          language: "bash",
+        },
+        {
+          title: "Sorted Set——排行榜第一名",
+          content: `Sorted Set 是 Set 的升级版——每个元素带「分数」按分自动排序。排行榜功能的最佳人选。
+
+按分数范围查、按排名查，非常灵活。`,
+          code: `ZADD score 100 "张三" 85 "李四" 92 "王五"
+
+ZRANGE score 0 -1 WITHSCORES    # 升序
+ZREVRANGE score 0 -1 WITHSCORES # 降序（排行榜）
+
+ZREVRANK score "张三"   # → 0（第一名）
+ZSCORE score "张三"     # → "100"
+
+ZRANGEBYSCORE score 90 100 WITHSCORES`,
+          language: "bash",
+        },
+      ],
+      quiz: [
+        { question: "Redis 中哪种数据类型最适合排行榜？", options: ["String", "Hash", "List", "Sorted Set"], answer: 3, explanation: "Sorted Set 每个元素带分数自定排序，天然适合排行榜和积分排名。" },
+        { question: "Hash 相比用 String 存 JSON 的优势？", options: ["更快", "可以单独读写某个字段", "更省内存", "更复杂"], answer: 1, explanation: "Hash 可以独立读写单个 field，不用像 JSON 那样序列化反序列化整个对象。" },
+      ],
+    },
+    "redis-commands": {
+      slug: "redis-commands",
+      sections: [
+        {
+          title: "键管理——增删查改加过期",
+          content: `Redis 键管理跟文件管理差不多，多了一个「自动过期」功能，特别好用。`,
+          code: `SET key1 "hello"
+GET key1
+EXISTS key1
+DEL key1
+TYPE key1
+
+# 过期（Redis 特色）
+EXPIRE session 3600      # 3600 秒后自动删
+TTL session              # 还剩多少秒
+PERSIST session          # 取消过期
+
+# 批量操作
+KEYS user:*              # 生产环境千万别用！阻塞全库
+SCAN 0 MATCH user:* COUNT 100  # 渐进式扫描，推荐`,
+          language: "bash",
+          warning: "生产环境严禁 KEYS *，几百万个 key 时能把 Redis 卡死。用 SCAN 代替。",
+        },
+        {
+          title: "事务——一次性打包执行",
+          content: `Redis 事务用 MULTI/EXEC 包裹，里面命令按顺序执行，中间不会被别的客户端插队。
+
+注意：Redis 事务不支持回滚！中间某条出错，其他照样执行，这点跟 MySQL 完全不同。`,
+          code: `MULTI                     # 开始
+SET a 1
+SET b 2
+INCR a
+EXEC                      # 全执行 → OK, OK, 2
+
+DISCARD                   # 放弃事务
+
+# 乐观锁（WATCH）
+WATCH balance
+MULTI
+DECRBY balance 100
+EXEC                      # balance 被改了则返回 nil`,
+          language: "bash",
+        },
+        {
+          title: "管道（Pipeline）——批量加速",
+          content: `正常是一发一回，100 个命令 = 100 次网络往返。Pipeline 把一堆命令打包一起发，Redis 处理完打包回，就一次往返。批量写入性能提升几十倍。`,
+          code: `# redis-cli 管道
+cat commands.txt | redis-cli --pipe
+
+# commands.txt:
+# SET k1 v1
+# SET k2 v2
+# SET k3 v3`,
+          language: "bash",
+          tip: "Pipeline 不保证原子性——中间可能被其他客户端命令插入。要原子性用 Lua 脚本或事务。",
+        },
+        {
+          title: "Pub/Sub——发布订阅",
+          content: `Redis Pub/Sub 是轻量消息系统。有人往「频道」发消息，订阅了该频道的全收到。适合实时通知、聊天推送。
+
+注意：消息不持久化——发时没人订阅，消息直接没了。`,
+          code: `# 终端1：订阅
+SUBSCRIBE news
+
+# 终端2：发布
+PUBLISH news "重大新闻！"
+
+# 模式订阅
+PSUBSCRIBE news.*
+
+UNSUBSCRIBE news`,
+          language: "bash",
+        },
+      ],
+      quiz: [
+        { question: "生产环境查找键该用什么？", options: ["KEYS *", "SCAN", "GET *", "FIND"], answer: 1, explanation: "SCAN 是渐进式遍历不会阻塞 Redis，生产必须用它替代 KEYS。" },
+        { question: "Redis 事务和 MySQL 事务最大不同？", options: ["不支持事务", "不支持回滚", "不支持 ACID", "不支持并发"], answer: 1, explanation: "Redis 事务不支持回滚，某条命令失败不影响其他命令执行。" },
+      ],
+    },
+    "redis-persistence": {
+      slug: "redis-persistence",
+      sections: [
+        {
+          title: "Redis 怎么把数据存硬盘？",
+          content: `Redis 数据全在内存，断电就没了。它提供两种持久化方式：
+
+RDB（快照）——每隔一段时间把整个内存「拍照」存硬盘，像游戏存档。文件小恢复快，但可能丢最后快照之后的数据。
+
+AOF（追加日志）——每条写命令都记下来，像记账本。数据更安全（可做到每秒记一次），但文件比 RDB 大，恢复慢些。`,
+        },
+        {
+          title: "RDB 快照——定期拍照",
+          content: `RDB 就是定期拍照——比如每 5 分钟有 100 次修改，生成 dump.rdb。恢复极快，适合备份。但两次快照之间的数据可能丢。`,
+          code: `# redis.conf RDB 配置
+save 900 1      # 15 分钟有 1 次修改就拍
+save 300 10     # 5 分钟有 10 次修改就拍
+save 60 10000   # 1 分钟有 1 万次修改就拍
+
+# 手动触发
+BGSAVE          # 后台保存，不阻塞（推荐用这个）
+LASTSAVE        # 看最后一次快照时间`,
+          language: "bash",
+          tip: "生产用 BGSAVE，它 fork 子进程做快照，不影响主进程干活。",
+        },
+        {
+          title: "AOF 日志——每笔都记",
+          content: `AOF 像记账——每条写命令追加到文件末尾。Redis 重启时把「账本」从头过一遍，数据恢复。
+
+三种同步策略：
+always——每条命令立刻写盘，最安全也最慢
+everysec——每秒写一次，折中方案，最多丢 1 秒数据（推荐）
+no——交给操作系统决定，最快但可能丢比较多`,
+          code: `# redis.conf AOF 配置
+appendonly yes
+appendfsync everysec        # 每秒同步（推荐）
+
+# AOF 文件会越来越大，需要重写压缩
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 64mb
+
+BGREWRITEAOF               # 手动重写
+redis-check-aof --fix appendonly.aof  # 修复损坏的 AOF`,
+          language: "bash",
+          warning: "AOF 损坏时 Redis 可能拒绝启动，用 redis-check-aof --fix 修复，但可能丢末尾损坏数据。",
+        },
+        {
+          title: "混合模式——鱼与熊掌兼得",
+          content: `Redis 4.0 起支持混合持久化——AOF 重写时先以 RDB 格式存当前数据，后面跟 AOF 增量日志。加载快（RDB）又安全（AOF）。
+
+生产最佳实践：同时开 RDB 和 AOF，AOF 用 everysec。RDB 做冷备份，AOF 保证数据不丢。`,
+          code: `# 混合持久化（Redis 4.0+）
+aof-use-rdb-preamble yes`,
+          language: "bash",
+        },
+      ],
+      quiz: [
+        { question: "RDB 持久化的特点？", options: ["实时记录每条命令", "定期生成内存快照", "不用存硬盘", "无法恢复"], answer: 1, explanation: "RDB 定期把内存快照存硬盘，恢复快但可能丢快照间隔内的数据。" },
+        { question: "AOF everysec 最多丢多少数据？", options: ["不丢", "1 秒", "1 分钟", "很多"], answer: 1, explanation: "everysec 每秒刷一次盘，最坏丢 1 秒内的写操作。" },
+      ],
+    },
+    "redis-sentinel": {
+      slug: "redis-sentinel",
+      sections: [
+        {
+          title: "哨兵是什么——自动值班警卫",
+          content: `Redis Sentinel（哨兵）是 Redis 的高可用方案，干三件事：
+
+监控——盯着主从节点，看谁挂没挂
+通知——出问题发消息通知你
+自动故障转移——主节点挂了，自动从从节点里选一个当新主节点
+
+像一群值班警卫 24 小时盯着集群，主节点一出问题立刻自动切换，对应用基本透明。`,
+        },
+        {
+          title: "哨兵怎么干活",
+          content: `哨兵工作流程：
+多个哨兵一起盯着主从（至少 3 个，防误判）
+大多数哨兵都认为主挂了（主观下线→客观下线）
+哨兵投票选个领头的执行故障转移
+领头哨兵从从节点里挑最合适的（数据最新、网络好）晋升为新主
+其他从节点自动切到新主节点
+整个过程通常在几十秒内完成`,
+          code: `# sentinel.conf 关键配置
+sentinel monitor mymaster 127.0.0.1 6379 2
+# ↑ 监控名为 mymaster 的主节点，至少 2 个哨兵同意才判定故障
+
+sentinel down-after-milliseconds mymaster 5000
+# ↑ 5 秒没响应就判主观下线
+
+sentinel failover-timeout mymaster 10000
+
+# 启动哨兵
+redis-sentinel /path/to/sentinel.conf`,
+          language: "bash",
+          tip: "哨兵至少 3 个且部署在不同物理机上。只有 2 个的话挂一个就没法达成多数派共识了。",
+        },
+        {
+          title: "客户端如何感知故障转移？",
+          content: `故障转移后主节点变了，客户端怎么知道新地址？
+
+答案是客户端不直连 Redis IP，而是先问哨兵：「现在主节点是谁？」哨兵告诉它当前主节点地址，客户端再连过去。主流客户端库（Jedis、Lettuce、ioredis）都支持 Sentinel 模式。`,
+          code: `// Node.js ioredis 连接 Sentinel
+const Redis = require('ioredis');
+const redis = new Redis({
+    sentinels: [
+        { host: 'sentinel1', port: 26379 },
+        { host: 'sentinel2', port: 26379 },
+        { host: 'sentinel3', port: 26379 }
+    ],
+    name: 'mymaster'
+});
+redis.set('key', 'value');  // 自动连到当前主节点`,
+          language: "javascript",
+        },
+      ],
+      quiz: [
+        { question: "Redis Sentinel 最少需要几个哨兵？", options: ["1 个", "2 个", "3 个", "5 个"], answer: 2, explanation: "最少 3 个，因为需要多数派（quorum）来判定故障和执行故障转移。" },
+        { question: "主观下线和客观下线有什么区别？", options: ["没区别", "主观是单哨兵认为挂了，客观是多数都认为挂了", "客观更快", "主观更准确"], answer: 1, explanation: "单个哨兵判定挂掉叫主观下线，大多数都这么认为才升级为客观下线并触发故障转移。" },
+      ],
+    },
+    "redis-cluster": {
+      slug: "redis-cluster",
+      sections: [
+        {
+          title: "Redis 集群——把数据「切开」",
+          content: `一台 Redis 不够用了（内存、QPS 跟不上），就需要集群。Redis Cluster 把数据「切分」到多台机器，每台只存一部分。
+
+跟主从复制的区别：主从是「复制」（每台数据一样），集群是「分片」（每台只存一部分）。`,
+        },
+        {
+          title: "数据分片——哈希槽",
+          content: `Redis Cluster 把数据空间切成 16384 个哈希槽。每个键通过 CRC16 算哈希对 16384 取模，决定它属哪个槽。各节点分摊这些槽。
+
+比如节点 A 管 0~5460 号槽，B 管 5461~10922，C 管 10923~16383。你查 key，客户端先算槽号知道去哪台机器找。`,
+          code: `# 看 key 在哪个槽
+CLUSTER KEYSLOT mykey
+
+CLUSTER NODES            # 所有节点
+CLUSTER INFO             # 集群状态
+CLUSTER SLOTS            # 槽分布`,
+          language: "bash",
+        },
+        {
+          title: "集群的高可用",
+          content: `Cluster 里每个主节点可配从节点。主挂了从自动顶上——自带故障转移，无需哨兵。
+
+跟 Sentinel 区别：Sentinel 管主从架构，Cluster 管分片架构，各有所长。`,
+          code: `# 创建集群（至少 6 节点：3 主 3 从）
+redis-cli --cluster create \\
+  192.168.1.1:6379 192.168.1.1:6380 \\
+  192.168.1.2:6379 192.168.1.2:6380 \\
+  192.168.1.3:6379 192.168.1.3:6380 \\
+  --cluster-replicas 1
+
+# 加节点
+redis-cli --cluster add-node 192.168.1.4:6379 192.168.1.1:6379
+
+# 重分片
+redis-cli --cluster reshard 192.168.1.1:6379`,
+          language: "bash",
+          tip: "redis-cli --cluster 命令创建和管理集群比手写配置容易得多。",
+        },
+        {
+          title: "集群的限制",
+          content: `Cluster 好使但有限制：
+不支持多键跨槽操作——mget/mset 的所有 key 必须在同一槽
+不支持跨节点事务——事务只能在单节点内
+Lua 脚本必须确保所有操作在同一节点
+需要客户端支持 MOVED/ASK 重定向
+
+主流客户端（Jedis、Lettuce、ioredis、redis-py）都已内置支持，这些细节基本帮你处理好了。`,
+        },
+      ],
+      quiz: [
+        { question: "Redis Cluster 有多少个哈希槽？", options: ["1024", "8192", "16384", "65536"], answer: 2, explanation: "Redis Cluster 固定 16384 个哈希槽分布数据。" },
+        { question: "Cluster 相比主从+哨兵最大区别？", options: ["没区别", "Cluster 支持数据分片可水平扩展", "Cluster 更简单", "哨兵更快"], answer: 1, explanation: "Cluster 通过哈希槽把数据分片到多台机器可水平扩展；主从+哨兵只做高可用，数据还是全量一份。" },
+      ],
+    },
+    "redis-patterns": {
+      slug: "redis-patterns",
+      sections: [
+        {
+          title: "缓存模式——旁路缓存",
+          content: `旁路缓存（Cache Aside）最常用，流程直接：
+查数据：先查 Redis → 有直接回 → 没有查数据库 → 写入 Redis 再回
+写数据：先更新数据库 → 删掉 Redis 对应缓存（等下次查询自动重建）
+
+这最稳妥，避免了缓存和数据库不一致的坑。`,
+          code: `// Node.js 旁路缓存示例
+async function getUser(id) {
+    const cacheKey = \`user:\${id}\`;
+    const cached = await redis.get(cacheKey);
+    if (cached) return JSON.parse(cached);
+
+    const user = await db.query('SELECT * FROM users WHERE id = ?', [id]);
+    if (user) await redis.setex(cacheKey, 3600, JSON.stringify(user));
+    return user;
+}
+
+// 更新时删缓存
+async function updateUser(id, data) {
+    await db.query('UPDATE users SET ? WHERE id = ?', [data, id]);
+    await redis.del(\`user:\${id}\`);
+}`,
+          language: "javascript",
+        },
+        {
+          title: "缓存穿透、击穿、雪崩——三大问题",
+          content: `这仨是面试必考、线上常见事故：
+
+缓存穿透——查不存在的数据（如 ID=-1），缓存没有直接打到数据库。攻击者专门构造这种请求能打爆数据库。解决：布隆过滤器，或者查不到也缓存空值（短时间）。
+
+缓存击穿——热点 key 刚好过期，瞬间大量请求涌向数据库。解决：加互斥锁，或者「永不过期」异步刷新。
+
+缓存雪崩——大量 key 同时过期，数据库瞬间被压垮。解决：给过期时间加随机值，避免集中过期。`,
+          code: `// 防穿透：缓存空值
+let data = await redis.get(\`product:\${id}\`);
+if (data === 'NULL') return null;
+if (data) return JSON.parse(data);
+const product = await db.findById(id);
+if (product) {
+    await redis.setex(\`product:\${id}\`, 3600, JSON.stringify(product));
+} else {
+    await redis.setex(\`product:\${id}\`, 60, 'NULL');  // 空值也缓存
+}
+return product;
+
+// 防雪崩：过期时间加随机
+const ttl = 3600 + Math.floor(Math.random() * 600);
+await redis.setex(key, ttl, value);`,
+          language: "javascript",
+          tip: "布隆过滤器防穿透神器——极小的内存判断「某 key 一定不存在」。Redis 4.0+ 有内置布隆过滤器模块。",
+        },
+        {
+          title: "分布式锁",
+          content: `多台服务器抢同一资源需要分布式锁协调。Redis 的 SETNX 可做简易版，但生产建议用 Redlock 算法或 Redisson 等成熟库。`,
+          code: `# 简易分布式锁
+SET lock:order:123 "random-value" NX EX 30
+
+# 释放用 Lua 保证原子性（先查再删）
+EVAL "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end" 1 lock:order:123 random-value`,
+          language: "bash",
+          warning: "简单 SETNX 锁在 Redis 主从切换时可能丢失（主挂了锁还没同步到从）。Redlock 通过在多个独立 Redis 实例同时加锁来解决。",
+        },
+        {
+          title: "计数器与限流器",
+          content: `利用 Redis 单线程和原子自增轻松实现计数器和限流器。点赞数、阅读量——INCR 搞定。固定窗口限流——设 key 带过期，每次 INCR 超了就拒绝。滑动窗口限流——用 Sorted Set 记录时间戳，精准控制。`,
+          code: `# 固定窗口限流（简单版）：1 分钟最多 100 次
+INCR rate:api:127.0.0.1
+EXPIRE rate:api:127.0.0.1 60
+
+# 滑动窗口限流（精确版）——用 Sorted Set
+ZADD rate:api:127.0.0.1 <timestamp> <unique-id>
+ZREMRANGEBYSCORE rate:api:127.0.0.1 0 <timestamp减60秒>
+ZCARD rate:api:127.0.0.1  # 这分钟内多少次`,
+          language: "bash",
+        },
+      ],
+      quiz: [
+        { question: "缓存穿透指的是什么？", options: ["缓存挂了", "查不存在的数据穿透到数据库", "缓存过期太快", "缓存占满"], answer: 1, explanation: "缓存穿透是查询数据库中不存在的数据，每次请求都穿透缓存打到数据库。" },
+        { question: "防缓存雪崩的主要思路？", options: ["加更多缓存", "给过期时间加随机值避免集中过期", "用更大 Redis", "关闭过期"], answer: 1, explanation: "缓存雪崩是大量 key 同时过期导致数据库压力突增，加随机偏移可避免集中过期。" },
+      ],
+    },
+    "redis-lua": {
+      slug: "redis-lua",
+      sections: [
+        {
+          title: "Lua 脚本——原子性地执行多个命令",
+          content: `Redis 的 Lua 脚本让你把多个命令写在一个脚本里原子执行——要么全做要么全不做，中间不会插进其他客户端命令。
+
+比事务（MULTI/EXEC）强在哪？Lua 可以在脚本里写逻辑判断，根据读到的值决定下一步。事务是「提交一批固定指令」，Lua 是「把逻辑搬进 Redis 里执行」。`,
+          code: `# 简单 Lua 脚本
+EVAL "return redis.call('GET', KEYS[1])" 1 mykey
+
+# 原子性检查并更新库存
+EVAL "
+    local stock = redis.call('GET', KEYS[1])
+    if stock and tonumber(stock) > 0 then
+        redis.call('DECR', KEYS[1])
+        return 1  -- 扣减成功
+    else
+        return 0  -- 库存不足
+    end
+" 1 product:100:stock`,
+          language: "bash",
+          tip: "Lua 脚本执行期间 Redis 会阻塞其他命令，别写太复杂太耗时。",
+        },
+        {
+          title: "SCRIPT LOAD 缓存脚本",
+          content: `EVAL 每次传整个脚本有网络开销。SCRIPT LOAD 先把脚本上传 Redis 返回 SHA1 摘要，之后用 EVALSHA 加摘要执行——省带宽还更快。`,
+          code: `SCRIPT LOAD "return redis.call('GET', KEYS[1])"
+# → "abc123def456..."（SHA1 摘要）
+
+EVALSHA "abc123def456..." 1 mykey
+
+SCRIPT EXISTS "abc123def456..."
+SCRIPT FLUSH`,
+          language: "bash",
+        },
+        {
+          title: "Lua 脚本实用场景",
+          content: `Lua 最实用的几个场景：分布式限流（原子检查+放行）、库存扣减（查库存+扣减一步到位防超卖）、获取分布式锁、原子性的复杂操作。`,
+          code: `# 原子性限流
+EVAL "
+    local key = KEYS[1]
+    local limit = tonumber(ARGV[1])
+    local window = tonumber(ARGV[2])
+    local current = redis.call('INCR', key)
+    if current == 1 then
+        redis.call('EXPIRE', key, window)
+    end
+    if current > limit then return 0 end
+    return 1
+" 1 rate:api:login 100 60`,
+          language: "bash",
+        },
+      ],
+      quiz: [
+        { question: "Redis Lua 脚本相比事务（MULTI/EXEC）的优势？", options: ["更快", "可以在脚本中做逻辑判断", "支持回滚", "不占网络"], answer: 1, explanation: "Lua 脚本支持条件判断、循环等逻辑，可根据读取数据决定下一步，比事务灵活得多。" },
+        { question: "EVALSHA 相比 EVAL 的好处？", options: ["省带宽", "更安全", "支持更多命令", "不需要脚本"], answer: 0, explanation: "EVALSHA 只传 SHA1 摘要（几十字节），不用每次传整个脚本。" },
+      ],
+    },
+    "redis-optimization": {
+      slug: "redis-optimization",
+      sections: [
+        {
+          title: "内存优化——省着点用",
+          content: `Redis 虽快，数据全在内存，内存就是真金白银。优化关键：用小而精的数据结构（能用 Hash 别用多个 String）、设好过期时间（别让冷数据一直占着）、避免大 key（一个 key 几 MB 又占内存又拖性能）。`,
+          code: `# 看内存
+INFO memory
+MEMORY USAGE mykey        # 某 key 占多少
+MEMORY DOCTOR             # Redis 内存诊断建议
+
+# 看大 key（生产慎用）
+redis-cli --bigkeys
+
+# 设最大内存和淘汰策略
+maxmemory 2gb
+maxmemory-policy allkeys-lru`,
+          language: "bash",
+          tip: "务必配置 maxmemory 和淘汰策略，不然内存满了 Redis 直接拒绝写入甚至崩溃。",
+        },
+        {
+          title: "内存淘汰策略",
+          content: `内存满了要淘汰 key。几种策略：
+noeviction——不淘汰直接拒绝写入（默认，一般不这么用）
+allkeys-lru——在所有 key 里淘汰最近最少用的（缓存场景推荐）
+volatile-lru——只在设了过期的 key 里淘汰
+allkeys-random——随机淘汰
+volatile-ttl——优先淘汰剩余寿命最短的
+
+缓存场景推荐 allkeys-lru。`,
+        },
+        {
+          title: "避免慢查询",
+          content: `Redis 单线程执行命令，一个慢命令让所有人排队等。要特别避免：
+禁用 KEYS * 用 SCAN
+大 key 的 DEL 用 UNLINK（异步删除，Redis 4.0+）
+SORT、SUNION 等集合操作数据量大时极慢
+SMEMBERS 是 O(N)，大 Set 慎用`,
+          code: `# 排查慢查询
+SLOWLOG GET 10            # 最近 10 条慢查询
+SLOWLOG RESET
+
+# 配置
+slowlog-log-slower-than 10000  # 超 10ms 就算慢`,
+          language: "bash",
+        },
+        {
+          title: "连接池与 Pipeline",
+          content: `频繁建连断开开销大，务必用连接池。主流客户端都内置了。配合 Pipeline 批量发命令，吞吐提升几十倍。`,
+          code: `// Node.js ioredis + Pipeline
+const Redis = require('ioredis');
+const redis = new Redis({ host: 'localhost', port: 6379 });
+
+const pipeline = redis.pipeline();
+pipeline.set('a', 1);
+pipeline.set('b', 2);
+pipeline.get('a');
+const results = await pipeline.exec();`,
+          language: "javascript",
+        },
+      ],
+      quiz: [
+        { question: "Redis 缓存场景推荐哪种淘汰策略？", options: ["noeviction", "allkeys-lru", "volatile-random", "allkeys-random"], answer: 1, explanation: "allkeys-lru 在所有 key 中淘汰最近最少用的，缓存场景最合适。" },
+        { question: "为啥不要直接 DEL 大 key？", options: ["不能删", "DEL 是 O(N) 可能阻塞 Redis", "会丢数据", "会触发淘汰"], answer: 1, explanation: "DEL 大 key 需释放大量内存 O(N) 可能到秒级阻塞其他请求。用 UNLINK 异步删除。" },
+      ],
+    },
+    "redis-security": {
+      slug: "redis-security",
+      sections: [
+        {
+          title: "Redis 安全问题——血的教训",
+          content: `Redis 默认安装几乎没安全措施：无密码、绑所有网卡、端口众所周知。互联网上被黑掉的 Redis 不计其数——攻击者连上你 Redis 要么偷数据，要么写 SSH 公钥控制服务器甚至挖矿。
+
+所以 Redis 安全不是「想不想」，是必须做。`,
+        },
+        {
+          title: "基本安全配置",
+          content: `上线前这几项必须配：
+设置密码——requirepass，虽明文传输但至少挡住大多数自动扫描
+绑内网 IP——bind 不设 0.0.0.0，只监听内网
+改端口——别用默认 6379（安全中的隐匿策略）
+禁用/重命名危险命令——FLUSHALL、CONFIG 等`,
+          code: `# redis.conf 安全配置
+bind 127.0.0.1 10.0.0.5
+port 16379
+
+requirepass "你的强密码"
+
+rename-command FLUSHALL ""           # 禁用
+rename-command CONFIG "CFG_hidden"  # 重命名
+rename-command KEYS ""               # 禁用
+
+maxclients 10000`,
+          language: "bash",
+          tip: "如果必须暴露公网，务必加防火墙限制来源 IP，只允许自己的应用服务器访问。",
+        },
+        {
+          title: "TLS 加密（Redis 6.0+）",
+          content: `Redis 6.0 开始原生支持 TLS，客户端到服务器连接加密。敏感数据或公网传输强烈建议开启。`,
+          code: `# redis.conf TLS
+port 0                      # 关非 TLS
+tls-port 6379
+tls-cert-file /path/to/redis.crt
+tls-key-file /path/to/redis.key
+tls-ca-cert-file /path/to/ca.crt
+
+# 连接
+redis-cli --tls --cert client.crt --key client.key --cacert ca.crt`,
+          language: "bash",
+        },
+        {
+          title: "ACL 权限控制（Redis 6.0+）",
+          content: `Redis 6.0 引入 ACL，不再一个密码走天下。可以给不同用户不同权限：应用用户只能读写特定数据、运维只读、监控只用 INFO。`,
+          code: `# 创建 ACL 用户
+ACL SETUSER appuser on >pass123 ~user:* +@all -@dangerous
+# ↑ 只能操作 user: 开头的键，禁用危险命令
+
+ACL SETUSER readonly on >readonly ~* +@read
+# ↑ 只读所有键
+
+ACL LIST
+ACL WHOAMI
+
+# 持久化
+aclfile /etc/redis/users.acl`,
+          language: "bash",
+          tip: "ACL 是 Redis 6.0 的重大安全升级，可以精细控制每个用户的权限，强烈建议启用。",
+        },
+      ],
+      quiz: [
+        { question: "Redis 默认最大安全隐患？", options: ["太慢了", "默认无密码且绑所有网卡", "不支持 HTTPS", "数据不压缩"], answer: 1, explanation: "Redis 默认无密码、绑 0.0.0.0、端口 6379 众所周知，攻击者可直接连接执行任意命令。" },
+        { question: "Redis 6.0 ACL 主要解决什么问题？", options: ["性能优化", "精细化权限控制", "数据压缩", "集群管理"], answer: 1, explanation: "ACL 允许为不同用户设置不同的命令和键权限，不再是一个密码走天下。" },
       ],
     },
   },
@@ -3304,15 +4521,14 @@ ZRANGE leaderboard 0 -1 WITHSCORES`,
       slug: "html-basics",
       sections: [
         {
-          title: "HTML 文档结构",
-          content: `HTML（HyperText Markup Language）是构建网页的标准语言。每个 HTML 文档都遵循基本的结构框架。
+          title: "HTML 文档结构——网页的骨架",
+          content: `HTML 就是搭网页的积木，每个网页背后都是一堆标签拼起来的。就跟盖房先打地基一样，每个 HTML 页面有个标准框架。
 
-一个标准的 HTML5 文档包含以下基本元素：
-
-- DOCTYPE 声明：告诉浏览器使用 HTML5 标准
-- html 根元素：包含整个页面内容
-- head 头部：包含元数据、标题、样式引用
-- body 主体：包含页面可见内容`,
+一个标准 HTML5 页面包含：
+DOCTYPE 声明——告诉浏览器「按 HTML5 规矩来」
+html 根元素——整个页面装这个大盒子里
+head 头部——放幕后信息：元数据、标题、样式链接等
+body 主体——用户能看到的所有东西`,
           code: `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -3322,29 +4538,29 @@ ZRANGE leaderboard 0 -1 WITHSCORES`,
 </head>
 <body>
     <h1>欢迎来到 HTML 世界</h1>
-    <p>这是一个段落元素。</p>
+    <p>这是一个段落。</p>
 </body>
 </html>`,
           language: "html",
         },
         {
-          title: "常用 HTML 标签",
-          content: `HTML 标签是构建网页内容的基本单元。常用标签分为以下几类：
+          title: "常用标签速览——搭积木的基本块",
+          content: `HTML 标签说白了就是你搭网页的积木块。最常用的：
 
-标题标签：h1 到 h6，h1 最大，h6 最小。
-段落标签：p 用于包裹文本段落。
-链接标签：a 用于创建超链接，href 属性指定目标地址。
-图片标签：img 用于插入图片，src 指定图片路径，alt 提供替代文本。
-列表标签：ul（无序列表）、ol（有序列表）、li（列表项）。
-容器标签：div 用于分组块级内容，span 用于行内内容。`,
-          code: `<h1>一级标题</h1>
+标题标签 h1~h6——数字越小字越大，h1 一般一个页面只有一个
+段落标签 p——文字都要包在 p 或别的标签里
+链接标签 a——href 是点它要跳转的地址
+图片标签 img——src 指图片在哪，alt 是加载不出时显示的替代文字
+列表——ul 无序列表带圆点，ol 有序列表带数字，li 是每行
+容器——div 块级占一行，span 行内不换行`,
+          code: `<h1>最大的标题</h1>
 <h2>二级标题</h2>
 
-<p>这是一个<strong>加粗</strong>和<em>斜体</em>的段落。</p>
+<p>这是一段文字，可以有<strong>加粗</strong>和<em>斜体</em>。</p>
 
-<a href="https://example.com" target="_blank">访问示例网站</a>
+<a href="https://example.com" target="_blank">点我跳转</a>
 
-<img src="photo.jpg" alt="风景照片" width="600">
+<img src="photo.jpg" alt="一张风景照" width="600">
 
 <ul>
     <li>苹果</li>
@@ -3358,34 +4574,18 @@ ZRANGE leaderboard 0 -1 WITHSCORES`,
     <li>第三步：运行</li>
 </ol>`,
           language: "html",
-          tip: "使用语义化标签（header、nav、main、article、footer）可以提高网页的可访问性和 SEO 友好性。",
+          tip: "用语义化标签（header、nav、main、article、footer）替代纯 div，代码更清晰还能提升 SEO 和无障碍体验。",
         },
         {
-          title: "表格与表单",
-          content: `表格和表单是 HTML 中重要的交互元素。
-
-表格用于展示结构化数据，由 table、tr（行）、th（表头）、td（数据单元格）组成。
-
-表单用于收集用户输入，常用元素包括 input、textarea、select、button。input 的 type 属性决定了输入类型（text、password、email、number 等）。`,
+          title: "表格与表单——跟用户打交道",
+          content: `网页不光展示内容还得跟用户互动。表格（table）展示结构化数据：table 包裹，tr 是一行，th 是表头加粗，td 是普通格。表单（form）收集用户输入：input 最常用，type 决定样子，textarea 多行输入，select 下拉框。`,
           code: `<table border="1">
     <thead>
-        <tr>
-            <th>姓名</th>
-            <th>年龄</th>
-            <th>城市</th>
-        </tr>
+        <tr><th>姓名</th><th>年龄</th><th>城市</th></tr>
     </thead>
     <tbody>
-        <tr>
-            <td>张三</td>
-            <td>25</td>
-            <td>北京</td>
-        </tr>
-        <tr>
-            <td>李四</td>
-            <td>30</td>
-            <td>上海</td>
-        </tr>
+        <tr><td>张三</td><td>25</td><td>北京</td></tr>
+        <tr><td>李四</td><td>30</td><td>上海</td></tr>
     </tbody>
 </table>
 
@@ -3408,114 +4608,279 @@ ZRANGE leaderboard 0 -1 WITHSCORES`,
         },
       ],
       quiz: [
-        { question: "HTML5 的 DOCTYPE 声明是什么？", options: ["<!DOCTYPE HTML PUBLIC>", "<!DOCTYPE html>", "<DOCTYPE HTML>", "<html DOCTYPE>"], answer: 1, explanation: "HTML5 的 DOCTYPE 声明非常简洁，只需 <!DOCTYPE html>。" },
-        { question: "哪个标签用于创建超链接？", options: ["<link>", "<a>", "<href>", "<url>"], answer: 1, explanation: "a 标签（anchor）用于创建超链接，href 属性指定链接目标。" },
-        { question: "img 标签的 alt 属性有什么作用？", options: ["设置图片大小", "指定图片路径", "提供图片替代文本", "设置图片边框"], answer: 2, explanation: "alt 属性在图片无法显示时提供替代文本，也有助于屏幕阅读器理解图片内容。" },
+        { question: "HTML5 的 DOCTYPE 怎么写？", options: ["<!DOCTYPE HTML PUBLIC>", "<!DOCTYPE html>", "<DOCTYPE HTML>", "<html DOCTYPE>"], answer: 1, explanation: "HTML5 的 DOCTYPE 极简，一行 <!DOCTYPE html>。" },
+        { question: "哪个标签创建超链接？", options: ["<link>", "<a>", "<href>", "<url>"], answer: 1, explanation: "a 标签（anchor）用于创建跳转链接，href 指定目标。" },
+        { question: "img 的 alt 属性是干嘛的？", options: ["设大小", "指定路径", "图片加载失败时的替代文字", "设边框"], answer: 2, explanation: "alt 在图片无法显示时展示替代文字，屏幕阅读器也用它描述图片。" },
       ],
     },
     "css-basics": {
       slug: "css-basics",
       sections: [
         {
-          title: "CSS 选择器",
-          content: `CSS 选择器用于选择要样式的 HTML 元素。常用选择器类型包括：
+          title: "CSS 选择器——找准你要「化妆」的元素",
+          content: `CSS 给 HTML 穿衣服化妆，选择器告诉它「给谁化」。常用选择器：
 
-元素选择器：直接使用标签名，如 p、h1。
-类选择器：使用点号加类名，如 .container。
-ID 选择器：使用井号加 ID，如 #header。
-后代选择器：空格分隔，选择嵌套元素。
-子元素选择器：使用 > 号，只选择直接子元素。
-伪类选择器：如 :hover、:focus、:nth-child()。`,
+元素选择器——直接写标签名，p 选所有段落
+类选择器——点号开头，.container 选所有 class="container" 的（最常用！）
+ID 选择器——井号开头，#header 选 id="header" 的元素
+后代选择器——空格隔开，.nav a 选导航里所有链接
+伪类——冒号开头，:hover 鼠标悬停，:focus 输入框获焦点`,
           code: `/* 元素选择器 */
-p {
-    color: #333;
-    line-height: 1.6;
-}
+p { color: #333; line-height: 1.6; }
 
-/* 类选择器 */
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
+/* 类选择器（最常用） */
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
 
 /* ID 选择器 */
-#header {
-    background: #1a1a1a;
-    color: white;
-}
+#header { background: #1a1a1a; color: white; }
 
 /* 后代选择器 */
-.nav a {
-    text-decoration: none;
-    color: inherit;
-}
+.nav a { text-decoration: none; color: inherit; }
 
 /* 伪类 */
-.button:hover {
-    background: #0066cc;
-    transform: translateY(-1px);
-}
-
-input:focus {
-    outline: 2px solid #0066cc;
-}`,
+.button:hover { background: #0066cc; transform: translateY(-1px); }
+input:focus { outline: 2px solid #0066cc; }`,
           language: "css",
         },
         {
-          title: "盒模型",
-          content: `CSS 盒模型是理解布局的基础。每个 HTML 元素都被看作一个矩形盒子，由以下部分组成：
+          title: "盒模型——每个元素都是盒子",
+          content: `CSS 世界里，每个元素都是矩形「盒子」。由里到外四层：
+content——实际内容区，width/height 控制这层
+padding——内边距，内容到边框的间距
+border——边框
+margin——外边距，跟邻居的距离
 
-content：实际内容区域，由 width 和 height 控制。
-padding：内边距，内容与边框之间的间距。
-border：边框，包围 padding 的线条。
-margin：外边距，元素与其他元素之间的间距。
+关键在 box-sizing。默认 width 只包括 content，加上 padding+border 实际更宽很难算。设 box-sizing: border-box 后 width 包含 content+padding+border，布局计算直观多了。`,
+          code: `/* 默认盒模型（算得头疼） */
+.box { width: 200px; padding: 20px; border: 2px solid #333; margin: 10px; }
+/* 实际占宽：200+40+4=244px */
 
-box-sizing: border-box 可以让 width/height 包含 padding 和 border，使布局计算更直观。`,
-          code: `/* 默认盒模型 */
-.box {
-    width: 200px;
-    padding: 20px;
-    border: 2px solid #333;
-    margin: 10px;
-    /* 实际占用宽度：200 + 20*2 + 2*2 = 244px */
-}
+/* border-box 盒模型（强烈推荐） */
+.box-border { box-sizing: border-box; width: 200px; padding: 20px; border: 2px solid #333; }
+/* 实际占宽就是 200px */
 
-/* border-box 盒模型（推荐） */
-.box-border {
-    box-sizing: border-box;
-    width: 200px;
-    padding: 20px;
-    border: 2px solid #333;
-    margin: 10px;
-    /* 实际占用宽度：200px（包含 padding 和 border） */
-}
-
-/* 全局设置 border-box */
-* {
-    box-sizing: border-box;
-}`,
+/* 项目开始就全局设置 */
+*, *::before, *::after { box-sizing: border-box; }`,
           language: "css",
-          tip: "在项目开头使用 * { box-sizing: border-box; } 可以避免很多布局问题。",
+          tip: "项目一开始就全局 box-sizing: border-box，能省掉你无数布局上的麻烦。",
         },
       ],
       quiz: [
-        { question: "类选择器使用什么符号前缀？", options: ["#", ".", "!", "@"], answer: 1, explanation: "类选择器使用点号（.）作为前缀，如 .my-class。" },
-        { question: "box-sizing: border-box 的作用是什么？", options: ["添加边框", "width/height 包含 padding 和 border", "移除边框", "设置外边距"], answer: 1, explanation: "border-box 让元素的 width/height 包含 padding 和 border，使布局计算更直观。" },
+        { question: "类选择器用什么符号？", options: ["#", ".", "!", "@"], answer: 1, explanation: "类选择器用点号（.）作前缀，如 .my-class。" },
+        { question: "box-sizing: border-box 作用？", options: ["加边框", "让 width 包含 padding 和 border", "去掉边框", "设外边距"], answer: 1, explanation: "border-box 让 width/height 包含 padding+border，布局不再需要心算。" },
+      ],
+    },
+    "css-flexbox": {
+      slug: "css-flexbox",
+      sections: [
+        {
+          title: "Flexbox——弹性盒子，布局救星",
+          content: `Flexbox 出现之前，CSS 做水平居中、等分布局、垂直对齐让人崩溃——float、clearfix 各种 hack。Flexbox 就是来救场的。
+
+思路特简单：给容器设 display: flex，子元素自动变「弹性元素」，在一行或一列里排列、对齐、分空间。就像把东西放进会自动调整的抽屉里。`,
+        },
+        {
+          title: "容器属性——管「抽屉」的",
+          content: `flex-direction——横排 row 或竖排 column
+justify-content——主轴对齐（居中、两端对齐、均匀分布）
+align-items——交叉轴对齐（顶、中、底、拉伸）
+flex-wrap——多了换不换行
+gap——子元素之间的间距`,
+          code: `/* Flexbox 容器 */
+.container {
+    display: flex;
+    flex-direction: row;           /* 横排（默认） */
+    justify-content: space-between; /* 两端对齐 */
+    align-items: center;           /* 垂直居中 */
+    flex-wrap: wrap;               /* 多了自动换行 */
+    gap: 16px;
+}
+
+/* 水平居中 */
+.h-center { display: flex; justify-content: center; }
+
+/* 万能居中（水平+垂直） */
+.perfect-center { display: flex; justify-content: center; align-items: center; }`,
+          language: "css",
+        },
+        {
+          title: "子元素属性——管「里面东西」的",
+          content: `flex-grow——有多余空间时能「长大」多少
+flex-shrink——空间不够时能「缩小」多少
+flex-basis——初始大小
+flex——上面仨的简写，flex: 1 就是均分空间
+align-self——单独设置某一项的对齐方式`,
+          code: `/* 子元素 */
+.item { flex: 1; }          /* 均分剩余空间 */
+.item-fixed { flex: 0 0 200px; }  /* 固定 200px */
+.item-double { flex: 2; }   /* 占别人的两倍 */
+
+/* 三栏布局（两侧固定 中间自适应） */
+.layout { display: flex; }
+.sidebar { flex: 0 0 250px; }
+.main    { flex: 1; }
+.aside   { flex: 0 0 300px; }`,
+          language: "css",
+          tip: "flex: 1 是 CSS 里用得最频繁的简写之一，等于告诉元素「剩余空间你都吃了，跟大家平分」。",
+        },
+        {
+          title: "Flexbox 实战场景",
+          content: `Flexbox 日常开发就能搞定大部分布局：导航栏（logo 左菜单右）、卡片列表（自动换行间距均匀）、居中（水平垂直再也不用纠结）、等分（几等分轻轻松松）、圣杯布局（侧边固定中间自适应）。`,
+        },
+      ],
+      quiz: [
+        { question: "justify-content: center 干嘛的？", options: ["垂直居中", "主轴居中", "子元素加间距", "换行"], answer: 1, explanation: "justify-content 控制主轴对齐，center 是居中对齐。" },
+        { question: "flex: 1 啥意思？", options: ["固定 1px", "均分剩余空间", "不放大", "不缩小"], answer: 1, explanation: "flex: 1 = flex-grow:1; flex-shrink:1; flex-basis:0，让元素均分剩余空间。" },
+      ],
+    },
+    "css-grid": {
+      slug: "css-grid",
+      sections: [
+        {
+          title: "Grid——二维布局之王",
+          content: `Flexbox 适合一维（要么横要么竖），Grid 是真正的二维布局——同时管行和列。像棋盘一样，把容器分几行几列，把元素放指定格子里。
+
+Grid 最适合：页面整体布局、仪表盘、图片墙、需要同时控制行列的场景。`,
+        },
+        {
+          title: "基础网格——分行分列",
+          content: `Grid 核心是定义行列「轨道」：
+grid-template-columns——几列、每列多宽
+grid-template-rows——几行、每行多高
+gap——格子之间的间距`,
+          code: `/* Grid 基础 */
+.container { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 16px; }
+
+/* fr 是 Grid 里最实用的单位：剩余空间的份数 */
+.equal-cols { display: grid; grid-template-columns: repeat(3, 1fr); /* 三等分 */ }
+
+/* 响应式自动列数，每列最少 250px */
+.auto-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }`,
+          language: "css",
+          tip: "fr（fraction）是 Grid 最实用的单位，1fr 2fr 表示第二列是第一列两倍宽，不用算百分比。",
+        },
+        {
+          title: "区域命名法——最优雅的布局方式",
+          content: `grid-template-areas 给每个格子取名字，放元素时直接用名字指定位子，布局结构一目了然。改布局只需改 areas 里的名字排列就行。`,
+          code: `/* Grid 区域命名——最直观的布局 */
+.layout {
+    display: grid;
+    grid-template-areas:
+        "header  header  header"
+        "sidebar main    aside"
+        "footer  footer  footer";
+    grid-template-columns: 200px 1fr 200px;
+    grid-template-rows: auto 1fr auto;
+    min-height: 100vh;
+    gap: 12px;
+}
+.header  { grid-area: header; }
+.sidebar { grid-area: sidebar; }
+.main    { grid-area: main; }
+.aside   { grid-area: aside; }
+.footer  { grid-area: footer; }`,
+          language: "css",
+          tip: "grid-template-areas 是 Grid 最优雅的用法，布局结构一眼就看明白了。",
+        },
+        {
+          title: "Flexbox 还是 Grid？",
+          content: `Flexbox——一维布局，一排或一列里排列元素。适合导航栏、按钮组、卡片列表。
+Grid——二维布局，同时控制行和列。适合整体页面布局、仪表盘、图库。
+
+它们不冲突，经常混着用——外层大结构用 Grid，里面小组件用 Flexbox。`,
+        },
+      ],
+      quiz: [
+        { question: "Grid 的 fr 单位表示什么？", options: ["固定像素", "剩余空间的份数", "百分比", "视口单位"], answer: 1, explanation: "fr（fraction）表示网格容器中剩余空间的一份，1fr 2fr 第二列是第一列两倍宽。" },
+        { question: "Grid 和 Flexbox 最核心的区别？", options: ["Flexbox 更快", "Grid 二维，Flexbox 一维", "Grid 更旧", "没区别"], answer: 1, explanation: "Grid 同时控制行和列（二维），Flexbox 主要负责一个方向的排列（一维）。" },
+      ],
+    },
+    "typescript-basics": {
+      slug: "typescript-basics",
+      sections: [
+        {
+          title: "TypeScript 是什么——给 JS 立规矩",
+          content: `TypeScript 就是 JavaScript 加了「类型标注」。JS 像随手写便签（自由但易写错），TS 像填规范表格（有约束但不易出错）。
+
+加类型的好处在哪：
+写代码时 IDE 就能即时提示——这个变量能点出什么方法、这个函数要什么参数
+传错类型当场报错——不用等到线上才炸锅
+看代码一目了然——不需要猜某个参数是字符串还是数字
+大型项目维护起来舒服——重构时改一个类型定义，所有用错的地方全给你标出来`,
+          code: `// JavaScript（没类型——偷偷埋雷）
+function greet(name) { return "Hello, " + name; }
+greet(123);  // 不会报错，但结果肯定有问题
+
+// TypeScript（有类型——编译就炸雷）
+function greet(name: string): string { return "Hello, " + name; }
+greet(123);  // ❌ 编译报错！参数类型不对`,
+          language: "typescript",
+        },
+        {
+          title: "基础类型——给变量贴「标签」",
+          content: `基础类型跟 JS 数据类型对应：
+string——字符串
+number——数字（没有 int/float 之分，都是 number）
+boolean——true 或 false
+array——用 Type[] 表示，比如 string[] 是字符串数组
+any——关了类型检查，「随便你」（少用！）
+unknown——不知道什么类型，但必须检查后才能用（比 any 安全）
+void——函数没有返回值`,
+          code: `// 基础类型标注
+let name: string = "小明";
+let age: number = 25;
+let isActive: boolean = false;
+let hobbies: string[] = ["编程", "读书"];
+
+// 函数类型
+function add(a: number, b: number): number { return a + b; }
+function greet(name: string, greeting?: string): string {
+    return (greeting || "你好") + ", " + name;
+}`,
+          language: "typescript",
+        },
+        {
+          title: "接口和类型别名——定义「形状」",
+          content: `interface 像「合同」——定义规范，谁用谁就得按规范来。可以扩展（extends）。
+type 像「别名」——给一个复杂类型起个简短名字。支持联合类型 |、交叉类型 & 等骚操作。
+
+泛型就是类型的「参数化」——不用写死类型，而是「谁用谁指定」。`,
+          code: `// 接口
+interface User { id: number; name: string; email: string; age?: number; }
+function printUser(user: User) { console.log(user.name); }
+
+// 接口继承
+interface AdminUser extends User {
+    role: "admin" | "superadmin";
+    permissions: string[];
+}
+
+// 类型别名
+type Status = "active" | "inactive" | "pending";
+type Point = { x: number; y: number };
+
+// 泛型——给类型「传参数」
+function getFirst<T>(arr: T[]): T | undefined { return arr[0]; }
+const first = getFirst<number>([1, 2, 3]);  // first 的类型是 number`,
+          language: "typescript",
+          tip: "TS 学习曲线是先陡后平——刚开始满屏报错觉得很烦，一旦适应了就再也回不去 JS 了。类型安全感极强。",
+        },
+      ],
+      quiz: [
+        { question: "TypeScript 相比 JS 最大优势？", options: ["更快", "编译时的类型检查", "更小体积", "不依赖 Node"], answer: 1, explanation: "TS 通过静态类型检查在编译时就能发现类型相关的 bug，大幅减少运行时错误。" },
+        { question: "any 和 unknown 的区别？", options: ["没区别", "any 绕过类型检查，unknown 必须先检查才能用", "unknown 更快", "any 更安全"], answer: 1, explanation: "any 直接关闭类型检查；unknown 虽然接受任何值，但使用前必须做类型判断，更安全。" },
       ],
     },
     "react-basics": {
       slug: "react-basics",
       sections: [
         {
-          title: "React 组件基础",
-          content: `React 是 Facebook 开发的用于构建用户界面的 JavaScript 库。React 的核心思想是将 UI 拆分为独立的、可复用的组件。
+          title: "React 组件基础——搭 UI 积木",
+          content: `React 的核心思想就是把 UI 拆成一个个独立的、可复用的「组件」。每个组件就像一块积木，你可以随便组合它们搭出复杂的界面。
 
-组件是 React 的基本构建块。每个组件都可以接收数据（props）并返回描述 UI 的 JSX。组件名必须以大写字母开头。
-
-JSX 是 JavaScript 的语法扩展，允许在 JS 中编写类似 HTML 的标记。JSX 最终会被编译为 React.createElement() 调用。`,
-          code: `// 函数组件（推荐）
-function Welcome({ name }) {
+组件就是一个返回 JSX 的函数。JSX 看起来像在 JavaScript 里写 HTML，其实会被编译成普通的 JS 函数调用。组件名必须以大写字母开头——React 靠这个区分「自定义组件」和「普通 HTML 标签」。`,
+          code: `// 函数组件（现代 React 的标准写法）
+function Welcome({ name }: { name: string }) {
     return (
         <div className="welcome">
             <h1>你好，{name}！</h1>
@@ -3524,7 +4889,7 @@ function Welcome({ name }) {
     );
 }
 
-// 使用组件
+// 使用组件——像搭乐高一样拼起来
 function App() {
     return (
         <div>
@@ -3538,67 +4903,187 @@ export default App;`,
           language: "jsx",
         },
         {
-          title: "Props 与 State",
-          content: `Props（属性）是组件之间传递数据的方式。Props 是只读的，组件不能修改自己的 Props。
+          title: "Props 与 State——数据怎么流动",
+          content: `React 里的数据分两种：
 
-State（状态）是组件内部管理的数据。当 State 改变时，组件会重新渲染。使用 useState Hook 管理函数组件的 State。
+Props——父组件传给子组件的数据，子组件只能读不能改。就像爸妈给你的零花钱，你可以花但不能在钱上改面额。
+State——组件自己管理的内部数据，改了 State 就会自动重新渲染界面。就像你自己的账户余额，想取就取想存就存。
 
-useState 返回一个数组：当前状态值和更新函数。调用更新函数会触发组件重新渲染。`,
+useState 是最基础的 State Hook。调用它返回一个数组：第一个是当前值，第二个是更新这个值的函数。每次调用更新函数，组件就会重新渲染。`,
           code: `import { useState } from 'react';
 
 function Counter() {
-    // 声明状态，初始值为 0
     const [count, setCount] = useState(0);
 
     return (
         <div>
             <p>当前计数：{count}</p>
-            <button onClick={() => setCount(count + 1)}>
-                加 1
-            </button>
-            <button onClick={() => setCount(count - 1)}>
-                减 1
-            </button>
-            <button onClick={() => setCount(0)}>
-                重置
-            </button>
+            <button onClick={() => setCount(count + 1)}>加 1</button>
+            <button onClick={() => setCount(count - 1)}>减 1</button>
+            <button onClick={() => setCount(0)}>重置</button>
         </div>
     );
 }`,
           language: "jsx",
-          tip: "State 更新是异步的。如果新状态依赖旧状态，应使用函数式更新：setCount(prev => prev + 1)。",
+          tip: "State 更新是异步的。如果新状态依赖于旧状态，要用函数式更新：setCount(prev => prev + 1)，避免拿到过期的值。",
         },
       ],
       quiz: [
-        { question: "React 组件名必须以什么开头？", options: ["小写字母", "大写字母", "下划线", "美元符号"], answer: 1, explanation: "React 约定组件名必须以大写字母开头，以便区分组件和普通 HTML 标签。" },
-        { question: "useState 返回什么？", options: ["一个对象", "一个值", "一个数组", "一个函数"], answer: 2, explanation: "useState 返回一个数组，包含当前状态值和更新状态的函数。" },
+        { question: "React 组件名为什么必须大写开头？", options: ["约定俗成", "React 用它区分组件和普通 HTML 标签", "为了好看", "性能更好"], answer: 1, explanation: "React 用首字母大写来区分是自定义组件还是原生 HTML 标签。" },
+        { question: "useState 返回的是什么？", options: ["一个对象", "一个值", "一个数组（值和更新函数）", "一个函数"], answer: 2, explanation: "useState 返回 [当前状态值, 更新状态的函数]。" },
+      ],
+    },
+    "react-hooks": {
+      slug: "react-hooks",
+      sections: [
+        {
+          title: "useEffect——管「额外的事」",
+          content: `React 组件主要负责「根据数据渲染 UI」，但有时候你需要干别的——发网络请求、订阅事件、操作 DOM、设置定时器。这些统统叫「副作用」，用 useEffect 来处理。
+
+useEffect 接受一个函数和一个依赖数组。函数在组件渲染后执行；依赖数组告诉 React「这些值变了才重新执行」。空数组 [] 表示只在组件加载时跑一次。`,
+          code: `import { useState, useEffect } from 'react';
+
+function UserProfile({ userId }: { userId: number }) {
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        fetch(\`/api/users/\${userId}\`)
+            .then(res => res.json())
+            .then(setUser);
+    }, [userId]);  // userId 变了就重新拉数据
+
+    // 清理函数：组件卸载或依赖变化前执行
+    useEffect(() => {
+        const timer = setInterval(() => console.log('tick'), 1000);
+        return () => clearInterval(timer);  // 一定要清理！
+    }, []);
+
+    if (!user) return <p>加载中...</p>;
+    return <div>{user.name}</div>;
+}`,
+          language: "jsx",
+          tip: "useEffect 的返回函数（清理函数）在组件卸载或者下一次 effect 执行前调用，用来清定时器、取消订阅等。忘记清理是内存泄漏的常见原因。",
+        },
+        {
+          title: "useRef——不被渲染影响的「小本本」",
+          content: `useRef 像一个「不被渲染影响的小本本」。它存的变量在组件整个生命周期里保持不变，改它的值也不会触发重新渲染。
+
+主要用途：拿 DOM 元素的引用（比如自动聚焦输入框）、保存上一次的值、存任何不想触发重渲染的数据。`,
+          code: `import { useRef, useEffect } from 'react';
+
+function AutoFocusInput() {
+    const inputRef = useRef<HTMLInputElement>(null);
+    useEffect(() => { inputRef.current?.focus(); }, []);
+    return <input ref={inputRef} type="text" />;
+}
+
+// 保存上一次的值（经典自定义 Hook）
+function usePrevious<T>(value: T): T | undefined {
+    const ref = useRef<T>();
+    useEffect(() => { ref.current = value; });
+    return ref.current;
+}`,
+          language: "jsx",
+        },
+        {
+          title: "useMemo 和 useCallback——需要时才优化",
+          content: `当组件重新渲染时，里面的计算和函数都会重新创建。大部分时候这不是问题，但如果计算很重或者函数传给子组件导致不必要的重渲染，就需要优化。
+
+useMemo——缓存计算结果，依赖不变就不重新算
+useCallback——缓存函数引用，依赖不变就返回同一个函数
+
+记住：不是每个地方都加这俩！只在真正需要优化的时候才用，否则反而增加复杂度和维护成本。`,
+          code: `import { useMemo, useCallback } from 'react';
+
+function ExpensiveList({ items, filter }: Props) {
+    // 只有 items 或 filter 变了才重新过滤
+    const filtered = useMemo(
+        () => items.filter(i => i.includes(filter)),
+        [items, filter]
+    );
+
+    // 函数引用不变，避免子组件不必要的重渲染
+    const handleClick = useCallback((id: number) => {
+        console.log('clicked', id);
+    }, []);
+
+    return filtered.map(item => <Item key={item} onClick={handleClick} />);
+}`,
+          language: "jsx",
+        },
+        {
+          title: "自定义 Hook——把逻辑抽出来复用",
+          content: `自定义 Hook 就是以 use 开头的普通函数，里面可以调用其他 Hook。这是 React 里复用状态逻辑的最佳方式——把「数据请求」「窗口尺寸」「表单处理」这些通用逻辑抽成自定义 Hook，多个组件直接用。`,
+          code: `// 自定义 Hook：追踪窗口尺寸
+function useWindowSize() {
+    const [size, setSize] = useState({
+        width: window.innerWidth,
+        height: window.innerHeight
+    });
+    useEffect(() => {
+        const handler = () => setSize({
+            width: window.innerWidth,
+            height: window.innerHeight
+        });
+        window.addEventListener('resize', handler);
+        return () => window.removeEventListener('resize', handler);
+    }, []);
+    return size;
+}
+
+// 在任何组件里直接用
+function ResponsiveComponent() {
+    const { width } = useWindowSize();
+    return <p>窗口宽度：{width}px</p>;
+}`,
+          language: "jsx",
+        },
+      ],
+      quiz: [
+        { question: "useEffect 第二个参数是空数组 [] 代表什么？", options: ["每次渲染都执行", "只在组件加载时执行一次", "依赖所有变量", "永不执行"], answer: 1, explanation: "[] 表示没有任何依赖，effect 只在组件首次渲染（挂载）后执行一次。" },
+        { question: "useRef 和 useState 最核心的区别是什么？", options: ["useRef 更快", "useRef 改变不触发重新渲染", "useState 能存 DOM 引用", "没区别"], answer: 1, explanation: "useRef 的值改变不会触发组件重新渲染，而 useState 的值改变会触发重渲染。" },
       ],
     },
     "vue-basics": {
       slug: "vue-basics",
       sections: [
         {
-          title: "Vue.js 模板语法",
-          content: `Vue.js 是一个渐进式 JavaScript 框架，核心思想是数据驱动视图。
+          title: "Vue.js 模板语法——数据驱动视图",
+          content: `Vue 的核心思想是「数据驱动视图」——你只管改数据，页面自动更新，不用手动操作 DOM。
 
-模板语法使用双大括号进行数据绑定（插值表达式）。v-bind 指令用于绑定 HTML 属性。v-on 指令用于绑定事件。
-
-Vue 实例通过 data 函数返回响应式数据对象。当数据改变时，视图自动更新。`,
+模板语法非常直觉：
+双大括号 {{ }}——把数据插到 HTML 里
+v-bind（简写 :）——把数据绑定到 HTML 属性上
+v-on（简写 @）——绑定事件
+v-model——表单双向绑定：改表单会更新数据，改数据会更新表单
+v-if / v-show——条件渲染，控制显示或隐藏
+v-for——循环渲染列表`,
           code: `<div id="app">
     <!-- 文本插值 -->
     <h1>{{ message }}</h1>
 
-    <!-- 绑定属性 -->
+    <!-- 属性绑定 -->
     <a v-bind:href="url">链接</a>
     <img :src="imageUrl" :alt="imageAlt">
 
     <!-- 事件绑定 -->
     <button v-on:click="handleClick">点击</button>
-    <button @click="handleClick">简写形式</button>
+    <button @click="handleClick">简写</button>
 
     <!-- 双向绑定 -->
     <input v-model="inputValue">
-    <p>输入内容：{{ inputValue }}</p>
+    <p>你输入了：{{ inputValue }}</p>
+
+    <!-- 条件渲染 -->
+    <p v-if="isLogin">欢迎回来！</p>
+    <p v-else>请先登录</p>
+
+    <!-- 列表渲染 -->
+    <ul>
+        <li v-for="(item, index) in items" :key="index">
+            {{ index }} - {{ item }}
+        </li>
+    </ul>
 </div>
 
 <script>
@@ -3609,26 +5094,606 @@ const app = Vue.createApp({
             url: 'https://vuejs.org',
             imageUrl: 'logo.png',
             imageAlt: 'Vue Logo',
-            inputValue: ''
+            inputValue: '',
+            isLogin: false,
+            items: ['苹果', '香蕉', '橘子']
         };
     },
     methods: {
-        handleClick() {
-            alert('按钮被点击了！');
-        }
+        handleClick() { alert('按钮被点击了！'); }
     }
 });
-
 app.mount('#app');
 </script>`,
           language: "html",
         },
       ],
       quiz: [
-        { question: "Vue 中 v-model 的作用是什么？", options: ["绑定事件", "双向数据绑定", "条件渲染", "列表渲染"], answer: 1, explanation: "v-model 实现表单元素与 Vue 数据的双向绑定。" },
+        { question: "Vue 中 v-model 的作用是什么？", options: ["绑定事件", "双向数据绑定", "条件渲染", "列表渲染"], answer: 1, explanation: "v-model 实现了表单元素和 Vue 数据的双向绑定——表单改数据就变，数据改表单就变。" },
+        { question: "v-if 和 v-show 的区别是什么？", options: ["没区别", "v-if 是真的添加/移除元素，v-show 是改 display", "v-show 更快", "v-if 只能用在表单上"], answer: 1, explanation: "v-if 是真正的条件渲染，不满足时 DOM 元素不存在；v-show 元素始终存在，只是切换 display 属性。" },
+      ],
+    },
+    "vue3-composition": {
+      slug: "vue3-composition",
+      sections: [
+        {
+          title: "组合式 API——把逻辑「组装」起来",
+          content: `Vue 3 最大的变化就是推出了组合式 API（Composition API）。在旧的选项式 API 里，同一个功能的代码散落在 data、methods、computed、watch 各处——功能一多就很难维护。组合式 API 允许你把同一块逻辑写在一起，然后用 setup() 函数「组装」起来。
+
+setup() 是组合式 API 的入口，在组件创建之前执行。在里面定义响应式数据、计算属性、方法，然后 return 出去给模板用。`,
+          code: `// Vue 3 组合式 API
+import { ref, reactive, computed, watch, onMounted } from 'vue';
+
+export default {
+    setup() {
+        // 响应式数据
+        const count = ref(0);              // 基本类型用 ref
+        const user = reactive({            // 对象用 reactive
+            name: '张三',
+            age: 25
+        });
+
+        // 计算属性
+        const doubleCount = computed(() => count.value * 2);
+
+        // 方法
+        function increment() {
+            count.value++;  // ref 需要 .value 访问
+        }
+
+        // 侦听器
+        watch(count, (newVal, oldVal) => {
+            console.log(\`count 从 \${oldVal} 变成了 \${newVal}\`);
+        });
+
+        // 生命周期
+        onMounted(() => {
+            console.log('组件挂载好了');
+        });
+
+        // 返回给模板用的东西
+        return { count, user, doubleCount, increment };
+    }
+};`,
+          language: "javascript",
+        },
+        {
+          title: "ref vs reactive——该用哪个？",
+          content: `ref 和 reactive 都能创建响应式数据，但有细微差别：
+
+ref——适合基本类型（字符串、数字、布尔）。在 JS 里访问要 .value，模板里自动解包不用加 .value。也能包对象但内部会转成 reactive。
+reactive——适合对象和数组，直接访问属性不用 .value。但不能整体重新赋值（会丢失响应式）。
+
+简单记：基本类型用 ref，对象用 reactive。或者偷懒统一用 ref（因为 ref 什么都能包）。`,
+        },
+        {
+          title: "组合函数——逻辑复用的最佳方式",
+          content: `组合式 API 最大的好处是你可以把一段逻辑抽成「组合函数」（composable），在多个组件里复用。就像 React 的自定义 Hook 一样，命名习惯也以 use 开头。`,
+          code: `// composables/useMouse.js——追踪鼠标位置
+import { ref, onMounted, onUnmounted } from 'vue';
+
+export function useMouse() {
+    const x = ref(0);
+    const y = ref(0);
+
+    function update(event) {
+        x.value = event.pageX;
+        y.value = event.pageY;
+    }
+
+    onMounted(() => window.addEventListener('mousemove', update));
+    onUnmounted(() => window.removeEventListener('mousemove', update));
+
+    return { x, y };
+}
+
+// 在组件中使用
+import { useMouse } from './composables/useMouse';
+
+export default {
+    setup() {
+        const { x, y } = useMouse();
+        return { x, y };
+    }
+};
+// 模板里：<p>鼠标位置：{{ x }}, {{ y }}</p>`,
+          language: "javascript",
+          tip: "组合函数命名习惯以 use 开头（useMouse、useFetch），这是 Vue 社区约定，跟 React Hook 的命名习惯一致。",
+        },
+      ],
+      quiz: [
+        { question: "Vue 3 中 ref 和 reactive 的主要区别？", options: ["ref 更快", "ref 适合基本类型需 .value，reactive 适合对象", "reactive 更旧", "没区别"], answer: 1, explanation: "ref 适合基本类型在 JS 里通过 .value 访问；reactive 适合对象直接访问属性。" },
+        { question: "组合式 API 相比选项式 API 最大优势？", options: ["更快", "能把同一功能的代码组织在一起", "更少代码", "更好的 TS 支持"], answer: 1, explanation: "组合式 API 允许将同一功能相关的数据、方法、侦听器写在一起，而不是分散在不同选项里。" },
+      ],
+    },
+    "nextjs-basics": {
+      slug: "nextjs-basics",
+      sections: [
+        {
+          title: "Next.js 是什么——React 的「完全体」",
+          content: `React 本身只是个 UI 库，要做完整的网站你得自己配路由、做服务端渲染、优化 SEO……Next.js 就是把这些「标配功能」全给你集成好了的 React 框架。
+
+它的几大亮点：
+文件即路由——在 app 目录下建个文件，自动就是一个页面路由，不用写路由配置
+服务端渲染（SSR）和静态生成（SSG）——页面可以在服务器上生成好再发给浏览器，首屏飞快，SEO 友好
+API 路由——同一个项目里既能写前端页面也能写后端 API
+图片优化、字体优化、代码分割……你需要的优化它基本都内置了`,
+          code: `// app/page.tsx——首页（App Router 写法）
+export default function Home() {
+    return (
+        <main>
+            <h1>欢迎来到我的网站</h1>
+            <p>这个页面可以是服务端渲染的，也可以是静态生成的</p>
+        </main>
+    );
+}`,
+          language: "tsx",
+        },
+        {
+          title: "服务端组件 vs 客户端组件",
+          content: `Next.js 13+ 的 App Router 区分了两种组件：
+
+服务端组件（默认）——在服务器上运行，可以直接查数据库、读文件系统，发给浏览器的 HTML 不含 JS，体积为零。但不能用 useState、useEffect 这些浏览器才能跑的 Hook。
+
+客户端组件——在浏览器中运行，就是传统的 React 组件。当你需要交互、状态管理、事件处理时，在文件顶部加 'use client' 声明就行了。`,
+          code: `// 服务端组件（默认）——可以直接 async/await 拿数据
+async function BlogList() {
+    const posts = await fetch('https://api.example.com/posts', {
+        next: { revalidate: 3600 }  // 每小时自动重新生成
+    }).then(res => res.json());
+
+    return (
+        <ul>
+            {posts.map(post => (
+                <li key={post.id}>{post.title}</li>
+            ))}
+        </ul>
+    );
+}
+
+// 客户端组件——需要交互时加 'use client'
+'use client';
+import { useState } from 'react';
+
+function LikeButton() {
+    const [likes, setLikes] = useState(0);
+    return <button onClick={() => setLikes(likes + 1)}>点赞 {likes}</button>;
+}`,
+          language: "tsx",
+        },
+        {
+          title: "路由和导航",
+          content: `Next.js 的 App Router 用文件夹结构定义路由：
+
+app/page.tsx → 首页 /
+app/about/page.tsx → /about 页面
+app/blog/[slug]/page.tsx → /blog/任意文章名 页面
+app/dashboard/layout.tsx → /dashboard 的共享布局
+
+链接用 next/link 组件而不是 a 标签，Next.js 自动做客户端导航——不刷新整页，体验跟 SPA 一样丝滑。`,
+          code: `// 导航示例
+import Link from 'next/link';
+
+export default function Nav() {
+    return (
+        <nav>
+            <Link href="/">首页</Link>
+            <Link href="/blog">博客</Link>
+            <Link href="/about">关于</Link>
+        </nav>
+    );
+}`,
+          language: "tsx",
+          tip: "App Router 里的 layout.tsx 在导航时不会重新渲染，只更新变化的部分——这个「部分渲染」是 Next.js 性能优秀的关键。",
+        },
+        {
+          title: "数据获取——三种策略",
+          content: `Next.js 提供了灵活的数据获取方式：
+
+SSR——每次请求都在服务器生成页面，数据永远最新。适合实时数据、个性化内容。
+SSG——构建时生成页面，CDN 一发，快到离谱。适合博客、文档、营销页面。
+ISR——SSG 升级版，可以设页面多长时间自动重新生成。兼顾速度和新鲜度。`,
+          code: `// SSR：每次请求都拿最新数据
+async function getData() {
+    const res = await fetch('https://api.example.com/data', {
+        cache: 'no-store'  // 不缓存，每次拿最新
+    });
+    return res.json();
+}
+
+// SSG + ISR：构建时生成，定时更新
+async function getData() {
+    const res = await fetch('https://api.example.com/posts', {
+        next: { revalidate: 60 }  // 每 60 秒允许重新生成
+    });
+    return res.json();
+}`,
+          language: "typescript",
+        },
+      ],
+      quiz: [
+        { question: "Next.js 「文件即路由」是什么意思？", options: ["每个文件手动配路由", "app 目录下创建文件就自动生成路由", "路由存在单独文件里", "只能用 API 路由"], answer: 1, explanation: "Next.js 基于文件系统自动生成路由，app 目录下的文件/文件夹结构直接对应 URL 路径。" },
+        { question: "ISR（增量静态再生）相比纯 SSG 的优势？", options: ["构建更快", "可以在运行时定期重新生成页面", "更安全", "体积更小"], answer: 1, explanation: "ISR 允许在运行中按设定间隔重新生成静态页面，不用重新构建整个站点就能更新内容。" },
+      ],
+    },
+    "tailwind-basics": {
+      slug: "tailwind-basics",
+      sections: [
+        {
+          title: "Tailwind CSS——直接给 HTML 化妆",
+          content: `传统 CSS 是「写类名然后在样式表里定义样式」。Tailwind 反过来了——直接用一堆预定义的工具类（utility class）在 HTML 上组合出样式，不写 CSS 文件。
+
+比如你想要一个蓝色背景、白色文字、内边距、圆角的 div，直接写成：
+<div class="bg-blue-500 text-white p-4 rounded-lg">
+
+每个 class 干一件事，组合起来就是最终效果。刚开始可能觉得 HTML 「好长好丑」，但用习惯了就回不去了——不用在 CSS 和 HTML 之间来回切，不用纠结给类起什么名。`,
+        },
+        {
+          title: "核心概念——「工具优先」",
+          content: `Tailwind 的几个核心概念：
+
+响应式前缀——sm:、md:、lg: 等前缀让类只在特定屏幕尺寸生效。md:flex 就是说中屏以上才变 flex。
+
+状态变体——hover:、focus:、active: 等。hover:bg-red-500 就是鼠标悬停背景变红。
+
+暗色模式——dark: 前缀。dark:bg-gray-800 在暗色模式下背景变深灰。
+
+任意值——方括号写法。w-[300px] 或 text-[#ff6600] 表示「就用这个值」。`,
+          code: `<!-- Tailwind 实战——一张卡片组件 -->
+<div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
+    <div class="md:flex">
+        <div class="md:shrink-0">
+            <img class="h-48 w-full object-cover md:h-full md:w-48"
+                 src="photo.jpg" alt="图片">
+        </div>
+        <div class="p-8">
+            <div class="uppercase tracking-wide text-sm text-indigo-500 font-semibold">
+                公司新闻
+            </div>
+            <a href="#" class="block mt-1 text-lg font-medium text-black hover:underline">
+                我们推出了新产品！
+            </a>
+            <p class="mt-2 text-gray-500">
+                这是一段产品描述文字，颜色为灰色。
+            </p>
+        </div>
+    </div>
+</div>`,
+          language: "html",
+        },
+        {
+          title: "Tailwind v4 的变化",
+          content: `Tailwind v4 相比 v3 大幅简化：
+不再需要 tailwind.config.js——配置直接在 CSS 文件里完成
+用 @import "tailwindcss" 引入，替代旧的 @tailwind 指令
+CSS-first 配置——在 CSS 里直接设置主题变量、自定义值
+原生支持最新的 CSS 特性如 oklch 颜色空间`,
+          tip: "Tailwind 的「丑」只是审美习惯问题——当你不再需要给类起名字、也不用在 CSS 文件里翻来翻去的时候，你会爱上这种极简的写法。",
+        },
+        {
+          title: "效率技巧",
+          content: `给 Tailwind 提速的几个技巧：
+装 VS Code 插件 Tailwind CSS IntelliSense——自动补全、悬停预览、还能排序类名
+编辑器设保存时自动排序类名——用 Prettier 的 tailwindcss 插件
+不理解某个类时看文档或问 AI——不用背，用得多了自然就记住了
+遇到重复的类组合提取成组件——这才是 Tailwind 的正确用法`,
+        },
+      ],
+      quiz: [
+        { question: "Tailwind CSS 的核心设计理念？", options: ["写更少 HTML", "用工具类直接在 HTML 上组合样式", "组件化 CSS", "CSS-in-JS"], answer: 1, explanation: "Tailwind 用大量预定义的工具类直接在 HTML 上写样式，而不是在单独的 CSS 文件里定义。" },
+        { question: "Tailwind 中 md:flex 的 md: 前缀是什么意思？", options: ["暗色模式", "中屏及以上才生效", "鼠标悬停", "最大宽度"], answer: 1, explanation: "md: 是响应式前缀，表示在中等屏幕尺寸及以上时这个样式才生效。" },
+      ],
+    },
+    "dom-manipulation": {
+      slug: "dom-manipulation",
+      sections: [
+        {
+          title: "DOM 是什么——浏览器眼里的网页",
+          content: `DOM（文档对象模型）就是浏览器把 HTML 解析之后生成的一棵「节点树」。每个标签、每段文字、每个属性都变成树上的一个节点。JavaScript 可以操作这棵树——增删改查节点——这就是「DOM 操作」。
+
+在没有 React/Vue 这些框架之前，前端开发基本就是在跟 DOM 打交道。现在框架帮我们封装了大部分 DOM 操作，但理解它仍然很重要——调试、写自定义交互都离不开。`,
+        },
+        {
+          title: "查找元素——找到你要操作的那个",
+          content: `要操作 DOM，先得找到那个元素。原生 JS 提供了几种查找方法：
+
+getElementById——按 ID 找，最快最直接
+querySelector——用 CSS 选择器找第一个匹配的，万能
+querySelectorAll——找所有匹配的，返回 NodeList
+getElementsByClassName / getElementsByTagName——按类名或标签名找（旧 API）`,
+          code: `// 查找元素
+const header = document.getElementById('header');
+const firstBtn = document.querySelector('.btn');
+const allBtns = document.querySelectorAll('.btn');
+const paragraphs = document.getElementsByTagName('p');
+
+// querySelector 支持任意 CSS 选择器
+const activeLink = document.querySelector('nav a.active');
+const firstLi = document.querySelector('ul > li:first-child');`,
+          language: "javascript",
+        },
+        {
+          title: "修改内容和样式",
+          content: `找到元素后就可以改内容、改属性、改样式：
+
+textContent——改文本（安全，不会执行 HTML）
+innerHTML——改 HTML 内容（可以插标签但有 XSS 风险）
+setAttribute / getAttribute——读写属性
+classList——管理 CSS 类（add、remove、toggle、contains）
+style——直接改内联样式`,
+          code: `// 改内容
+const title = document.querySelector('h1');
+title.textContent = '新标题';           // 安全，只当纯文本
+title.innerHTML = '新<em>标题</em>';     // 能插 HTML，注意 XSS
+
+// 管理 CSS 类
+const box = document.querySelector('.box');
+box.classList.add('active');
+box.classList.remove('hidden');
+box.classList.toggle('dark');          // 有就去掉，没有就加上
+box.classList.contains('active');      // → true
+
+// 直接改样式
+box.style.backgroundColor = '#ff6600';
+box.style.transform = 'translateY(-10px)';`,
+          language: "javascript",
+        },
+        {
+          title: "创建和删除节点",
+          content: `不光能改现有元素，还能动态创建新元素或删掉不要的：
+
+createElement——创建新标签
+appendChild / append——往一个元素里加子节点
+insertBefore / insertAdjacentHTML——在指定位置插入
+remove / removeChild——删除元素`,
+          code: `// 创建新元素
+const newDiv = document.createElement('div');
+newDiv.textContent = '我是新来的';
+newDiv.classList.add('new-box');
+document.body.appendChild(newDiv);
+
+// 在特定位置插入
+container.insertBefore(newDiv, beforeThis);
+
+// 快速插入 HTML
+container.insertAdjacentHTML('beforeend', '<p>加到最后</p>');
+// 四个位置：beforebegin, afterbegin, beforeend, afterend
+
+// 删除
+oldElement.remove();`,
+          language: "javascript",
+        },
+        {
+          title: "事件处理——让页面「活」起来",
+          content: `用户的点击、输入、滚动、按键……都是「事件」。通过事件监听让页面响应这些操作。
+
+事件冒泡是 DOM 的核心机制——事件先在最内层元素触发，然后一层层往上冒。利用这个可以做「事件委托」——在父元素上统一处理子元素的事件。`,
+          code: `// 事件监听
+const btn = document.querySelector('button');
+btn.addEventListener('click', (event) => {
+    console.log('被点了！', event.target);
+    event.preventDefault();   // 阻止默认行为
+    event.stopPropagation();  // 阻止冒泡
+});
+
+// 事件委托——在父元素上统一处理（性能优化经典套路）
+document.querySelector('ul').addEventListener('click', (event) => {
+    if (event.target.tagName === 'LI') {
+        console.log('点了：', event.target.textContent);
+    }
+});
+
+// 常用事件类型
+// click, dblclick, mousedown, mouseup, mousemove
+// keydown, keyup, keypress
+// submit, change, input, focus, blur
+// scroll, resize, load, DOMContentLoaded`,
+          language: "javascript",
+          tip: "事件委托是性能优化的经典技巧——不要给 100 个 li 分别绑事件，在父元素 ul 上绑一个，通过 event.target 判断点了哪个。",
+        },
+      ],
+      quiz: [
+        { question: "innerHTML 和 textContent 区别？", options: ["没区别", "innerHTML 可解析 HTML 标签，textContent 只当纯文本", "textContent 更快", "innerHTML 更安全"], answer: 1, explanation: "innerHTML 把内容当 HTML 解析（有 XSS 风险），textContent 只插入纯文本，更安全。" },
+        { question: "事件委托利用了 DOM 的什么机制？", options: ["事件捕获", "事件冒泡", "同步执行", "异步回调"], answer: 1, explanation: "事件委托利用事件冒泡，在父元素上绑定一个监听器处理所有子元素事件。" },
+      ],
+    },
+    "ajax-fetch": {
+      slug: "ajax-fetch",
+      sections: [
+        {
+          title: "Ajax 和 Fetch——网页怎么偷偷发请求",
+          content: `Ajax 技术的核心就一件事：不刷新整个页面就能跟服务器交换数据。你刷微博时往下滑自动加载更多内容、在搜索框里输入时弹出的联想词——全是 Ajax 在背后干活。
+
+以前用 XMLHttpRequest（又长又臭的 XHR），现在全用 Fetch API，基于 Promise，写法清爽多了。`,
+        },
+        {
+          title: "Fetch 基本用法",
+          content: `Fetch 用法很简单：传 URL 进去，它返回一个 Promise，拿到响应后按需解析 JSON、文本等。
+
+核心就是 fetch(url, options)，其中 options 可以指定请求方法（GET/POST）、请求头、请求体等。`,
+          code: `// GET 请求
+fetch('/api/users')
+    .then(res => {
+        if (!res.ok) throw new Error('请求失败');
+        return res.json();
+    })
+    .then(data => console.log('数据：', data))
+    .catch(err => console.error('出错：', err));
+
+// POST 请求（发数据）
+fetch('/api/users', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: '张三', email: 'zhangsan@example.com' })
+})
+    .then(res => res.json())
+    .then(data => console.log('创建成功：', data));
+
+// async/await 写法（更优雅）
+async function getUsers() {
+    try {
+        const res = await fetch('/api/users');
+        const users = await res.json();
+        return users;
+    } catch (err) {
+        console.error('请求出错：', err);
+    }
+}`,
+          language: "javascript",
+        },
+        {
+          title: "处理响应——不只是 JSON",
+          content: `Response 对象提供多种解析方式：
+
+res.json()——解析 JSON 数据（最常用）
+res.text()——获取纯文本
+res.blob()——获取二进制数据（图片、文件等）
+res.arrayBuffer()——获取原始二进制缓冲
+
+还要注意 res.ok——它是 true 时状态码在 200-299 之间，false 时（如 404、500）也要处理。`,
+        },
+        {
+          title: "请求配置——更多选项",
+          content: `Fetch 的第二个参数 options 可以配置很多东西：
+
+method——请求方法（GET、POST、PUT、DELETE 等）
+headers——请求头对象
+body——请求体数据
+mode——CORS 模式（cors、no-cors、same-origin）
+credentials——是否带 Cookie（include、same-origin、omit）
+cache——缓存策略（default、no-cache、reload、force-cache）`,
+          code: `// 完整配置示例
+await fetch('/api/data', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+    },
+    body: JSON.stringify(data),
+    credentials: 'include',  // 跨域请求也带 Cookie
+    cache: 'no-cache'
+});`,
+          language: "javascript",
+          tip: "Fetch 默认不会在 404 或 500 时 reject，只会把 ok 设为 false。记得检查 res.ok 或手动处理状态码。",
+        },
+        {
+          title: "取消请求——AbortController",
+          content: `有时候用户操作变了（比如快速切换页面），需要取消正在飞行的请求。AbortController 就是干这个的。`,
+          code: `// 取消请求
+const controller = new AbortController();
+
+fetch('/api/data', { signal: controller.signal })
+    .then(res => res.json())
+    .catch(err => {
+        if (err.name === 'AbortError') {
+            console.log('请求被取消了');
+        }
+    });
+
+// 5 秒后超时取消
+setTimeout(() => controller.abort(), 5000);
+
+// 或者用 AbortSignal.timeout() 一键设置超时
+fetch('/api/data', { signal: AbortSignal.timeout(5000) });`,
+          language: "javascript",
+        },
+      ],
+      quiz: [
+        { question: "Fetch API 相比旧的 XMLHttpRequest 最大优势？", options: ["更快", "基于 Promise，写法更清晰", "支持更多格式", "不依赖浏览器"], answer: 1, explanation: "Fetch 基于 Promise 和链式调用，配合 async/await 代码更简洁易读。" },
+        { question: "Fetch 请求返回 404 时会 reject 吗？", options: ["会", "不会，只会把 ok 设为 false", "取决于配置", "会抛出异常"], answer: 1, explanation: "Fetch 只在网络故障时 reject。HTTP 错误状态码（404、500 等）不会 reject，需要通过 res.ok 或 res.status 手动判断。" },
+      ],
+    },
+    "bootstrap-basics": {
+      slug: "bootstrap-basics",
+      sections: [
+        {
+          title: "Bootstrap 是什么——老牌 UI 框架",
+          content: `Bootstrap 是最老牌的 CSS 框架，由 Twitter 开发。它的核心价值就是「开箱即用」——提供了大量预置的组件和栅格系统，不用从零设计按钮、表单、导航栏，直接用现成的 class 就行。
+
+虽然现在有了 Tailwind 等更现代的方案，但 Bootstrap 在快速原型、后台管理系统、不追求个性化设计的项目里依然很能打。`,
+        },
+        {
+          title: "栅格系统——12 列响应式布局",
+          content: `Bootstrap 最经典的就是它的 12 列栅格系统。页面横向分成 12 列，你想占几列就占几列。而且自带 5 个断点（xs、sm、md、lg、xl），不同屏幕尺寸自动适配。`,
+          code: `<!-- Bootstrap 栅格 -->
+<div class="container">
+    <div class="row">
+        <!-- 中屏及以上占 8 列，小屏占 12 列（全宽） -->
+        <div class="col-md-8 col-12">
+            <h2>主内容区</h2>
+            <p>在大屏幕上占 8/12 宽，手机上全宽。</p>
+        </div>
+        <!-- 侧边栏 -->
+        <div class="col-md-4 col-12">
+            <h3>侧边栏</h3>
+            <p>在大屏幕上占 4/12 宽。</p>
+        </div>
+    </div>
+</div>`,
+          language: "html",
+        },
+        {
+          title: "常用组件速览",
+          content: `Bootstrap 提供了一大堆现成的组件，加个 class 就能用：
+
+按钮——btn、btn-primary、btn-lg 等
+卡片——card、card-header、card-body
+导航栏——navbar、nav、dropdown
+表单——form-control、form-check、input-group
+弹窗——modal、alert、toast
+排版工具——text-center、fw-bold、mt-3、p-4（间距工具类）`,
+          code: `<!-- Bootstrap 组件示例 -->
+<!-- 按钮 -->
+<button class="btn btn-primary">主要按钮</button>
+<button class="btn btn-outline-danger">危险轮廓按钮</button>
+<button class="btn btn-success btn-lg">大号成功按钮</button>
+
+<!-- 卡片 -->
+<div class="card" style="width: 18rem;">
+    <img src="photo.jpg" class="card-img-top" alt="图片">
+    <div class="card-body">
+        <h5 class="card-title">卡片标题</h5>
+        <p class="card-text">这是卡片的内容文字。</p>
+        <a href="#" class="btn btn-primary">了解更多</a>
+    </div>
+</div>
+
+<!-- 导航栏 -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">品牌名</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link active" href="#">首页</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">功能</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">关于</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>`,
+          language: "html",
+        },
+        {
+          title: "Bootstrap 怎么选？",
+          content: `Bootstrap 还是 Tailwind？简单说：
+
+选 Bootstrap 如果——你要快速出活、做后台管理系统、不想纠结设计细节、团队不擅长写 CSS。
+选 Tailwind 如果——你想要高度定制化的设计风格、喜欢用工具类组合样式、追求设计自由度。
+
+两个框架都很成熟，选哪个都不会错。关键看你的团队和项目需求。`,
+        },
+      ],
+      quiz: [
+        { question: "Bootstrap 栅格系统把一行分成几列？", options: ["6 列", "10 列", "12 列", "24 列"], answer: 2, explanation: "Bootstrap 使用 12 列栅格系统，通过 col-* 类指定元素占多少列。" },
+        { question: "Bootstrap 中 col-md-6 的 md 代表什么？", options: ["暗色模式", "中等屏幕及以上", "中等字体", "中等间距"], answer: 1, explanation: "md 是 Bootstrap 的断点前缀，表示在中等屏幕（>=768px）及以上时生效。" },
       ],
     },
   },
+
   // ============ Backend ============
   backend: {
     "go-basics": {
