@@ -196,8 +196,11 @@ function QuizSection({
   const [selected, setSelected] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState({ correct: 0, total: 0 });
+  const [wrongAnswers, setWrongAnswers] = useState<Array<{ question: string; userAnswer: number; correctAnswer: number; explanation: string }>>([]);
+  const [finished, setFinished] = useState(false);
 
   const q = quiz[current];
+  const lastQuestion = current === quiz.length - 1;
 
   const handleSelect = (i: number) => {
     if (showResult) return;
@@ -207,17 +210,86 @@ function QuizSection({
   const handleSubmit = () => {
     if (selected === null) return;
     setShowResult(true);
+    const isCorrect = selected === q.answer;
     setScore(prev => ({
-      correct: prev.correct + (selected === q.answer ? 1 : 0),
+      correct: prev.correct + (isCorrect ? 1 : 0),
       total: prev.total + 1,
     }));
+    if (!isCorrect) {
+      setWrongAnswers(prev => [...prev, {
+        question: q.question,
+        userAnswer: selected,
+        correctAnswer: q.answer,
+        explanation: q.explanation,
+      }]);
+    }
   };
 
   const handleNext = () => {
-    setCurrent(prev => (prev + 1) % quiz.length);
-    setSelected(null);
-    setShowResult(false);
+    if (lastQuestion) {
+      setFinished(true);
+    } else {
+      setCurrent(prev => prev + 1);
+      setSelected(null);
+      setShowResult(false);
+    }
   };
+
+  if (finished) {
+    return (
+      <div className="pt-6 border-t" style={{ borderColor: "var(--outline-variant)" }}>
+        <h2 className="text-lg font-semibold mb-4" style={{ color: "var(--on-surface)" }}>知识测验</h2>
+        <div className="rounded-lg border p-4" style={{ background: "var(--surface-container-lowest)", borderColor: "var(--outline-variant)" }}>
+          <div className="text-center mb-4">
+            <p className="text-xl font-bold mb-1" style={{ color: "var(--on-surface)" }}>
+              {score.correct}/{score.total} 正确
+            </p>
+            <p className="text-sm" style={{ color: "var(--outline)" }}>
+              {score.correct === score.total ? "全部答对，太强了！" :
+               score.correct >= score.total * 0.7 ? "还不错，继续加油！" :
+               "多复习一下，下次会更好！"}
+            </p>
+          </div>
+          {wrongAnswers.length > 0 && (
+            <div className="mt-4 pt-4 border-t" style={{ borderColor: "var(--outline-variant)" }}>
+              <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--error)" }}>
+                错题回顾 ({wrongAnswers.length} 题)
+              </h3>
+              <div className="space-y-3">
+                {wrongAnswers.map((w, i) => (
+                  <div key={i} className="p-3 rounded text-sm" style={{ background: "color-mix(in srgb, var(--error) 6%, transparent)", color: "var(--on-surface)" }}>
+                    <p className="font-medium mb-1">{i + 1}. {w.question}</p>
+                    <p className="mb-1">
+                      <span style={{ color: "var(--error)" }}>你的答案：{String.fromCharCode(65 + w.userAnswer)}. {quiz.find(q => q.question === w.question)?.options[w.userAnswer]}</span>
+                    </p>
+                    <p className="mb-1">
+                      <span style={{ color: "var(--tertiary)" }}>正确答案：{String.fromCharCode(65 + w.correctAnswer)}. {quiz.find(q => q.question === w.question)?.options[w.correctAnswer]}</span>
+                    </p>
+                    <p style={{ color: "var(--outline)" }}>{w.explanation}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {wrongAnswers.length === 0 && (
+            <div className="mt-4 pt-4 border-t text-center" style={{ borderColor: "var(--outline-variant)", color: "var(--tertiary)" }}>
+              <CheckCircle className="w-10 h-10 mx-auto mb-2" />
+              <p className="text-sm font-medium">完美！没有错题。</p>
+            </div>
+          )}
+          <div className="mt-4 flex justify-center">
+            <button
+              onClick={() => { setCurrent(0); setSelected(null); setShowResult(false); setFinished(false); setWrongAnswers([]); setScore({ correct: 0, total: 0 }); }}
+              className="px-4 py-2 rounded text-sm font-medium"
+              style={{ background: "var(--secondary)", color: "var(--on-secondary)" }}
+            >
+              重新测验
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pt-6 border-t" style={{ borderColor: "var(--outline-variant)" }}>
@@ -285,7 +357,7 @@ function QuizSection({
               className="px-4 py-2 rounded text-sm font-medium"
               style={{ background: "var(--secondary)", color: "var(--on-secondary)" }}
             >
-              下一题
+               {lastQuestion ? "查看结果" : "下一题"}
             </button>
           )}
         </div>
