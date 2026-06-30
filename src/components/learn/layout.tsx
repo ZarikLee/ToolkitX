@@ -11,7 +11,7 @@ export default function LearnLayout({ children }: { children: React.ReactNode })
     <div className="min-h-screen" style={{ background: "var(--background)", color: "var(--foreground)" }}>
       {/* Header */}
       <header className="border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
-        <div className="w-full px-4 py-3 flex items-center justify-between gap-4">
+        <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <div className="w-8 h-8 flex items-center justify-center rounded" style={{ background: "var(--secondary)", color: "var(--on-secondary)" }}>
               <Wrench className="w-4 h-4" />
@@ -34,7 +34,7 @@ export default function LearnLayout({ children }: { children: React.ReactNode })
 export function CategoryNav({ activeId }: { activeId?: string }) {
   return (
     <nav className="border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
-      <div className="w-full px-3 py-1.5 flex items-center gap-0.5 overflow-x-auto">
+      <div className="max-w-[1400px] mx-auto px-3 py-1.5 flex items-center gap-0.5 overflow-x-auto">
         {categories.map(cat => (
           <Link
             key={cat.id}
