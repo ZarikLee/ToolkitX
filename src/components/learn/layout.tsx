@@ -33,19 +33,21 @@ export default function LearnLayout({ children }: { children: React.ReactNode })
 // Category horizontal nav bar (shown on category and tutorial pages)
 export function CategoryNav({ activeId }: { activeId?: string }) {
   return (
-    <nav className="border-b overflow-x-auto" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
-      <div className="max-w-[1200px] mx-auto px-4 flex items-center gap-0">
+    <nav className="border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
+      <div className="max-w-[1200px] mx-auto px-4 py-2 flex flex-wrap gap-1">
         {categories.map(cat => (
           <Link
             key={cat.id}
             href={`/learn/${cat.id}`}
-            className="px-3 py-2.5 text-[13px] font-medium shrink-0 border-b-2 transition-colors whitespace-nowrap"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-[12px] font-medium rounded transition-colors"
             style={{
-              color: activeId === cat.id ? "var(--secondary)" : "var(--on-surface-variant)",
-              borderColor: activeId === cat.id ? "var(--secondary)" : "transparent",
+              color: activeId === cat.id ? "var(--on-secondary)" : "var(--on-surface-variant)",
+              background: activeId === cat.id ? "var(--secondary)" : "transparent",
             }}
           >
-            <span className="mr-1">{cat.icon}</span>
+            <span className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold" style={{ background: activeId === cat.id ? "rgba(255,255,255,0.2)" : cat.color, color: activeId === cat.id ? "inherit" : "#fff" }}>
+              {cat.icon}
+            </span>
             {cat.name}
           </Link>
         ))}
@@ -66,7 +68,8 @@ export function TutorialSidebar({
     <aside className="w-56 shrink-0 hidden lg:block">
       <div className="sticky top-4 rounded-lg border overflow-hidden" style={{ background: "var(--surface-container-lowest)", borderColor: "var(--outline-variant)" }}>
         <div className="px-3 py-2.5 text-sm font-semibold border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-low)", color: "var(--on-surface)" }}>
-          {category.icon} {category.name}
+          <span className="w-5 h-5 rounded inline-flex items-center justify-center text-[10px] font-bold mr-1.5" style={{ background: category.color, color: "#fff" }}>{category.icon}</span>
+          {category.name}
         </div>
         <div className="py-1 max-h-[calc(100vh-120px)] overflow-y-auto">
           {category.tutorials.map(tutorial => (

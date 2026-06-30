@@ -22,7 +22,7 @@ export const categories: TutorialCategory[] = [
     id: "linux",
     name: "Linux",
     description: "Linux 系统管理与运维",
-    icon: "🐧",
+    icon: "L",
     color: "#f97316",
     gradient: "from-orange-500 to-red-500",
     tutorials: [
@@ -50,7 +50,7 @@ export const categories: TutorialCategory[] = [
     id: "sql",
     name: "SQL 数据库",
     description: "SQL 语言与数据库管理",
-    icon: "🗄️",
+    icon: "S",
     color: "#3b82f6",
     gradient: "from-blue-500 to-cyan-500",
     tutorials: [
@@ -75,7 +75,7 @@ export const categories: TutorialCategory[] = [
     id: "docker",
     name: "Docker & K8s",
     description: "容器化与编排技术",
-    icon: "🐳",
+    icon: "D",
     color: "#06b6d4",
     gradient: "from-cyan-500 to-blue-500",
     tutorials: [
@@ -97,7 +97,7 @@ export const categories: TutorialCategory[] = [
     id: "git",
     name: "Git 版本控制",
     description: "Git 工作流与协作开发",
-    icon: "📦",
+    icon: "G",
     color: "#ef4444",
     gradient: "from-red-500 to-orange-500",
     tutorials: [
@@ -117,7 +117,7 @@ export const categories: TutorialCategory[] = [
     id: "nginx",
     name: "Nginx",
     description: "Web 服务器与反向代理",
-    icon: "🌐",
+    icon: "N",
     color: "#22c55e",
     gradient: "from-green-500 to-emerald-500",
     tutorials: [
@@ -135,7 +135,7 @@ export const categories: TutorialCategory[] = [
     id: "python",
     name: "Python",
     description: "Python 编程与自动化",
-    icon: "🐍",
+    icon: "Py",
     color: "#eab308",
     gradient: "from-yellow-500 to-amber-500",
     tutorials: [
@@ -159,7 +159,7 @@ export const categories: TutorialCategory[] = [
     id: "javascript",
     name: "JavaScript & Node.js",
     description: "前端与后端 JavaScript 开发",
-    icon: "⚡",
+    icon: "JS",
     color: "#f59e0b",
     gradient: "from-amber-500 to-yellow-500",
     tutorials: [
@@ -181,7 +181,7 @@ export const categories: TutorialCategory[] = [
     id: "shell",
     name: "Shell 脚本",
     description: "Bash 脚本编程与自动化",
-    icon: "💻",
+    icon: "Sh",
     color: "#10b981",
     gradient: "from-emerald-500 to-green-500",
     tutorials: [
@@ -201,7 +201,7 @@ export const categories: TutorialCategory[] = [
     id: "network",
     name: "网络基础",
     description: "TCP/IP、HTTP、DNS 网络协议",
-    icon: "🔗",
+    icon: "Net",
     color: "#8b5cf6",
     gradient: "from-violet-500 to-purple-500",
     tutorials: [
@@ -221,7 +221,7 @@ export const categories: TutorialCategory[] = [
     id: "redis",
     name: "Redis",
     description: "内存数据库与缓存技术",
-    icon: "⚡",
+    icon: "Re",
     color: "#ef4444",
     gradient: "from-red-500 to-rose-500",
     tutorials: [
@@ -241,7 +241,7 @@ export const categories: TutorialCategory[] = [
     id: "frontend",
     name: "前端开发",
     description: "HTML、CSS、JavaScript 与主流框架",
-    icon: "🎨",
+    icon: "F",
     color: "#f472b6",
     gradient: "from-pink-500 to-rose-500",
     tutorials: [
@@ -265,7 +265,7 @@ export const categories: TutorialCategory[] = [
     id: "backend",
     name: "后端开发",
     description: "服务端编程与 API 开发",
-    icon: "⚙️",
+    icon: "B",
     color: "#6366f1",
     gradient: "from-indigo-500 to-violet-500",
     tutorials: [
@@ -286,7 +286,7 @@ export const categories: TutorialCategory[] = [
     id: "ai",
     name: "AI 智能开发",
     description: "机器学习、深度学习与 AI 应用",
-    icon: "🤖",
+    icon: "AI",
     color: "#a855f7",
     gradient: "from-purple-500 to-fuchsia-500",
     tutorials: [
@@ -308,7 +308,7 @@ export const categories: TutorialCategory[] = [
     id: "mobile",
     name: "移动开发",
     description: "iOS、Android 与跨平台开发",
-    icon: "📱",
+    icon: "M",
     color: "#14b8a6",
     gradient: "from-teal-500 to-cyan-500",
     tutorials: [
@@ -325,7 +325,7 @@ export const categories: TutorialCategory[] = [
     id: "languages",
     name: "编程语言",
     description: "C、C++、Go、Rust 等系统语言",
-    icon: "📝",
+    icon: "C",
     color: "#f59e0b",
     gradient: "from-amber-500 to-orange-500",
     tutorials: [
@@ -344,7 +344,7 @@ export const categories: TutorialCategory[] = [
     id: "fundamentals",
     name: "计算机基础",
     description: "数据结构、算法与设计模式",
-    icon: "🧮",
+    icon: "CS",
     color: "#ec4899",
     gradient: "from-pink-500 to-purple-500",
     tutorials: [

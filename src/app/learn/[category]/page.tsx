@@ -24,7 +24,7 @@ export default function CategoryPage({ params }: { params: Promise<{ category: s
         <main className="flex-1 min-w-0 px-6 py-6">
           {/* Category Header */}
           <div className="flex items-center gap-3 mb-4">
-            <span className="text-2xl">{category.icon}</span>
+            <span className="w-10 h-10 rounded flex items-center justify-center text-sm font-bold shrink-0" style={{ background: category.color, color: "#fff" }}>{category.icon}</span>
             <div>
               <h1 className="text-xl font-bold" style={{ color: "var(--on-surface)" }}>{category.name}</h1>
               <p className="text-sm" style={{ color: "var(--outline)" }}>{category.description} · {category.tutorials.length} 篇教程</p>

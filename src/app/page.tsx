@@ -170,7 +170,7 @@ export default function HomePage() {
                       fontWeight: activeCategory === cat.id ? 600 : 400,
                     }}
                   >
-                    <span className="text-base">{cat.icon}</span>
+                    <span className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold shrink-0" style={{ background: cat.color, color: "#fff" }}>{cat.icon}</span>
                     <span className="truncate">{cat.name}</span>
                   </button>
                 ))}
@@ -217,7 +217,7 @@ export default function HomePage() {
                 <div key={cat.id} className="mb-4">
                   <div className="rounded-lg border overflow-hidden" style={{ background: "var(--surface-container-lowest)", borderColor: "var(--outline-variant)" }}>
                     <div className="flex items-center gap-2 px-4 py-2.5 border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-low)" }}>
-                      <span style={{ color: cat.color }}>{iconMap[cat.id] || <BookOpen className="w-5 h-5" />}</span>
+                      <span className="w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold" style={{ background: cat.color, color: "#fff" }}>{cat.icon}</span>
                       <h2 className="text-sm font-semibold" style={{ color: "var(--on-surface)" }}>{cat.name}</h2>
                       <span className="ml-auto text-xs" style={{ color: "var(--outline)" }}>{cat.tutorials.length} 篇</span>
                     </div>
@@ -229,8 +229,8 @@ export default function HomePage() {
                           className="flex items-center gap-3 px-4 py-3 border-b border-r transition-colors hover:opacity-80"
                           style={{ borderColor: "var(--outline-variant)" }}
                         >
-                          <div className="w-9 h-9 rounded flex items-center justify-center shrink-0 text-sm" style={{ background: "var(--surface-container)", color: cat.color }}>
-                            {iconMap[cat.id] || <BookOpen className="w-4 h-4" />}
+                          <div className="w-9 h-9 rounded flex items-center justify-center shrink-0 text-xs font-bold" style={{ background: cat.color, color: "#fff" }}>
+                            {cat.icon}
                           </div>
                           <div className="min-w-0">
                             <h4 className="text-[13px] font-medium truncate" style={{ color: "var(--on-surface)" }}>{tutorial.title}</h4>
