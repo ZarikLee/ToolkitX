@@ -69,31 +69,31 @@ Shell——翻译官，你说人话（命令），Shell 翻译给内核听。最
           title: "第一行命令",
           content: `打开终端，看到那个一闪一闪的光标，这就是你的指挥中心了：`,
           code: `whoami          # 我是谁？
-root
+# root                                        ← 当前用户名
 
 hostname         # 这台机器叫什么？
-web-server-01
+# web-server-01                               ← 主机名
 
 uname -a         # 看看系统版本
-Linux web-server-01 5.15.0 #1 SMP x86_64 GNU/Linux
+# Linux web-server-01 5.15.0 #1 SMP x86_64 GNU/Linux  ← 内核名 主机名 内核版本 架构
 
 pwd              # 我现在在哪个目录？
-/root
+# /root                                       ← 当前工作目录路径
 
 ls               # 这目录里有什么？
-Desktop  Documents  Downloads
+# Desktop  Documents  Downloads               ← 当前目录下的文件和文件夹
 
 date             # 现在几点？
-Sun Jun 28 10:30:00 CST 2026
+# Sun Jun 28 10:30:00 CST 2026                ← 星期 月 日 时分秒 时区 年
 
 cal              # 看看日历
- June 2026
-Su Mo Tu We Th Fr Sa
- 1  2  3  4  5  6  7
- 8  9 10 11 12 13 14
-15 16 17 18 19 20 21
-22 23 24 25 26 27 28
-29 30`,
+#  June 2026                                  ← 当前月份日历
+# Su Mo Tu We Th Fr Sa                        ← 星期表头（周日到周六）
+#  1  2  3  4  5  6  7
+#  8  9 10 11 12 13 14
+# 15 16 17 18 19 20 21
+# 22 23 24 25 26 27 28
+# 29 30                                       ← 当月所有日期`,
           language: "bash",
           tip: "Tab 键是 Linux 里最好用的快捷键——帮你自动补全命令和文件名，告别手打全称的痛苦。",
         },
@@ -142,7 +142,7 @@ cd ..              # 上一级目录
 cd /               # 去根目录
 
 pwd                # 我现在在哪儿？
-/home/user/projects
+# /home/user/projects                         ← 当前目录的绝对路径
 
 mkdir newdir           # 新建一个文件夹
 mkdir -p a/b/c         # 一口气建三层文件夹
