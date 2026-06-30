@@ -11,7 +11,7 @@ export default function LearnLayout({ children }: { children: React.ReactNode })
     <div className="min-h-screen" style={{ background: "var(--background)", color: "var(--foreground)" }}>
       {/* Header */}
       <header className="border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
-        <div className="max-w-[1200px] mx-auto px-4 py-3 flex items-center justify-between gap-4">
+        <div className="w-full px-4 py-3 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <div className="w-8 h-8 flex items-center justify-center rounded" style={{ background: "var(--secondary)", color: "var(--on-secondary)" }}>
               <Wrench className="w-4 h-4" />
@@ -34,18 +34,18 @@ export default function LearnLayout({ children }: { children: React.ReactNode })
 export function CategoryNav({ activeId }: { activeId?: string }) {
   return (
     <nav className="border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
-      <div className="max-w-[1200px] mx-auto px-4 py-2 flex flex-wrap gap-1">
+      <div className="w-full px-3 py-1.5 flex items-center gap-0.5 overflow-x-auto">
         {categories.map(cat => (
           <Link
             key={cat.id}
             href={`/learn/${cat.id}`}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 text-[12px] font-medium rounded transition-colors"
+            className="flex items-center gap-1 px-1.5 py-1 text-[11px] font-medium rounded shrink-0 transition-colors"
             style={{
               color: activeId === cat.id ? "var(--on-secondary)" : "var(--on-surface-variant)",
               background: activeId === cat.id ? "var(--secondary)" : "transparent",
             }}
           >
-            <span className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold" style={{ background: activeId === cat.id ? "rgba(255,255,255,0.2)" : cat.color, color: activeId === cat.id ? "inherit" : "#fff" }}>
+            <span className="w-4 h-4 rounded flex items-center justify-center text-[9px] font-bold shrink-0" style={{ background: activeId === cat.id ? "rgba(255,255,255,0.2)" : cat.color, color: activeId === cat.id ? "inherit" : "#fff" }}>
               {cat.icon}
             </span>
             {cat.name}

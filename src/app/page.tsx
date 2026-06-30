@@ -91,7 +91,7 @@ export default function HomePage() {
     <div className="min-h-screen" style={{ background: "var(--background)", color: "var(--foreground)" }}>
       {/* Header */}
       <header className="border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
-        <div className="max-w-[1200px] mx-auto px-4 py-3 flex items-center justify-between gap-4">
+        <div className="w-full px-4 py-3 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <div className="w-8 h-8 flex items-center justify-center rounded" style={{ background: "var(--secondary)", color: "var(--on-secondary)" }}>
               <Wrench className="w-4 h-4" />
@@ -141,7 +141,7 @@ export default function HomePage() {
 
       {/* Navigation */}
       <nav className="border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
-        <div className="max-w-[1200px] mx-auto px-4 flex items-center gap-1">
+        <div className="w-full px-4 flex items-center gap-1">
           <Link href="/" className="px-3 py-2.5 text-sm font-medium border-b-2" style={{ color: "var(--secondary)", borderColor: "var(--secondary)" }}>
             首页
           </Link>
@@ -149,7 +149,7 @@ export default function HomePage() {
       </nav>
 
       {/* Main Content */}
-      <div className="max-w-[1200px] mx-auto px-4 py-4 flex gap-4">
+      <div className="w-full px-4 py-4 flex gap-4">
         {/* Left Sidebar - only in knowledge mode */}
         {mode === "knowledge" && (
           <aside className="w-44 shrink-0 hidden lg:block">
@@ -282,7 +282,7 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="border-t mt-8" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
-        <div className="max-w-[1200px] mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs" style={{ color: "var(--outline)" }}>
+        <div className="w-full px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs" style={{ color: "var(--outline)" }}>
           <div className="flex items-center gap-2">
             <span className="font-semibold" style={{ color: "var(--secondary)" }}>ToolkitX</span>
             <span>·</span>
