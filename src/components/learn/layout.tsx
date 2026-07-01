@@ -1,8 +1,7 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Wrench } from "lucide-react";
 import { categories, type TutorialCategory } from "@/data/tutorials";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 
@@ -13,9 +12,6 @@ export default function LearnLayout({ children }: { children: React.ReactNode })
       <header className="border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
         <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-8 h-8 flex items-center justify-center rounded" style={{ background: "var(--secondary)", color: "var(--on-secondary)" }}>
-              <Wrench className="w-4 h-4" />
-            </div>
             <span className="text-lg font-bold" style={{ color: "var(--on-surface)" }}>ToolkitX</span>
           </Link>
           <div className="flex items-center gap-2">
@@ -32,13 +28,24 @@ export default function LearnLayout({ children }: { children: React.ReactNode })
 
 // Category horizontal nav bar (shown on category and tutorial pages)
 export function CategoryNav({ activeId }: { activeId?: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!activeId || !containerRef.current) return;
+    const el = containerRef.current.querySelector(`[data-cat="${activeId}"]`) as HTMLElement | null;
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    }
+  }, [activeId]);
+
   return (
     <nav className="border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
-      <div className="max-w-[1400px] mx-auto px-3 py-1.5 flex items-center gap-0.5 overflow-x-auto">
+      <div ref={containerRef} className="max-w-[1400px] mx-auto px-3 py-1.5 flex items-center gap-0.5 overflow-x-auto">
         {categories.map(cat => (
           <Link
             key={cat.id}
             href={`/learn/${cat.id}`}
+            data-cat={cat.id}
             className="flex items-center gap-1 px-1.5 py-1 text-[11px] font-medium rounded shrink-0 transition-colors"
             style={{
               color: activeId === cat.id ? "var(--on-secondary)" : "var(--on-surface-variant)",

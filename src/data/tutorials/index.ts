@@ -275,7 +275,7 @@ export const categories: TutorialCategory[] = [
     ],
   },
   {
-    id: "html-css",
+    id: "htmlcss",
     name: "HTML & CSS",
     description: "网页结构与样式",
     icon: "HC",
@@ -342,7 +342,7 @@ export const categories: TutorialCategory[] = [
     ],
   },
   {
-    id: "c-cpp",
+    id: "ccpp",
     name: "C / C++",
     description: "系统级编程语言",
     icon: "C",

@@ -95,10 +95,7 @@ function HomePageContent() {
       {/* Header */}
       <header className="border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
         <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-8 h-8 flex items-center justify-center rounded" style={{ background: "var(--secondary)", color: "var(--on-secondary)" }}>
-              <Wrench className="w-4 h-4" />
-            </div>
+          <Link href="/" className="shrink-0">
             <span className="text-lg font-bold" style={{ color: "var(--on-surface)" }}>ToolkitX</span>
           </Link>
           <div className="flex-1 max-w-md">
