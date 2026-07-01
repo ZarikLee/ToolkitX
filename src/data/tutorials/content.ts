@@ -1629,6 +1629,527 @@ HAVING AVG(salary) > 10000;`,
         { question: "GROUP BY 后面跟上多个列是什么意思？", options: ["报错", "按多列组合分组", "只按最后一列分组", "随机分组"], answer: 1, explanation: "多列分组就是按列的排列组合来分，比如按部门+职位分组，同一个部门同一个职位的算一组。" },
       ],
     },
+    "mongodb-crud": {
+      slug: "mongodb-crud",
+      sections: [
+        {
+          title: "MongoDB 是啥——文档数据库",
+          content: `MongoDB 跟 MySQL 完全不是一个路数。MySQL 是关系型数据库，数据存在「表」里，行列整整齐齐像 Excel 表格。MongoDB 是文档数据库，数据存在「集合」里，每条数据是个 JSON 对象——也就是文档。
+
+说人话就是：MySQL 是填表格，每列类型固定、不能乱搞。MongoDB 是扔 JSON——字段随便加、结构随意变。现代 Web 应用最爱这种灵活性。
+
+核心概念对照：
+MySQL 的数据库 → MongoDB 还是数据库
+MySQL 的表 → MongoDB 的集合（collection）
+MySQL 的行 → MongoDB 的文档（document，一个 JSON 对象）
+MySQL 的列 → MongoDB 的字段（field）`,
+        },
+        {
+          title: "插入数据——insertOne / insertMany",
+          content: `增删改查里先学「增」。MongoDB 插入就是往集合里丢 JSON 对象，简单粗暴：`,
+          code: `// 进到某个数据库（没有就自动创建）
+use my_shop
+
+// 插入一条
+db.products.insertOne({
+  name: "机械键盘",
+  price: 399,
+  stock: 100,
+  tags: ["外设", "办公"],
+  created_at: new Date()
+})
+
+// 插入多条——用数组包起来
+db.products.insertMany([
+  { name: "鼠标", price: 99, stock: 200 },
+  { name: "显示器", price: 1599, stock: 50 },
+  { name: "耳机", price: 299, stock: 80 }
+])
+
+// 插入后 MongoDB 自动给每个文档加 _id，相当于主键
+// _id 你不指定的话它自己生成一个 12 字节的 ObjectId`,
+          language: "javascript",
+          tip: "insertMany 比循环调 insertOne 快得多——批量操作是单次网络请求，减少开销。",
+        },
+        {
+          title: "查询数据——find",
+          content: `find 是 MongoDB 里用得最多的命令。第一个参数是「条件」——告诉 MongoDB 你要找啥样的文档：`,
+          code: `// 查全部
+db.products.find()
+
+// 查价格等于 399 的
+db.products.find({ price: 399 })
+
+// 查价格大于 200 的——用 $gt（greater than）
+db.products.find({ price: { $gt: 200 } })
+
+// 查库存小于 100 的——$lt（less than）
+db.products.find({ stock: { $lt: 100 } })
+
+// 多条件 AND——价格大于 100 且库存大于 50
+db.products.find({ price: { $gt: 100 }, stock: { $gt: 50 } })
+
+// 查名字包含「键盘」的——正则
+db.products.find({ name: /键盘/ })
+
+// 只查一条——findOne
+db.products.findOne({ name: "机械键盘" })`,
+          language: "javascript",
+        },
+        {
+          title: "更新与删除——updateOne / deleteOne",
+          content: `改数据和删数据，每天必用。注意 MongoDB 的更新默认只改第一条，想改多条要加 multi 选项：`,
+          code: `// 更新一条——$set 是把指定字段设成新值
+db.products.updateOne(
+  { name: "机械键盘" },       // 找到这条
+  { $set: { price: 459 } }    // 把价格改成 459
+)
+
+// 更新多条——updateMany
+db.products.updateMany(
+  { stock: { $lt: 50 } },     // 找库存不足 50 的
+  { $set: { status: "缺货" } }  // 全标成缺货
+)
+
+// 自增——$inc，库存加 10
+db.products.updateOne(
+  { name: "鼠标" },
+  { $inc: { stock: 10 } }
+)
+
+// 删除一条
+db.products.deleteOne({ name: "耳机" })
+
+// 删除多条——小心，条件为空则全删！
+db.products.deleteMany({ stock: { $lt: 10 } })
+
+// 删集合里所有文档
+db.products.deleteMany({})`,
+          language: "javascript",
+          warning: "deleteMany({}) 会把整个集合清空，条件为空等于匹配所有。操作前务必确认。",
+        },
+        {
+          title: "数据校验——Schema 验证",
+          content: `MongoDB 虽然灵活，但太自由也容易出乱子。你可以给集合加验证规则——相当于给无门槛的场子拉根警戒线：`,
+          code: `// 创建集合时加验证规则
+db.createCollection("users", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["name", "email", "age"],     // 这三个字段必须有
+      properties: {
+        name: { bsonType: "string" },          // name 必须是字符串
+        email: { bsonType: "string" },
+        age: { bsonType: "int", minimum: 0, maximum: 150 }
+      }
+    }
+  }
+})
+
+// 给已有集合加验证
+db.runCommand({
+  collMod: "products",
+  validator: { $jsonSchema: { ... } }
+})`,
+          language: "javascript",
+          tip: "生产环境强烈建议给集合加验证规则。灵活不等于随便——不合规的数据一开始就别让它进去。",
+        },
+      ],
+      quiz: [
+        { question: "MongoDB 里 MySQL「行」对应的概念是？", options: ["集合", "文档", "字段", "数据库"], answer: 1, explanation: "MongoDB 的行叫文档，其实就是个 JSON 对象。" },
+        { question: "插入多条数据用哪个命令？", options: ["insertOne", "insertMany", "addMany", "putMany"], answer: 1, explanation: "insertMany 接受数组，一次插入多条，比逐条快得多。" },
+        { question: "find({ price: { $gt: 100 } }) 查的是什么？", options: ["价格等于 100 的", "价格大于 100 的", "价格小于 100 的", "所有数据"], answer: 1, explanation: "$gt 就是 greater than，返回价格大于 100 的文档。" },
+        { question: "让库存加 10 用哪个操作符？", options: ["$set", "$inc", "$add", "$update"], answer: 1, explanation: "$inc 用于自增或自减，传正数加、负数减。" },
+        { question: "deleteMany({}) 会怎样？", options: ["删第一条", "删匹配的", "删除整个集合的所有文档", "报错"], answer: 2, explanation: "空对象 {} 匹配所有文档，deleteMany({}) 等于清空集合。慎用。" },
+      ],
+    },
+    "mongodb-queries": {
+      slug: "mongodb-queries",
+      sections: [
+        {
+          title: "比较操作符——条件的十八般兵器",
+          content: `查数据不可能只查等于。MongoDB 提供了一堆比较操作符，记好这几个够用一辈子：`,
+          code: `// $gt 大于, $gte 大于等于, $lt 小于, $lte 小于等于, $ne 不等于
+db.products.find({ price: { $gte: 100, $lte: 500 } })  // 100 到 500 之间
+
+db.products.find({ stock: { $ne: 0 } })                // 库存不为 0 的
+
+// $in 在某个列表里, $nin 不在
+db.products.find({ category: { $in: ["外设", "数码"] } })
+
+// $exists 这个字段存在不？
+db.products.find({ description: { $exists: true } })`,
+          language: "javascript",
+        },
+        {
+          title: "逻辑操作符——OR / NOR / NOT",
+          content: `有时候条件不是「并且」而是「或者」。$or、$nor、$and、$not 就是干这个的：`,
+          code: `// $or——价格低于 50 或者高于 1000 的
+db.products.find({
+  $or: [
+    { price: { $lt: 50 } },
+    { price: { $gt: 1000 } }
+  ]
+})
+
+// $nor——既不是 A 也不是 B（跟 $or 相反）
+db.products.find({
+  $nor: [
+    { category: "外设" },
+    { category: "数码" }
+  ]
+})
+
+// $not——单个条件的取反
+db.products.find({ price: { $not: { $gt: 100 } } })  // 价格不大于 100
+
+// $and 一般不需要显式写，多个条件默认就是 AND
+// 但同一个字段多次判断时不能省略
+db.products.find({
+  $and: [
+    { price: { $gt: 100 } },
+    { price: { $lt: 500 } }
+  ]
+})`,
+          language: "javascript",
+        },
+        {
+          title: "投影与排序——控制输出",
+          content: `有时候一条文档字段太多，你只关心其中几列。投影帮你筛选字段，排序控制输出顺序：`,
+          code: `// 只返回 name 和 price，_id 默认会带出来，不想要 _id 设 0
+db.products.find({}, { name: 1, price: 1, _id: 0 })
+
+// 排除某几个字段
+db.products.find({}, { description: 0, supplier: 0 })
+
+// 排序——1 升序，-1 降序
+db.products.find().sort({ price: 1 })        // 按价格从低到高
+db.products.find().sort({ price: -1 })        // 从高到低
+db.products.find().sort({ price: -1, name: 1 }) // 先按价格降序，价格相同按名字升序
+
+// 分页——skip 跳过, limit 限制条数
+db.products.find().skip(0).limit(10)   // 第 1 页，每页 10 条
+db.products.find().skip(10).limit(10)  // 第 2 页
+db.products.find().skip(20).limit(10)  // 第 3 页`,
+          language: "javascript",
+          tip: "1 和 0 不能混着用（除了 _id）。要么都设 1（白名单），要么都设 0（黑名单），否则会报错。",
+        },
+        {
+          title: "数组查询——匹配数组元素",
+          content: `MongoDB 文档里可以存数组，查数组元素有专门的玩法：`,
+          code: `// tags 数组里包含「外设」的
+db.products.find({ tags: "外设" })
+
+// tags 数组里同时包含「外设」和「办公」的——$all
+db.products.find({ tags: { $all: ["外设", "办公"] } })
+
+// 数组长度等于 2 的——$size
+db.products.find({ tags: { $size: 2 } })
+
+// 数组里某个元素满足某条件——$elemMatch
+db.orders.find({
+  items: { $elemMatch: { product: "键盘", qty: { $gt: 1 } } }
+})`,
+          language: "javascript",
+        },
+      ],
+      quiz: [
+        { question: "价格在 50 到 200 之间，查询条件怎么写？", options: ["{ price: { $gt: 50, $lt: 200 } }", "{ price: { $gte: 50, $lte: 200 } }", "{ price: { $between: [50, 200] } }", "{ price: [50, 200] }"], answer: 1, explanation: "$gte 大于等于，$lte 小于等于，组合起来就是区间查询。" },
+        { question: "$or 和 $in 的区别？", options: ["没区别", "$or 是不同字段或不同条件，$in 是同一字段的值在列表中", "$or 只能两个条件", "$in 只能数字"], answer: 1, explanation: "$in 是同一字段的简写，$or 可以用在不同字段上。" },
+        { question: "查第 3 页数据（每页 10 条），skip 和 limit 怎么设？", options: ["skip(30).limit(10)", "skip(20).limit(10)", "skip(10).limit(20)", "skip(3).limit(10)"], answer: 1, explanation: "第 3 页：skip 前两页的总数即 20，limit 保持每页 10 条。" },
+        { question: "查 tags 数组同时包含 'A' 和 'B' 的文档，用哪个操作符？", options: ["$in", "$all", "$or", "$elemMatch"], answer: 1, explanation: "$all 要求数组包含所有指定的值，顺序无所谓。" },
+      ],
+    },
+    "mongodb-aggregation": {
+      slug: "mongodb-aggregation",
+      sections: [
+        {
+          title: "聚合管道是啥——数据加工流水线",
+          content: `聚合管道（Aggregation Pipeline）是 MongoDB 里最强大的分析工具。你可以把它想象成工厂流水线——数据从一头进去，经过多个步骤（管道阶段），每个阶段对数据做一种加工，最后从另一头出来你想要的结果。
+
+MySQL 里 GROUP BY、HAVING、JOIN、子查询这些事，MongoDB 用一条聚合管道全能搞定。管道是一串阶段组成，每个阶段的处理结果自动传给下一个阶段。`,
+        },
+        {
+          title: "$match 与 $group——过滤与分组",
+          content: `$match 相当于 find 的条件过滤，$group 相当于 SQL 的 GROUP BY。聚合管道的铁律：$match 越靠前越好——先把数据筛掉，后面处理量就小了：`,
+          code: `// 统计每个分类的商品数量
+db.products.aggregate([
+  { $group: { _id: "$category", count: { $sum: 1 } } }
+])
+
+// 统计每个分类的平均价格
+db.products.aggregate([
+  { $group: { _id: "$category", avg_price: { $avg: "$price" } } }
+])
+
+// 先过滤再分组——统计在售商品的总库存
+db.products.aggregate([
+  { $match: { status: "在售" } },           // 先筛掉下架的
+  { $group: { _id: "$category", total: { $sum: "$stock" } } }
+])
+
+// 聚合操作符一览：
+// $sum   求和
+// $avg   求平均
+// $min   最小值
+// $max   最大值
+// $first 第一条
+// $last  最后一条
+// $push  拼成数组`,
+          language: "javascript",
+          tip: "引用字段时前面加 $——如 $price。这是告诉 MongoDB 取 price 字段的值而不是字符串 'price'。",
+        },
+        {
+          title: "$sort 与 $limit——排序与截断",
+          content: `聚合里也可以排序和分页，跟 find 的语法类似：`,
+          code: `// 查平均价格最高的前 3 个分类
+db.products.aggregate([
+  { $group: { _id: "$category", avg_price: { $avg: "$price" } } },
+  { $sort: { avg_price: -1 } },     // 按平均价格降序
+  { $limit: 3 }                      // 只要前 3
+])
+
+// 每个分类最贵的商品
+db.products.aggregate([
+  { $sort: { price: -1 } },
+  { $group: { _id: "$category", most_expensive: { $first: "$name" }, price: { $first: "$price" } } }
+])`,
+          language: "javascript",
+        },
+        {
+          title: "$project 与 $lookup——字段塑造与关联查询",
+          content: `$project 决定最终输出哪些字段——跟 SQL 的 SELECT 一样。$lookup 是 MongoDB 的 JOIN，让不同集合的数据能关联到一起：`,
+          code: `// $project——改名、取舍、加减乘除
+db.products.aggregate([
+  { $project: {
+      _id: 0,
+      product_name: "$name",       // 把 name 字段改叫 product_name
+      price_with_tax: { $multiply: ["$price", 1.13] },  // 税前价
+      worth: { $multiply: ["$price", "$stock"] }         // 库存总价值
+  }}
+])
+
+// $lookup——关联 orders 集合，看哪些用户买了哪些商品
+db.orders.aggregate([
+  { $lookup: {
+      from: "users",                // 关联哪个集合
+      localField: "user_id",        // 本集合的字段
+      foreignField: "_id",          // 对方集合的字段
+      as: "user_info"               // 结果存到这个字段里
+  }},
+  { $unwind: "$user_info" }        // 把数组炸开，变成每个订单带一个用户对象
+])`,
+          language: "javascript",
+        },
+      ],
+      quiz: [
+        { question: "聚合管道中，$match 放靠前的好处是？", options: ["语法好看", "先筛数据减少后续处理量，更快", "必须放第一个", "没区别"], answer: 1, explanation: "$match 越早筛掉的数据越多，后面 $group、$sort 处理的数据量就越小，性能更好。" },
+        { question: "$group 里 _id 字段的作用是？", options: ["文档 ID", "分组依据——按哪个字段分组", "没用的字段", "自动生成的 ID"], answer: 1, explanation: "_id 在 $group 中指分组的键——按谁分组就把谁赋给 _id。_id: null 则是所有文档归一组。" },
+        { question: "$lookup 相当于是什么操作？", options: ["排序", "过滤", "关联查询——SQL 的 JOIN", "去重"], answer: 2, explanation: "$lookup 实现跨集合关联，等价于 SQL 的 LEFT OUTER JOIN。" },
+        { question: "聚合中想取每个分组的最大值用哪个操作符？", options: ["$sum", "$avg", "$first", "$max"], answer: 3, explanation: "$max 返回分组内某字段的最大值。" },
+        { question: "$unwind 干什么用的？", options: ["排序", "把数组字段拆成多条文档", "去重", "过滤"], answer: 1, explanation: "$unwind 把包含数组的字段拆开——数组有 3 个元素就拆成 3 条文档。" },
+      ],
+    },
+    "mongodb-indexes": {
+      slug: "mongodb-indexes",
+      sections: [
+        {
+          title: "索引——给查询加个导航",
+          content: `数据量一大，全表扫描就扛不住了。索引就像书的目录——你要找某个章节，不用一页页翻，先查目录直接跳过去。
+
+MongoDB 默认在 _id 上建了唯一索引，但你自己查询常走哪些字段，就在那些字段上建索引。一个索引能让查询从扫百万条变成扫几十条。`,
+        },
+        {
+          title: "创建和管理索引",
+          content: `createIndex 建索引。单字段索引最简单，复合索引能服务多个查询场景：`,
+          code: `// 单字段索引——加速按 name 的查询
+db.products.createIndex({ name: 1 })     // 1 升序，-1 降序（单字段时无所谓）
+
+// 复合索引——加速按 category + price 的查询
+db.products.createIndex({ category: 1, price: -1 })
+
+// 唯一索引——不让重复值插入
+db.users.createIndex({ email: 1 }, { unique: true })
+
+// 文本索引——给字符串字段建立全文搜索
+db.articles.createIndex({ title: "text", content: "text" })
+
+// 查看集合上所有索引
+db.products.getIndexes()
+
+// 删索引
+db.products.dropIndex("name_1")    // 按索引名删
+db.products.dropIndexes()          // 删所有非 _id 索引`,
+          language: "javascript",
+          tip: "复合索引遵循「最左前缀」原则——索引 {a:1, b:1} 能服务 a 的单字段查询，但不能服务只有 b 的查询。字段顺序很重要。",
+        },
+        {
+          title: "看查询有没有用索引——explain",
+          content: `建了索引到底有没有用上？explain 告诉你查询的执行计划——是走索引还是全表扫描：`,
+          code: `// explain 看执行计划
+db.products.find({ name: "键盘" }).explain("executionStats")
+
+// 关注这几个字段：
+// winningPlan.stage: IXSCAN（走索引）还是 COLLSCAN（全表扫）
+// totalDocsExamined: 扫了多少文档
+// nReturned: 返回了多少文档
+// 如果扫了 10 万条只返回 3 条——说明索引没建或没走对
+
+// 看所有查询的性能
+db.setProfilingLevel(2)          // 记录所有操作
+db.system.profile.find().sort({ millis: -1 }).limit(5)  // 看最慢的 5 个`,
+          language: "javascript",
+          tip: "explain 是调试必备——document examined 远大于 returned 的话，八成是没走索引或索引选的不对。",
+        },
+        {
+          title: "TTL 索引——自动过期删除",
+          content: `有些数据不需要永久存——比如验证码、临时 token、缓存数据。TTL 索引让 MongoDB 自动帮你清理过期数据：`,
+          code: `// 建 TTL 索引——30 秒后自动删除
+db.sessions.createIndex(
+  { created_at: 1 },
+  { expireAfterSeconds: 30 }
+)
+
+// 插入时会自动算过期时间
+db.sessions.insertOne({
+  user: "john",
+  created_at: new Date()
+})
+// 30 秒后这条数据自动消失
+
+// 也可以指定具体过期时间字段
+db.cache.createIndex(
+  { expire_at: 1 },
+  { expireAfterSeconds: 0 }   // 0 表示到了 expire_at 那一刻就删
+)`,
+          language: "javascript",
+          tip: "TTL 索引的后台清理是每分钟跑一次，所以过期后最多延迟 60 秒才会被真正删除，不是精确到秒。",
+        },
+      ],
+      quiz: [
+        { question: "索引的主要目的是什么？", options: ["让数据更整齐", "加速查询，避免全表扫描", "压缩数据", "备份数据"], answer: 1, explanation: "索引是给查询加速的——从扫百万条变成定位几条，效果立竿见影。" },
+        { question: "复合索引 {a:1, b:1} 能服务只查 b 的查询吗？", options: ["能，完美匹配", "不能，最左前缀原则要求查询从索引最左侧字段开始", "看情况", "一定能"], answer: 1, explanation: "最左前缀原则——索引像字典，a 是首字母，b 是第二个字母，你只给第二个字母没法查。" },
+        { question: "explain 里 COLLSCAN 是什么意思？", options: ["走索引", "全表扫描——没走索引", "部分扫描", "索引扫描"], answer: 1, explanation: "COLLSCAN 就是 collection scan——千万要注意，数据量大时这就是慢的原因。" },
+        { question: "TTL 索引的用途是？", options: ["加速查询", "自动删除过期数据", "加密数据", "备份数据"], answer: 1, explanation: "TTL 索引让 MongoDB 自动清理到了时间的文档，验证码、临时 token 这些场景必备。" },
+      ],
+    },
+    "mongodb-replication": {
+      slug: "mongodb-replication",
+      sections: [
+        {
+          title: "副本集——备胎机制",
+          content: `单台 MongoDB 跑生产？万一挂了数据就没了。副本集就是用多台服务器组一个团队：一台是「主」，负责读写；其他是「从」，时刻跟主同步数据被当备胎。
+
+比喻：主是唱主角的歌手，从是后备——主唱倒了，从自动顶上继续唱。用户几乎感觉不到切换。
+
+副本集最少需要 3 台（或者 2 台 + 1 个仲裁者），因为选举需要多数票。`,
+        },
+        {
+          title: "副本集的启动",
+          content: `每台 MongoDB 都带上 --replSet 参数启动，然后在任意一台执行初始化：`,
+          code: `# 三台服务器分别启动
+mongod --replSet rs0 --port 27017 --dbpath /data/db1 &
+mongod --replSet rs0 --port 27018 --dbpath /data/db2 &
+mongod --replSet rs0 --port 27019 --dbpath /data/db3 &
+
+# 连上任意一台，初始化副本集
+mongo --port 27017
+rs.initiate({
+  _id: "rs0",
+  members: [
+    { _id: 0, host: "localhost:27017" },
+    { _id: 1, host: "localhost:27018" },
+    { _id: 2, host: "localhost:27019" }
+  ]
+})`,
+          language: "bash",
+        },
+        {
+          title: "监控与故障转移",
+          content: `副本集跑起来后，rs 命令是你的监控面板。主挂了从自动顶上，全程自动：`,
+          code: `// 看当前角色
+rs.status()        // 详细状态——谁是主、谁是从、同步延迟
+rs.isMaster()      // 只看当前这台是主还是从
+
+// 看复制延迟——从比主慢了多少
+rs.printReplicationInfo()       // oplog 信息
+rs.printSlaveReplicationInfo()  // 每台从的同步情况
+
+// 手动切换主（维护时用）
+rs.stepDown()     // 当前主自愿让位，触发重新选举`,
+          language: "javascript",
+          tip: "副本集不是备份方案。如果有人误删了数据，主从会同步删除。真正的备份还是要定期 mongodump 导出。",
+        },
+      ],
+      quiz: [
+        { question: "副本集中从节点的作用是什么？", options: ["分担写压力", "作为数据备份——主挂了能顶上去", "计算聚合", "管理索引"], answer: 1, explanation: "从节点是主节点的实时备份，主一旦宕机，从节点参与选举成为新主，保证服务不中断。" },
+        { question: "副本集最少需要几台节点？", options: ["1 台", "2 台", "3 台（或 2 台+仲裁）", "4 台"], answer: 2, explanation: "选举需要多数票，最少 2 票过关。2 台若挂一台只剩 1 票不过半，所以通常用 3 台或 2 台+1 个仲裁者。" },
+        { question: "仲裁节点（Arbiter）的角色是什么？", options: ["存数据", "只参与投票不存数据", "备份数据", "处理查询"], answer: 1, explanation: "仲裁者不存数据、不干活，唯一作用就是选举时投一票。当预算有限又需要奇数节点时用它。" },
+        { question: "rs.stepDown() 做什么？", options: ["删节点", "当前主节点主动让位", "加新节点", "停副本集"], answer: 1, explanation: "让主节点主动让位触发选举——维护时先把主切走再操作，优雅。" },
+      ],
+    },
+    "mongodb-sharding": {
+      slug: "mongodb-sharding",
+      sections: [
+        {
+          title: "分片——数据太大一台装不下",
+          content: `数据量大到一台服务器放不下怎么办？分片就是把数据切碎分散到多台机器上，每台管一部分。
+
+比喻：图书馆书太多了一个书架放不下，就按类别分成几个书架——文学类一个、科技类一个。MongoDB 的分片也是这个思路，按某个字段（分片键）把数据散到各个分片上。
+
+副本集解决高可用（挂了能顶），分片解决大数据量（一台放不下、一台扛不住）。生产环境通常是分片 + 副本集一起用。`,
+        },
+        {
+          title: "分片架构与分片键",
+          content: `分片集群由三部分组成：分片（每个存一部分数据）、配置服务器（存元数据，相当于地图）、路由（mongos，客户端连它，它知道去哪找数据）。
+
+分片键是最重要的决策——选好了数据均匀，选坏了某个分片撑爆：`,
+          code: `// 选分片键原则：
+// 1. 基数高——值的种类多（如 user_id，不要 gender 只有男/女两种）
+// 2. 分布均匀——别让大部分数据都落在一个分片上
+// 3. 查询能带上——查数据时条件能包含分片键，否则得所有分片全扫一遍
+
+// 启用分片
+sh.enableSharding("my_database")
+
+// 创建分片集合——按 user_id 哈希分片（最常用）
+sh.shardCollection("my_database.users", { user_id: "hashed" })
+
+// 范围分片——按创建时间
+sh.shardCollection("my_database.logs", { created_at: 1 })
+
+// 哈希分片 vs 范围分片：
+// 哈希——数据均匀散开，写入压力均衡，但范围查询效率低
+// 范围——相近的数据在同一个分片上，范围查询快，但写入可能倾斜`,
+          language: "javascript",
+          tip: "分片键一旦选定就很难改——相当于把图书馆重新按另一套规则分类，工作量极大。建之前想清楚。",
+        },
+        {
+          title: "Chunk 分裂与迁移",
+          content: `数据在分片间是以 chunk（数据块）为单位的。默认一个 chunk 64MB，超了自动分裂，分片间数据不均会自动迁移：`,
+          code: `// 查看分片状态
+sh.status()
+
+// 手动分裂 chunk
+sh.splitAt("my_database.users", { user_id: MinKey })
+
+// 迁移 chunk 到指定分片
+sh.moveChunk("my_database.users", { user_id: 100 }, "shard02")
+
+// 查看数据分布
+use my_database
+db.users.getShardDistribution()   // 每个分片各有多少数据
+db.users.stats()                   // 集合的详细统计`,
+          language: "javascript",
+        },
+      ],
+      quiz: [
+        { question: "分片解决的是什么问题？", options: ["数据安全", "数据量太大单台放不下/扛不住", "查询加速", "数据备份"], answer: 1, explanation: "分片是横向扩展——把数据分散到多台机器，每台只负责一部分。" },
+        { question: "选分片键最重要的原则是？", options: ["字段名短", "基数高、分布均匀、查询能覆盖", "必须是 _id", "必须是数字"], answer: 1, explanation: "基数高确保均匀分布，查询能覆盖避免广播到所有分片。" },
+        { question: "mongos 的作用是什么？", options: ["存储数据", "路由——客户端连它，它根据分片键转发请求", "备份数据", "监控"], answer: 1, explanation: "mongos 是分片集群的入口，客户端连 mongos 而不是直接连分片，mongos 负责把请求路由到正确的分片上。" },
+        { question: "哈希分片相比范围分片，优势是？", options: ["范围查询更快", "数据分布更均匀，写入不倾斜", "总能用索引", "不需要分片键"], answer: 1, explanation: "哈希分片把数据打散分布到各分片，写入压力均匀。但牺牲了范围查询的效率。" },
+      ],
+    },
   },
   docker: {
     "docker-basics": {
@@ -1867,6 +2388,326 @@ docker-compose top`,
         { question: "docker-compose down 做了什么？", options: ["只停止容器", "停止并删除容器、网络等资源", "重启服务", "查看日志"], answer: 1, explanation: "down 会停止所有服务并清理容器、网络，比 stop 更彻底。" },
         { question: "docker-compose.yml 里 depends_on 是什么意思？", options: ["环境变量", "指定启动顺序，等依赖的服务先启动", "网络配置", "端口映射"], answer: 1, explanation: "depends_on 告诉 Docker 这个服务依赖另外几个服务，启动时按依赖关系来。" },
         { question: "docker-compose.yml 里 volumes 段的用途？", options: ["网络配置", "数据持久化，把目录/卷挂载到容器", "环境变量", "端口映射"], answer: 1, explanation: "volumes 把宿主机目录或命名卷挂进容器，容器删了数据还在——这就是数据持久化的秘诀。" },
+      ],
+    },
+    "k8s-pods": {
+      slug: "k8s-pods",
+      sections: [
+        {
+          title: "Kubernetes 是啥——容器的指挥官",
+          content: `Docker 解决了一个应用的打包和运行问题，但生产环境几十上百个容器怎么管？谁该跑在哪台机器上？挂了怎么重启？流量怎么分配？这是 K8s（Kubernetes）的活。
+
+K8s 就是个容器编排平台——你告诉它「我要跑 3 个 Nginx、2 个 Redis」，它自己找机器、调度、监控、自动恢复。你把服务器组成一个集群，K8s 是集群的大脑。
+
+核心概念简表：
+Pod——最小调度单位，一个 Pod 里可以有一个或多个容器（通常一个）
+Node——物理机或虚拟机，Pod 最终跑在 Node 上
+Service——给 Pod 提供稳定的访问入口（IP 不随 Pod 重启变化）
+Deployment——声明式管理 Pod 的副本数和更新策略`,
+        },
+        {
+          title: "Pod 的生命周期",
+          content: `Pod 是 K8s 里最小也是最重要的概念。它不是永生的——挂了就重建、节点坏了就调度到别处。Pod 的一生分几个阶段：`,
+          code: `# Pod 生命周期状态
+# Pending    → Pod 已创建，但容器还没完全跑起来（拉镜像、调度中）
+# Running    → Pod 跑起来了，至少一个容器还在运行
+# Succeeded  → Pod 里所有容器正常退出了（一次性任务）
+# Failed     → Pod 里有容器异常退出
+# Unknown     → 节点失联，K8s 不知道 Pod 啥状态
+
+# 查看 Pod 状态
+kubectl get pods
+kubectl describe pod my-pod    # 详细状态——启动过程、事件日志
+
+# 看 Pod 日志
+kubectl logs my-pod
+kubectl logs my-pod -c sidecar  # 多容器 Pod 指定容器
+kubectl logs -f my-pod          # 实时跟踪`,
+          language: "bash",
+          tip: "Pod 本身不是长期存在的——它会被重建、迁移，IP 会变。所以不要直接依赖 Pod IP，用 Service 来访问。",
+        },
+        {
+          title: "Pod 容器模式——多容器 Pod",
+          content: `虽然大部分情况一个 Pod 只有一个容器，但高级玩法里一个 Pod 可以有多个容器共享网络和存储。常见模式：`,
+          code: `# Sidecar 模式——主容器 + 辅助容器
+# 比如：主容器跑 Nginx，Sidecar 跑日志采集器
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-app
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.25
+      ports:
+        - containerPort: 80
+    - name: log-collector    # Sidecar 采集日志
+      image: fluentd:latest
+      volumeMounts:
+        - name: shared-logs
+          mountPath: /var/log/nginx
+
+# Init 容器——主容器启动前先跑，做初始化工作
+# 比如：等数据库就绪、下载配置文件、设置权限
+spec:
+  initContainers:
+    - name: init-db
+      image: busybox
+      command: ['sh', '-c', 'until nslookup db-svc; do echo waiting; sleep 2; done']
+  containers:
+    - name: app
+      image: my-app:1.0`,
+          language: "yaml",
+          tip: "Init 容器按顺序执行，前一个成功才跑下一个。主容器启动时 init 已经全部跑完了。",
+        },
+        {
+          title: "资源限制与健康检查",
+          content: `不给 Pod 设资源限制等于把车开上高速不装刹车——一个 Pod 吃光所有内存可能导致整台节点崩掉。同时要配健康检查让 K8s 知道 Pod 是不是真在干活：`,
+          code: `# resources——资源请求和上限
+spec:
+  containers:
+    - name: app
+      image: my-app:1.0
+      resources:
+        requests:          # 调度保证——Node 至少要有这么多资源才调度过来
+          memory: "64Mi"
+          cpu: "100m"      # 100m = 0.1 核
+        limits:            # 上限——超过就 OOMKill
+          memory: "256Mi"
+          cpu: "500m"
+
+# 存活探针——Pod 还活着吗？不健康就重启
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8080
+  initialDelaySeconds: 10    # 等 10 秒再开始查
+  periodSeconds: 5           # 每 5 秒查一次
+
+# 就绪探针——Pod 准备好接客了吗？
+readinessProbe:
+  httpGet:
+    path: /ready
+    port: 8080
+  periodSeconds: 3`,
+          language: "yaml",
+          warning: "没有配 resources limits 的 Pod 是无底洞——内存泄露或 bug 可能让整台机器 OOM。生产环境必须给每个容器设 limits。",
+        },
+      ],
+      quiz: [
+        { question: "K8s 里最小的调度单位是什么？", options: ["容器", "Pod", "Node", "Service"], answer: 1, explanation: "Pod 是 K8s 最小调度单位——一个 Pod 可以包含多个容器，共享网络和存储。" },
+        { question: "Pod 挂了 K8s 怎么做？", options: ["不管", "自动重建一个新的 Pod", "发邮件报警", "等待人工重启"], answer: 1, explanation: "Deployment 控制的 Pod 挂了会自动重建——这是 K8s 自我修复能力的核心。" },
+        { question: "Init 容器的执行顺序是？", options: ["和主容器同时跑", "在主容器启动前按顺序依次跑", "在主容器之后跑", "随机跑"], answer: 1, explanation: "Init 容器按定义顺序串行执行，前一个成功才跑下一个，全部成功后才启动主容器。" },
+        { question: "LivenessProbe 和 ReadinessProbe 的区别？", options: ["没区别", "Liveness 判断是否要重启，Readiness 判断是否可以接流量", "Readiness 重启容器", "Liveness 决定流量分配"], answer: 1, explanation: "活着的探针失败了就重启；就绪探针失败了只是把 Pod 从 Service 摘掉不分配流量，不重启。" },
+        { question: "Pod 里所有容器共享什么？", options: ["独立网络", "网络命名空间和存储卷", "CPU 限制", "镜像"], answer: 1, explanation: "同一个 Pod 内所有容器共享 localhost 网络和挂载的卷——可以通过 localhost 互访。" },
+      ],
+    },
+    "k8s-services": {
+      slug: "k8s-services",
+      sections: [
+        {
+          title: "Service——不变的入口",
+          content: `Pod 的 IP 会变——重建就换 IP。Service 就是给一组 Pod 提供一个固定的访问入口，不管 Pod 怎么变，Service 的 IP 和 DNS 名不变。
+
+工作原理：Service 通过标签选择器找到目标 Pod，自动维护后端列表。流量打到 Service，由 Service 转发到后端的某个 Pod 上。`,
+        },
+        {
+          title: "ClusterIP——内部通信专用",
+          content: `ClusterIP 是最常用的 Service 类型。它分配一个集群内部 IP，只能在集群内部访问——适合微服务之间互相调用：`,
+          code: `apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+spec:
+  type: ClusterIP          # 默认类型，集群内部 IP
+  selector:
+    app: my-api            # 把流量转发到带 app=my-api 标签的 Pod
+  ports:
+    - protocol: TCP
+      port: 80             # Service 暴露的端口
+      targetPort: 8080     # 容器实际监听的端口
+
+# 访问：
+# 集群内其他 Pod 可以通过 api-service:80 访问，或者 curl http://api-service
+# K8s 自动把 Service 名注册为 DNS 名`,
+          language: "yaml",
+        },
+        {
+          title: "NodePort 与 LoadBalancer——对外暴露",
+          content: `ClusterIP 只有内部能访问，外部用户怎么办？NodePort 把 Service 映射到每个 Node 的固定端口上，LoadBalancer 则是云厂商提供的公网负载均衡器：`,
+          code: `# NodePort——在每个 Node 上开同一个端口
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service
+spec:
+  type: NodePort
+  selector:
+    app: web
+  ports:
+    - port: 80
+      targetPort: 3000
+      nodePort: 30080      # 每个 Node 上监听 30080（范围 30000-32767）
+
+# 访问：任意 Node 的 IP:30080 → Service → Pod:3000
+
+# LoadBalancer——云环境下自动创建负载均衡器（AWS ELB, GCP LB 等）
+apiVersion: v1
+kind: Service
+metadata:
+  name: public-api
+spec:
+  type: LoadBalancer
+  selector:
+    app: api
+  ports:
+    - port: 443
+      targetPort: 8080`,
+          language: "yaml",
+          tip: "本地开发用 NodePort 够了。生产环境建议 LoadBalancer，不过要注意云厂商会为此收费。",
+        },
+        {
+          title: "Ingress——HTTP 路由",
+          content: `Service 只负责 TCP/UDP 层的流量转发。HTTP 层的路由——基于域名、路径分发流量——是 Ingress 的活。比如 /api 走后端，/ 走前端：`,
+          code: `apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-ingress
+spec:
+  rules:
+    - host: myapp.example.com     # 域名
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: api-service
+                port:
+                  number: 80
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-service
+                port:
+                  number: 80`,
+          language: "yaml",
+          tip: "Ingress 需要安装 Ingress Controller（如 Nginx Ingress）才能工作，它不是 K8s 自带的。",
+        },
+      ],
+      quiz: [
+        { question: "Service 的主要作用是什么？", options: ["存储数据", "给一组 Pod 提供固定访问入口", "管理节点", "监控"], answer: 1, explanation: "Pod IP 会变，Service 提供稳定的 IP 和 DNS 名，不管 Pod 怎么重建都通过 Service 访问。" },
+        { question: "ClusterIP 类型的 Service 能从哪里访问？", options: ["公网", "任意地方", "只能集群内部", "指定国家"], answer: 2, explanation: "ClusterIP 只分配集群内部 IP，外部访问不了——专门给集群内微服务互调用。" },
+        { question: "NodePort 端口范围是多少？", options: ["1-65535", "80-443", "30000-32767", "8000-9000"], answer: 2, explanation: "NodePort 默认分配 30000-32767 范围之间的端口，也可以自己指定。" },
+        { question: "Ingress 和 Service 什么关系？", options: ["完全替代 Service", "Service 管 TCP/UDP，Ingress 管 HTTP 路由（域名/路径分发）", "一样的东西", "Ingress 更快"], answer: 1, explanation: "Service 是基础层——让流量打到 Pod；Ingress 在此基础上提供 HTTP 七层路由能力。" },
+      ],
+    },
+    "k8s-config": {
+      slug: "k8s-config",
+      sections: [
+        {
+          title: "ConfigMap——配置跟代码分家",
+          content: `应用代码和配置混在一起是定时炸弹——改个数据库地址就得重新构建镜像然后部署。ConfigMap 把配置从容器里抽出来，改配置不用重建镜像，Pod 重启就能生效：`,
+          code: `# 从命令行创建 ConfigMap
+kubectl create configmap app-config \\
+  --from-literal=DB_HOST=mysql-service \\
+  --from-literal=DB_PORT=3306 \\
+  --from-literal=LOG_LEVEL=debug
+
+# 从文件创建
+kubectl create configmap nginx-config --from-file=nginx.conf
+
+# YAML 方式
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-settings
+data:
+  APP_ENV: production
+  DB_URL: "mysql://db-service:3306/myapp"
+  app.json: |         # 也可以存多行配置
+    {
+      "max_connections": 100,
+      "timeout": 30
+    }`,
+          language: "yaml",
+        },
+        {
+          title: "将 ConfigMap 注入 Pod",
+          content: `建好 ConfigMap 后，可以当环境变量注入容器，也可以挂载成文件：`,
+          code: `# 方式一：环境变量
+spec:
+  containers:
+    - name: app
+      image: my-app:1.0
+      envFrom:
+        - configMapRef:
+            name: app-settings     # ConfigMap 里所有 key 全变成环境变量
+
+# 方式二：指定某个 key 为环境变量
+      env:
+        - name: DATABASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: app-settings
+              key: DB_URL
+
+# 方式三：挂载为文件——适合配置文件
+      volumeMounts:
+        - name: config-volume
+          mountPath: /etc/config
+  volumes:
+    - name: config-volume
+      configMap:
+        name: app-settings`,
+          language: "yaml",
+          tip: "ConfigMap 修改后不会自动更新到运行的 Pod——需要重启 Pod 或者用 reloader 工具自动触发滚动更新。",
+        },
+        {
+          title: "Secret——敏感信息单独保管",
+          content: `数据库密码、API 密钥这些敏感信息不能用 ConfigMap（那是明文）。Secret 也是键值对，但数据是 base64 编码存储的，Pod 挂载后自动解码。
+
+注意：Secret 的 base64 只是编码不是加密——做做样子而已。生产环境建议配合加密方案：`,
+          code: `# 创建 Secret
+kubectl create secret generic db-secret \\
+  --from-literal=username=admin \\
+  --from-literal=password=S3cr3t!
+
+# YAML——数据必须 base64 编码
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credentials
+type: Opaque
+data:
+  username: YWRtaW4=        # echo -n 'admin' | base64
+  password: UzNjcjN0IQ==    # echo -n 'S3cr3t!' | base64
+
+# 或者用 stringData 直接写明文（K8s 自动编码）
+stringData:
+  username: admin
+  password: S3cr3t!
+
+# 以环境变量注入 Pod
+spec:
+  containers:
+    - name: app
+      env:
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: username`,
+          language: "yaml",
+          warning: "base64 不是加密！任何能 kubectl 的人都能看到明文。生产环境建议用 Vault 或 Sealed Secrets 对 Secret 加密后再存进 Git。",
+        },
+      ],
+      quiz: [
+        { question: "ConfigMap 和 Secret 的主要区别？", options: ["没区别", "ConfigMap 存普通配置，Secret 存敏感信息", "Secret 更快", "ConfigMap 更安全"], answer: 1, explanation: "ConfigMap 明文存普通配置，Secret 存密码、密钥等敏感数据，但也要配合加密方案才真正安全。" },
+        { question: "可以把 ConfigMap 以什么形式注入 Pod？", options: ["只能环境变量", "环境变量和文件挂载都可以", "只能文件挂载", "只能命令行参数"], answer: 1, explanation: "两种方式：envFrom/env 注入环境变量，或者 volume 挂载成文件——根据场景选。" },
+        { question: "Secret 的数据编码方式是什么？", options: ["MD5", "base64", "AES 加密", "不编码"], answer: 1, explanation: "Secret 数据存成 base64——注意这只是编码不是加密，解码后就是明文。" },
+        { question: "ConfigMap 更新后 Pod 会自动感知吗？", options: ["会，实时生效", "不会，需要重启 Pod 或用外部工具触发", "自动滚动更新", "分批更新"], answer: 1, explanation: "ConfigMap 改了不会自动推送给 Pod，要么手动重启 Pod，要么用 Reloader 等工具触发滚动更新。" },
       ],
     },
   },
@@ -4258,6 +5099,200 @@ expect(result).toBeTruthy();
         { question: "Jest 的 mock 函数 jest.fn() 能干什么？", options: ["创建真实函数", "创建假函数——追踪调用次数和参数，替代真实依赖", "删除函数", "加密函数"], answer: 1, explanation: "mock 让你不需要真的调用数据库或 API，用假的替代并检查函数是否被正确调用。" },
       ],
     },
+    "nodejs-database": {
+      slug: "nodejs-database",
+      sections: [
+        {
+          title: "Node.js 操作数据库——概览",
+          content: `Web 后台离不开数据库。Node.js 操作数据库有两种路子：直接用数据库驱动（原生写法），或者用 ORM（对象关系映射——把数据库表映射成 JS 对象操作）。
+
+原生驱动更灵活性能更好，ORM 写起来更爽更不容易出错。MySQL 和 MongoDB 是两大主流，各走各的路子。`,
+        },
+        {
+          title: "MySQL——mysql2 驱动",
+          content: `mysql2 是 Node.js 操作 MySQL 最常用的库，支持 Promise 异步调用：`,
+          code: `const mysql = require('mysql2/promise');
+
+// 创建连接池——别每次请求都新连一次，用池子复用连接
+const pool = mysql.createPool({
+  host: 'localhost',
+  user: 'root',
+  password: 'your_password',
+  database: 'my_app',
+  waitForConnections: true,
+  connectionLimit: 10
+});
+
+// 查询
+async function getUsers() {
+  const [rows] = await pool.query('SELECT * FROM users WHERE age > ?', [18]);
+  return rows;
+}
+
+// 插入——用 ? 占位符防 SQL 注入
+async function createUser(name, email) {
+  const [result] = await pool.query(
+    'INSERT INTO users (name, email) VALUES (?, ?)',
+    [name, email]
+  );
+  return result.insertId;  // 新插入行的 ID
+}
+
+// 更新
+await pool.query('UPDATE users SET name = ? WHERE id = ?', ['新名字', 1]);
+
+// 删除
+await pool.query('DELETE FROM users WHERE id = ?', [1]);
+
+// 事务——要么全成功要么全回滚
+const conn = await pool.getConnection();
+try {
+  await conn.beginTransaction();
+  await conn.query('UPDATE accounts SET balance = balance - 100 WHERE id = 1');
+  await conn.query('UPDATE accounts SET balance = balance + 100 WHERE id = 2');
+  await conn.commit();
+} catch (err) {
+  await conn.rollback();
+  throw err;
+} finally {
+  conn.release();
+}`,
+          language: "javascript",
+          tip: "一定要用连接池！每次都新建连接的话，并发一上来 MySQL 就撑不住了。",
+        },
+        {
+          title: "MongoDB——mongoose ODM",
+          content: `mongoose 是 Node.js 操作 MongoDB 最主流的库。它不是 ORM 而是 ODM（Object Document Mapper）——把 MongoDB 的文档映射成 JS 对象。定义 schema 约束数据形状，数据模型一目了然：`,
+          code: `const mongoose = require('mongoose');
+
+// 连接数据库
+mongoose.connect('mongodb://localhost:27017/my_app');
+
+// 定义 Schema——给集合套个约束
+const userSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  age: { type: Number, min: 0, max: 150 },
+  role: { type: String, enum: ['user', 'admin'], default: 'user' },
+  createdAt: { type: Date, default: Date.now }
+});
+
+// 创建 Model——相当于 MySQL 的表
+const User = mongoose.model('User', userSchema);
+
+// CRUD 操作
+async function demo() {
+  // 创建
+  const newUser = await User.create({ name: '张三', email: 'zhang@test.com', age: 28 });
+
+  // 查询
+  const users = await User.find({ age: { $gt: 18 } }).sort({ name: 1 }).limit(10);
+
+  // 更新
+  await User.updateOne({ email: 'zhang@test.com' }, { $set: { age: 29 } });
+
+  // 删除
+  await User.deleteOne({ email: 'zhang@test.com' });
+}
+
+// 关联——ref 实现类似 JOIN
+const orderSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  total: Number,
+  items: [String]
+});
+const Order = mongoose.model('Order', orderSchema);
+
+// 查订单时自动填上用户信息
+const orders = await Order.find().populate('user', 'name email');`,
+          language: "javascript",
+          tip: "mongoose 在默认情况下会给查询加很多校验和安全检查。追求极致性能时可考虑直接用 mongodb 原生驱动。",
+        },
+        {
+          title: "Prisma——新一代 ORM",
+          content: `Prisma 是近年最火的 Node.js ORM，支持 MySQL、PostgreSQL、MongoDB、SQLite 等多种数据库。最大的优点是自动生成类型——写代码时 IDE 有智能提示，告别拼写错误：`,
+          code: `// schema.prisma——定义数据模型
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  posts     Post[]   // 一对多
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int
+}
+
+// JS 代码
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+
+// 创建用户并同时创建帖子
+const user = await prisma.user.create({
+  data: {
+    name: '张三',
+    email: 'zhang@test.com',
+    posts: {
+      create: { title: '我的第一篇博客' }
+    }
+  },
+  include: { posts: true }   // 返回时带上下级
+})
+
+// 查询
+const users = await prisma.user.findMany({
+  where: { name: { contains: '张' } },
+  orderBy: { createdAt: 'desc' },
+  take: 10
+})
+
+// 更新
+await prisma.user.update({
+  where: { email: 'zhang@test.com' },
+  data: { name: '张三丰' }
+})
+
+// 删除
+await prisma.user.delete({ where: { id: 1 } })`,
+          language: "javascript",
+          tip: "改完 schema.prisma 后要跑 npx prisma generate 重新生成客户端类型，否则代码里找不到新字段。",
+        },
+        {
+          title: "怎么选——MySQL vs MongoDB vs ORM",
+          content: `选型指南，大白话版：
+
+你要存的数据结构固定、需要事务、要做复杂统计报表 → MySQL + Prisma 或 mysql2
+你的数据每条的字段都不太一样、JSON 嵌套深、追求开发速度 → MongoDB + mongoose
+你是个刚起步的个人项目、不想被 schema 束缚 → MongoDB，后面需要了再迁
+你是个正规团队项目、数据一致性要求高 → MySQL
+你不管用啥数据库都想写起来爽、有类型提示 → Prisma
+你追求极致性能、特别清楚自己在写什么 SQL → mysql2 原生驱动
+
+没有最佳方案，只有最适合你的方案。`,
+        },
+      ],
+      quiz: [
+        { question: "Node.js 里用 mysql2 为什么推荐连接池？", options: ["池子更安全", "复用连接避免频繁创建销毁，支撑高并发", "连接池更快", "MySQL 要求"], answer: 1, explanation: "每次请求都新建连接会造成大量 TCP 握手开销，连接池让多个请求共享固定数量的连接。" },
+        { question: "mongoose 的 populate 方法干什么的？", options: ["填充数据", "关联查询——把 ref 引用的文档自动查出来填进字段", "删除数据", "验证数据"], answer: 1, explanation: "populate 相当于 MongoDB 的 JOIN——把 ObjectId 引用换成实际文档对象。" },
+        { question: "Prisma 相比原生驱动的最大优势是？", options: ["更快", "自动生成 TypeScript 类型——智能提示和编译检查", "更小", "只支持 MySQL"], answer: 1, explanation: "Prisma 从 schema 自动生成 TS 类型，查哪个字段写错了 IDE 直接飘红，大幅减少低级 bug。" },
+        { question: "SQL 注入怎么防？", options: ["用更强的密码", "用参数化查询——占位符 ? 替代字符串拼接", "加密 SQL", "关掉数据库"], answer: 1, explanation: "千万别把用户输入拼进 SQL 字符串！用 ? 或 $1 占位符让驱动自动转义，从根上杜绝注入。" },
+        { question: "MySQL 事务的 ACID 是什么意思？", options: ["四种 SQL 语句", "原子性、一致性、隔离性、持久性", "四种数据库", "四个用户权限"], answer: 1, explanation: "ACID 是事务的四大特性，保证一组操作要么全做要么全不做，数据不会半拉子坏掉。" },
+      ],
+    },
   },
   network: {
     "network-osi": {
@@ -5657,6 +6692,236 @@ aclfile /etc/redis/users.acl`,
         { question: "rename-command FLUSHDB \"\" 做了什么？", options: ["改名命令", "禁用 FLUSHDB 命令——设成空字符串", "重命名数据库", "创建新命令"], answer: 1, explanation: "把危险命令重命名为空串等于禁用——防止误删或被人恶意全清数据库。" },
       ],
     },
+    "js-closures": {
+      slug: "js-closures",
+      sections: [
+        {
+          title: "闭包是什么——函数记住了它的出生地",
+          content: `闭包就是函数加上它被申明时所处的词法作用域的总和。说得再直白一点：内部函数把外部函数的变量「锁」在了自己肚子里，即使外部函数已经执行完了，内部函数还是能访问那些变量。`,
+          code: `function createCounter() {
+    let count = 0;
+    return function() {
+        count++;
+        return count;
+    };
+}
+
+const counter = createCounter();
+console.log(counter());  // 1
+console.log(counter());  // 2
+console.log(counter());  // 3
+// count 变量不在全局，外面碰不到，只有返回的函数能碰`,
+          language: "javascript",
+        },
+        {
+          title: "词法作用域——代码写在哪就决定了作用域",
+          content: `JavaScript 的作用域是静态的（词法的），你在哪写的变量就决定了谁能访问它。闭包之所以工作就是因为函数定义时就「记住」了周围可用的变量——不是说运行时才去找。`,
+          code: `const name = "global";
+
+function outer() {
+    const name = "outer";
+    function inner() {
+        console.log(name);  // "outer"——看定义位置不是调用位置
+    }
+    inner();
+}
+
+outer();  // outer 不是 global`,
+          language: "javascript",
+        },
+        {
+          title: "闭包实战——私有变量和模块模式",
+          content: `闭包最经典的应用就是造私有变量。JS 没有 private 关键字，闭包是实现私有变量的唯一原生方式。模块模式在 ES6 前就是靠闭包搞的。`,
+          code: `// 用闭包做私有变量
+const user = (function() {
+    let _name = "张三";  // 私有
+
+    return {
+        getName() { return _name; },
+        setName(name) {
+            if (name.length > 0) _name = name;
+        }
+    };
+})();
+
+console.log(user.getName());  // "张三"
+console.log(user._name);      // undefined——碰不到`,
+          language: "javascript",
+        },
+        {
+          title: "IIFE——立即执行函数表达式",
+          content: `IIFE 是立即执行函数——定义的同时就执行了。它创造一个隔离的作用域避免变量污染全局。ES6 后有 let/const 块作用域和模块，IIFE 用得少了但理解它对于理解闭包很重要。`,
+          code: `// IIFE——定义 + 执行一条龙
+(function() {
+    const secret = "只有我知道";
+    console.log(secret);  // 打印
+})();
+
+// console.log(secret);  // ReferenceError——secret 只在 IIFE 里
+
+// IIFE 带参数
+const result = (function(n) {
+    let total = 1;
+    for (let i = 1; i <= n; i++) total *= i;
+    return total;
+})(5);
+console.log(result);  // 120——5 的阶乘`,
+          language: "javascript",
+          tip: "循环里用 var 会全指向同一个值，用 let 自带块作用域或 IIFE 创独立作用域解决这个历史坑。",
+        },
+      ],
+      quiz: [
+        { question: "闭包的「闭包」闭住了什么？", options: ["函数本身", "函数 + 它定义位置的词法作用域——内部函数锁住外部变量", "全局对象", "参数列表"], answer: 1, explanation: "闭包把函数和它声明的环境绑在一起——内部函数能「回忆」外部函数的变量和 scope 链。" },
+        { question: "词法作用域和动态作用域的根本区别？", options: ["一样", "词法看代码写在哪，动态看代码从哪调起", "动态更常用", "没有区别"], answer: 1, explanation: "词法作用域在定义时就确定了查找链，动态作用域在调用时动态解析。" },
+        { question: "IIFE 的全称和作用？", options: ["延迟加载", "Immediately Invoked Function Expression——立即执行隔离作用域", "延迟执行", "异步加载"], answer: 1, explanation: "IIFE 定义同时执行——常用创建独立作用域避免变量泄露绑定打包。" },
+        { question: "闭包在实际开发中干嘛用的？", options: ["只有一个作用", "私有变量、模块化、回调函数、定时器、事件绑定传递参数", "只用于排序", "替代 for 循环"], answer: 1, explanation: "闭包用途极广——封装私有变量、回调中保上下文、节流防抖、模块模式等都靠它。" },
+        { question: "for (var i = 0; ...) 和闭包的经典坑怎么解决？", options: ["不能用", "let 块作用域——每轮循环有独立的 i 值", "用 const", "别用循环"], answer: 1, explanation: "var 是函数作用域所以所有回调共享同一个 i；let 块作用域每轮循环独立 i 值。" },
+      ],
+    },
+    "js-prototype": {
+      slug: "js-prototype",
+      sections: [
+        {
+          title: "prototype——所有对象的共享属性来源",
+          content: `JavaScript 是靠原型链实现继承的，不是传统 class 模式。每个函数都有 prototype 属性（只有函数有），每个对象都有内部 __proto__ 链接指向它的构造函数的 prototype。`,
+          code: `function Dog(name) {
+    this.name = name;
+}
+
+Dog.prototype.bark = function() {
+    console.log(this.name + " 汪汪！");
+};
+
+const dog1 = new Dog("旺财");
+const dog2 = new Dog("Black");
+dog1.bark();  // 两个实例共享同一个 bark 方法
+dog2.bark();`,
+          language: "javascript",
+        },
+        {
+          title: "__proto__——对象的实际原型链",
+          content: `__proto__ 是每个对象指向它原型对象的引用，prototype 只是构造函数的一个属性。new 创建对象时会自动把 __proto__ 设成构造函数的 prototype。这才有了原型链。`,
+          code: `const arr = [1, 2, 3];
+console.log(arr.__proto__ === Array.prototype);    // true
+console.log(Array.prototype.__proto__ === Object.prototype);  // true
+console.log(Object.prototype.__proto__);           // null
+
+// 属性查找沿原型链往上走
+const obj = { x: 1 };
+obj.toString();  // 从 Object.prototype 继承的方法`,
+          language: "javascript",
+        },
+        {
+          title: "原型链——找属性的一路追踪",
+          content: `当你访问 obj.prop 时 JS 在 obj 本身找，没找到顺着 __proto__ 往上查，一直到 Object.prototype 再没找到就 undefined。这就是原型链——每一段 __proto__ 连着前一个。`,
+          code: `const parent = { parentProp: "我是爸爸的" };
+const child = Object.create(parent);  // child.__proto__ = parent
+child.childProp = "我是孩子的";
+
+console.log(child.childProp);  // 在 child 上
+console.log(child.parentProp); // 沿原型链向上找 parent
+console.log(child.toString);   // 再向上到 Object.prototype`,
+          language: "javascript",
+        },
+        {
+          title: "class 语法糖——底层还是原型",
+          content: `ES6 的 class 只是原型继承的语法糖——底层还是 constructor 函数 + prototype 链。class 让代码更好看但内部机制完全一样——instanceof、extends 都基于原型链。`,
+          code: `class Animal {
+    constructor(name) { this.name = name; }
+    speak() { console.log(this.name + " 叫了"); }
+}
+
+class Dog extends Animal {
+    constructor(name, breed) {
+        super(name);
+        this.breed = breed;
+    }
+    speak() { console.log(this.name + " 汪汪!"); }
+}
+
+const d = new Dog("Buddy", "金毛");
+d.speak();  // Buddy 汪汪!
+
+// class 的本质
+console.log(typeof Dog);                      // "function"
+console.log(d.__proto__ === Dog.prototype);   // true`,
+          language: "javascript",
+          tip: "Object.getPrototypeOf(obj) 是标准方式读原型替代直接读 __proto__（非标准但有浏览器支持）。",
+        },
+      ],
+      quiz: [
+        { question: "prototype 属性只有谁有？", options: ["所有对象", "只有函数有", "null", "数组"], answer: 1, explanation: "prototype 专属于函数——直接用 {} 或 new Object() 创建的对象没有 prototype 属性。" },
+        { question: "__proto__ 和 prototype 是同一个东西吗？", options: ["一样", "__proto__ 是对象内部的真实原型引用，prototype 是构造函数的静态属性", "prototype 对象内部有 __proto__", "没有区别"], answer: 1, explanation: "prototype 是属于构造函数的一个属性——new 对象时它给新对象设 __proto__。" },
+        { question: "ES6 class 和原型继承的关系？", options: ["完全新机制", "class 是语法糖——底层还是构造函数 + prototype + __proto__ 链", "class 替代了原型", "class 更快"], answer: 1, explanation: "class 只是让代码看起来像传统 OOP，内部 new、super、extends 全部基于原型和原型链。" },
+        { question: "Object.create(null) 创建的对象有什么特点？", options: ["一样", "没有任何原型链——连 toString 方法都没有", "更快的对象", "不能删除"], answer: 1, explanation: "Object.create(null) 的 __proto__ 为 null——一个没有任何继承方法的纯对象，适合做 map 字典。" },
+        { question: "原型链的终点是什么？", options: ["undefined", "null——Object.prototype.__proto__ 为 null", "Object", "window"], answer: 1, explanation: "原型链一路从 own property 到 constructor.prototype 到 Object.prototype.__proto__ 为 null 结束。" },
+      ],
+    },
+    "js-event-loop": {
+      slug: "js-event-loop",
+      sections: [
+        {
+          title: "事件循环——JS 运行的心跳机制",
+          content: `JavaScript 是单线程的，但为什么看起来能同时干多件事？靠的就是事件循环(event loop)。JS 引擎加一个消息队列，主线程执行完同步代码后去队列里取消息执行——这就是「异步」的本质。`,
+          code: `console.log("1");
+
+setTimeout(() => {
+    console.log("2");
+}, 0);
+
+Promise.resolve().then(() => {
+    console.log("3");
+});
+
+console.log("4");
+// 输出: 1 4 3 2
+// 为什么不是 1 4 2 3？——因为微任务(task)优先于宏任务(macrotask)`,
+          language: "javascript",
+        },
+        {
+          title: "宏任务 vs 微任务——两级队列",
+          content: `每次事件循环从宏任务树领一件活干，执行完所有的微任务再拿下一件。宏任务：setTimeout、setInterval、I/O、UI render。微任务：Promise.then/catch/finally、MutationObserver、queueMicrotask。微任务先跑完才轮到下一个宏任务。`,
+          code: `console.log("start");
+
+setTimeout(() => console.log("宏任务1"), 0);
+setTimeout(() => console.log("宏任务2"), 0);
+
+Promise.resolve()
+    .then(() => console.log("微任务1"))
+    .then(() => console.log("微任务2"));
+
+console.log("end");
+
+// 输出: start end 微任务1 微任务2 宏任务1 宏任务2`,
+          language: "javascript",
+        },
+        {
+          title: "渲染时机——render 也排队",
+          content: `浏览器每 16.6ms（60fps）刷新一次画面。渲染发生在每一轮事件循环结束后——前提是没有微任务一直产生新任务。这就是为什么你不应该在 Promise 里递归做无限循环——会卡死渲染。`,
+          code: `// 危险写法——阻塞渲染
+function blockingLoop() {
+    Promise.resolve().then(() => {
+        // 无限产生微任务——render 永远轮不到
+        blockingLoop();
+    });
+}
+
+// 安全写法——requestAnimationFrame 配合微任务
+requestAnimationFrame(() => {
+    // 在下一帧之前执行——不会错过渲染
+});`,
+          language: "javascript",
+          tip: "requestAnimationFrame 是为渲染同步的最佳 API——在下一个渲染帧之前执行。微任务过多会挤占宏任务直到渲染延迟。",
+        },
+      ],
+      quiz: [
+        { question: "为什么 Promise.then 的代码比 setTimeout 先执行？", options: ["Promise 更快", "微任务优先级高于宏任务——宏任务回来前微任务清空", "Promise 是异步的", "随机"], answer: 1, explanation: "微任务在每一轮宏任务执行完后立即清空——setTimeout 是下一轮宏任务。" },
+        { question: "哪些是微任务？", options: ["setTimeout", "Promise.then/catch/finally + queueMicrotask", "setInterval", "I/O"], answer: 1, explanation: "Promise.then 和 queueMicrotask 是微任务。setTimeout/setInterval 属于宏任务。" },
+        { question: "requestAnimationFrame 和 setTimeout 零秒哪个先跑？", options: ["setTimeout", "rAF——浏览器保证在下一帧渲染前执行", "两个同时", "随机"], answer: 1, explanation: "rAF 专门绑定渲染周期——确保在下次浏览器重绘前执行，比 setTimeout 更接近渲染自然节奏。" },
+        { question: "事件循环中在下一帧前最多能执行多少个宏任务？", options: ["无限", "一个——一个宏任务后清空所有微任务然后可能 render", "两个", "三个"], answer: 1, explanation: "每轮循环拿一个宏任务执行 → 清空微任务队列 → 如果需要渲染就 render → 继续下一轮。" },
+        { question: "微任务导致渲染卡死的原因？", options: ["不会", "微任务中递归创建新微任务——永远清不完，渲染轮不到", "微任务只在 node 中", "微任务是同步"], answer: 1, explanation: "微任务执行过程中新创建的微任务就在同一轮清掉——无限产生微任务会让宏任务和渲染永远等不到。" },
+      ],
+    },
   },
   // ============ Frontend ============
   frontend: {
@@ -6875,6 +8140,1379 @@ fetch('/api/data', { signal: AbortSignal.timeout(5000) });`,
         { question: "Bootstrap 的栅格系统有多少列？", options: ["10", "12", "16", "24"], answer: 1, explanation: "Bootstrap 默认 12 列，col-6 占一半，col-4 占三分之一，加起来刚好 12。" },
         { question: "class=\"btn btn-primary\" 渲染出什么？", options: ["文本", "蓝色主按钮", "红色按钮", "没有样式"], answer: 1, explanation: "btn 是按钮基础样式，btn-primary 是主色（通常是蓝色），组合成一个标准按钮。" },
         { question: "Bootstrap 的 class=\\\"d-none d-md-block\\\" 是什么意思？", options: ["总是隐藏", "移动端隐藏，中等屏幕及以上显示", "总是显示", "只在桌面隐藏"], answer: 1, explanation: "d-none 默认隐藏，d-md-block 在 md 断点及以上覆盖为显示。" },
+      ],
+    },
+    "react-state": {
+      slug: "react-state",
+      sections: [
+        {
+          title: "React 状态管理——数据怎么存怎么传",
+          content: `React 组件的数据分两种：props（别人传给你的，只读）和 state（你自己管的数据，可改）。简单页面直接在组件里 useState 就够用了。但当多个组件需要共享同一份数据时——比如用户登录信息、购物车——就需要状态管理方案。
+
+三种主流方案从小到大：
+useState + props 传参——适合组件少、数据流简单的场景
+Context API + useReducer——React 自带，适合中型应用，多个组件需要访问同一数据
+Zustand——第三方轻量库，写法最爽、性能最好、侵入性最低`,
+        },
+        {
+          title: "Context API——跨组件共享数据",
+          content: `Context 解决的是 props 层层传递的痛点。不用 Context 的话，爷爷要传数据给孙子，得先经过爸爸，爸爸只是当个搬运工：`,
+          code: `import { createContext, useContext, useState } from 'react';
+
+// 1. 创建 Context
+const ThemeContext = createContext(null);
+
+// 2. Provider——在外层包住需要共享数据的组件
+function App() {
+  const [theme, setTheme] = useState('light');
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      <Header />
+      <Main />
+    </ThemeContext.Provider>
+  );
+}
+
+// 3. 任何后代组件直接用
+function Header() {
+  const { theme, setTheme } = useContext(ThemeContext);
+  return (
+    <header>
+      当前主题：{theme}
+      <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
+        切换
+      </button>
+    </header>
+  );
+}`,
+          language: "tsx",
+          tip: "Context 值一变，所有用到它的组件都重渲染。别把所有状态扔一个 Context，按业务拆分——比如分 ThemeContext 和 UserContext。",
+        },
+        {
+          title: "useReducer——复杂状态逻辑",
+          content: `useState 适合简单状态，但当状态逻辑复杂——比如多种操作、状态间相互依赖——useReducer 更好维护。它跟 Redux 一个思路但 React 自带：`,
+          code: `import { useReducer } from 'react';
+
+// Reducer——纯函数，接收旧状态 + action，返回新状态
+function cartReducer(state, action) {
+  switch (action.type) {
+    case 'ADD_ITEM':
+      return { ...state, items: [...state.items, action.payload], total: state.total + action.payload.price };
+    case 'REMOVE_ITEM':
+      const newItems = state.items.filter(item => item.id !== action.payload);
+      const newTotal = newItems.reduce((sum, item) => sum + item.price, 0);
+      return { ...state, items: newItems, total: newTotal };
+    case 'CLEAR':
+      return { items: [], total: 0 };
+    default:
+      return state;
+  }
+}
+
+function ShoppingCart() {
+  const [cart, dispatch] = useReducer(cartReducer, { items: [], total: 0 });
+
+  return (
+    <div>
+      <p>共 {cart.items.length} 件，总价 {cart.total}</p>
+      <button onClick={() => dispatch({ type: 'ADD_ITEM', payload: { id: 1, name: '键盘', price: 299 } })}>
+        添加键盘 (299)
+      </button>
+      <button onClick={() => dispatch({ type: 'CLEAR' })}>清空</button>
+    </div>
+  );
+}`,
+          language: "tsx",
+          tip: "reducer 必须是纯函数——同样的输入一定同样的输出，不要在里面调 API、改外部变量，把副作用放在 dispatch 之前处理。",
+        },
+        {
+          title: "Zustand——最简状态管理",
+          content: `Zustand 是这几年最火的小巧状态管理库。跟 Redux 比少了一大堆模板代码，写起来跟 useState 一样顺滑。没有 Provider、没有 Action Type 常量、一个函数搞定：`,
+          code: `import { create } from 'zustand';
+
+// 一个 store 就是一个自定义 hook
+const useUserStore = create((set) => ({
+  user: null,
+  isLoggedIn: false,
+  login: (userData) => set({ user: userData, isLoggedIn: true }),
+  logout: () => set({ user: null, isLoggedIn: false }),
+  updateName: (name) => set((state) => ({ user: { ...state.user, name } })),
+}));
+
+// 组件里直接用——爽
+function Profile() {
+  const user = useUserStore((s) => s.user);
+  const login = useUserStore((s) => s.login);
+  const logout = useUserStore((s) => s.logout);
+
+  if (!user) return <button onClick={() => login({ name: '张三' })}>登录</button>;
+  return (
+    <div>
+      <p>欢迎, {user.name}</p>
+      <button onClick={logout}>退出</button>
+    </div>
+  );
+}`,
+          language: "tsx",
+          tip: "Zustand 默认不用 Provider，store 是模块级单例。如果需要隔离（比如多个独立实例），用 createStore 配合 Provider 模式。",
+        },
+      ],
+      quiz: [
+        { question: "Context API 主要解决什么问题？", options: ["性能优化", "跨组件共享数据避免 props 逐层传递", "样式管理", "路由"], answer: 1, explanation: "Context 让数据跨过中间组件直接传到底，不用一层层当搬运工。" },
+        { question: "useReducer 和 useState 的区别？", options: ["完全一样", "useReducer 适合复杂状态逻辑——多种操作集中管", "useReducer 更快", "useState 不能存对象"], answer: 1, explanation: "useReducer 把状态更新逻辑集中进 reducer 函数里，dispatch 触发，结构清晰适合复杂场景。" },
+        { question: "Zustand 相比 Redux 的最大优点？", options: ["功能更多", "零模板代码——一个函数创建 store，直接 hook 使用", "性能更高", "只能用在 React"], answer: 1, explanation: "Zustand 没有 Provider、Action Type、Reducer 这些概念，极其简洁，新手十分钟上手。" },
+        { question: "Reducer 函数为什么要纯函数？", options: ["习惯", "同样的输入必同样的输出——利于调试、测试和状态预测", "运行更快", "React 限制"], answer: 1, explanation: "纯函数保证状态变化的可预测性，加了副作用就难排查 bug 了。" },
+      ],
+    },
+    "react-router": {
+      slug: "react-router",
+      sections: [
+        {
+          title: "React Router v6 安装与基础配置",
+          content: `单页应用需要在不同「页面」之间切换，但又不重新加载整个页面。React Router 负责管理浏览器地址栏和页面内容之间的映射关系：`,
+          code: `// 安装：npm install react-router-dom
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/user/:id" element={<UserProfile />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+// 从 v6 开始，Route 必须包在 Routes 里，element 代替了 component
+// BrowserRouter 用 HTML5 history API，HashRouter 用 hash（兼容老浏览器）`,
+          language: "tsx",
+        },
+        {
+          title: "导航与参数传递",
+          content: `页面跳转用 Link 或 useNavigate。获取 URL 参数或查询字符串用 useParams 和 useSearchParams：`,
+          code: `import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+
+// 声明式导航——Link
+<Link to="/about">关于我们</Link>
+<Link to="/user/123">用户 123</Link>
+
+// 编程式导航——useNavigate
+const navigate = useNavigate();
+navigate('/login');
+navigate(-1);   // 回上一页
+navigate('/user/123', { replace: true });  // 替换当前历史而非追加
+
+// 获取路径参数
+// URL: /user/123 → path="/user/:id"
+function UserProfile() {
+  const { id } = useParams();
+  return <p>用户 ID: {id}</p>;
+}
+
+// 获取查询参数
+// URL: /search?q=react&page=2
+function Search() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const query = searchParams.get('q');
+  const page = searchParams.get('page') || '1';
+
+  // 更新查询参数
+  setSearchParams({ q: 'vue', page: '1' });
+  return <p>搜索: {query}, 第 {page} 页</p>;
+}`,
+          language: "tsx",
+        },
+        {
+          title: "嵌套路由与布局",
+          content: `嵌套路由让你在不刷新整页的情况下切换局部内容——比如后台管理系统的左侧菜单不变，只换右侧内容：`,
+          code: `// 定义嵌套路由
+<Routes>
+  <Route path="/dashboard" element={<DashboardLayout />}>
+    <Route index element={<DashboardHome />} />        {/* /dashboard */}
+    <Route path="analytics" element={<Analytics />} />   {/* /dashboard/analytics */}
+    <Route path="settings" element={<Settings />} />     {/* /dashboard/settings */}
+  </Route>
+</Routes>
+
+// DashboardLayout——用 Outlet 渲染子路由的内容
+import { Outlet, NavLink } from 'react-router-dom';
+
+function DashboardLayout() {
+  return (
+    <div className="dashboard">
+      <nav>
+        <NavLink to="." end>首页</NavLink>
+        <NavLink to="analytics">数据</NavLink>
+        <NavLink to="settings">设置</NavLink>
+      </nav>
+      <main>
+        <Outlet />  {/* 子路由内容在这里渲染 */}
+      </main>
+    </div>
+  );
+}
+
+// index 路由——当路径精确匹配父路径时渲染
+// NavLink 的 end 属性——避免父路径一直处于激活状态`,
+          language: "tsx",
+        },
+        {
+          title: "路由守卫——权限控制",
+          content: `实际项目里不是所有页面谁都能看——需要登录验证、角色校验。路由守卫就是这些「看门人」：`,
+          code: `import { Navigate, useLocation } from 'react-router-dom';
+
+// 要求登录的守卫
+function RequireAuth({ children }) {
+  const isLoggedIn = useUserStore((s) => s.isLoggedIn);
+  const location = useLocation();
+
+  if (!isLoggedIn) {
+    // 记住当前地址，登录后跳回来
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  return children;
+}
+
+// 使用——把要保护的页面包起来
+<Routes>
+  <Route path="/login" element={<Login />} />
+  <Route path="/dashboard" element={
+    <RequireAuth>
+      <DashboardLayout />
+    </RequireAuth>
+  }>
+    <Route index element={<DashboardHome />} />
+  </Route>
+</Routes>
+
+// Login 组件登录成功后跳回
+function Login() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/';
+
+  const handleLogin = async () => {
+    // ...登录逻辑
+    navigate(from, { replace: true });
+  };
+}`,
+          language: "tsx",
+          tip: "location.state 传参是 React Router 的特色——不同页面间传数据不经过 URL，适合传一些敏感或复杂数据。",
+        },
+      ],
+      quiz: [
+        { question: "React Router v6 中定义路由必须包在什么组件里？", options: ["Switch", "Routes", "RouterGroup", "RouteGroup"], answer: 1, explanation: "v6 里 Switch 被 Routes 取代了，Route 必须放在 Routes 里面。" },
+        { question: "useParams 的作用是？", options: ["获取查询参数", "获取路径参数——如 /user/:id 里的 id", "修改路由", "跳转"], answer: 1, explanation: "useParams 返回路径中的动态参数，如 :id 在 URL 中的实际值。" },
+        { question: "嵌套路由中，子路由的内容在哪渲染？", options: ["自动放父组件最前面", "在父组件里用 Outlet 占位——子路由内容就填那", "替换父组件", "新开页面"], answer: 1, explanation: "Outlet 是嵌套路由的渲染出口，子路由匹配到的组件自动渲染到 Outlet 的位置。" },
+        { question: "路由守卫失败了怎么让用户跳到登录页？", options: ["手动改地址栏", "返回 Navigate 组件——自动重定向", "刷新页面", "报警"], answer: 1, explanation: "Navigate 组件渲染后自动跳转，传 state 还能把原始地址带过去，登录后跳回来。" },
+      ],
+    },
+    "react-performance": {
+      slug: "react-performance",
+      sections: [
+        {
+          title: "React 性能优化——为什么组件没完没了渲染",
+          content: `React 的默认行为：父组件渲染，子组件也跟着渲染——哪怕子组件的数据没变。这在小型应用里无所谓，但组件多了、数据复杂了就会卡顿。
+
+优化的核心思路：让没变化的组件跳过渲染。React 提供了几个工具帮你做这件事。`,
+        },
+        {
+          title: "React.memo——组件级跳过渲染",
+          content: `React.memo 把组件包起来，当 props 没变时跳过纯重新渲染。相当于告诉 React：这个组件很纯，输入不变就别折腾了：`,
+          code: `import { memo } from 'react';
+
+// 普通组件——父组件每次渲染，子组件也会渲染
+function ExpensiveList({ items }) {
+  // 复杂的列表渲染...
+  return <ul>{items.map(i => <li key={i.id}>{i.name}</li>)}</ul>;
+}
+
+// memo 包裹——只有 items 引用变了才重新渲染
+const ExpensiveList = memo(function ExpensiveList({ items }) {
+  return <ul>{items.map(i => <li key={i.id}>{i.name}</li>)}</ul>;
+});
+
+// 自定义比较——默认浅比较，特殊需求自己写
+const ExpensiveList = memo(
+  function ExpensiveList({ items, filters }) {
+    // ...
+  },
+  (prevProps, nextProps) => {
+    // 返回 true 表示相同——不渲染
+    return prevProps.items.length === nextProps.items.length;
+  }
+);`,
+          language: "tsx",
+          warning: "memo 不是免费的——它需要做 props 比较。给每个组件都套 memo 反而可能更慢。只给渲染昂贵的组件用。",
+        },
+        {
+          title: "useMemo 与 useCallback——缓存值和函数",
+          content: `useMemo 缓存计算结果——依赖没变就返回上次的结果，避免每次渲染都重算。useCallback 缓存函数引用——避免把新函数传给子组件导致无谓的重新渲染：`,
+          code: `import { useMemo, useCallback, useState } from 'react';
+
+function ProductList({ products, sortBy }) {
+  const [filter, setFilter] = useState('');
+
+  // 只有 products 或 sortBy 变了才重新排序——filter 变不触发重算
+  const sortedProducts = useMemo(() => {
+    return [...products].sort((a, b) => {
+      if (sortBy === 'price') return a.price - b.price;
+      return a.name.localeCompare(b.name);
+    });
+  }, [products, sortBy]);
+
+  // 只有 setFilter 的调用方式变了才缓存（实际上不会变）
+  // 但传给 memo 子组件时保持不变，避免子组件无谓渲染
+  const handleClick = useCallback((id) => {
+    setFilter(prev => prev === id ? '' : id);
+  }, []);
+
+  return (
+    <ul>
+      {sortedProducts.map(p => (
+        <ProductItem key={p.id} product={p} onClick={handleClick} />
+      ))}
+    </ul>
+  );
+}`,
+          language: "tsx",
+          tip: "useMemo 和 useCallback 只应该在确实有性能问题时才用。React 的默认行为在大多数场景下足够快，过早优化是万恶之源。",
+        },
+        {
+          title: "Lazy Loading——按需加载",
+          content: `首屏加载慢的一大原因是把所有页面代码都打到一起了。React.lazy 让你按需加载——用户访问某个页面时才加载该页面的代码：`,
+          code: `import { lazy, Suspense } from 'react';
+
+// 动态导入——用到才加载
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Settings = lazy(() => import('./pages/Settings'));
+const Analytics = lazy(() => import('./pages/Analytics'));
+
+function App() {
+  return (
+    <Suspense fallback={<div>加载中...</div>}>
+      <Routes>
+        <Route path="/dashboard/*" element={<Dashboard />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/analytics" element={<Analytics />} />
+      </Routes>
+    </Suspense>
+  );
+}
+
+// Suspense 的 fallback 是加载时的占位 UI
+// 你也可以包多个 Suspense 放在不同粒度
+
+// Vite / Webpack 打包时会把动态 import 的模块自动拆成独立文件`,
+          language: "tsx",
+          tip: "lazy 只对默认导出的组件生效。如果组件是命名导出的，需要在中间模块转一下。",
+        },
+      ],
+      quiz: [
+        { question: "React.memo 的作用是什么？", options: ["记住组件状态", "props 没变时跳过子组件渲染", "缓存数据", "延迟加载"], answer: 1, explanation: "memo 浅比较 props，没变化就跳过本次渲染——适合纯展示型的大列表组件。" },
+        { question: "useMemo 和 useCallback 的区别？", options: ["完全一样", "useMemo 缓存计算结果，useCallback 缓存函数引用", "useCallback 缓存数据", "useMemo 缓存函数"], answer: 1, explanation: "useMemo 回缓存值——数组过滤排序结果；useCallback 回缓存函数——传函数给 memo 子组件时保持不变。" },
+        { question: "React.lazy 配合什么组件使用？", options: ["ErrorBoundary", "Suspense", "Fragment", "StrictMode"], answer: 1, explanation: "lazy 组件必须用 Suspense 包着，加载时显示 fallback 内容。" },
+        { question: "memo 给所有组件都套上好还是只有部分？", options: ["全套上最好", "只给确实昂贵的组件用——遍地的 memo 比较成本可能超过渲染成本", "不需要用", "看心情"], answer: 1, explanation: "memo 本身也有 props 比较开销。给轻量组件套 memo 得不偿失，优先优化渲染重的。" },
+      ],
+    },
+    "react-testing": {
+      slug: "react-testing",
+      sections: [
+        {
+          title: "React Testing Library 入门",
+          content: `React Testing Library（RTL）是 React 官方推荐的测试工具。它的核心理念是「测试行为，不测试实现」——别管组件内部怎么写的，只管用户看到什么、点了按钮有什么反应。
+
+Jest 是测试框架（跑测试、断言），RTL 是辅助工具（渲染组件、模拟用户操作）。两者搭配使用。`,
+        },
+        {
+          title: "渲染与查询",
+          content: `RTL 用 render 把组件渲染到虚拟 DOM 里，然后用查询方法找到页面元素。查询方法按推荐的顺序：getByRole > getByLabelText > getByText > getByTestId：`,
+          code: `import { render, screen } from '@testing-library/react';
+import Greeting from './Greeting';
+
+test('显示问候语', () => {
+  render(<Greeting name="张三" />);
+
+  // 按文本查找
+  expect(screen.getByText('你好, 张三')).toBeInTheDocument();
+
+  // 按角色查找
+  const button = screen.getByRole('button', { name: '提交' });
+  expect(button).toBeInTheDocument();
+
+  // 按 label 查找表单元素
+  const emailInput = screen.getByLabelText('邮箱');
+  expect(emailInput).toBeInTheDocument();
+
+  // 按 testid 查找（最后手段）
+  expect(screen.getByTestId('submit-btn')).toBeInTheDocument();
+});`,
+          language: "tsx",
+          tip: "getByRole 是最推荐的查询方式——最接近用户实际感知，也最有利于可访问性。getByTestId 是最后的备用手段。",
+        },
+        {
+          title: "模拟用户操作——fireEvent 与 userEvent",
+          content: `找到元素后就要模拟用户操作：点击、输入、提交。userEvent 比 fireEvent 更贴近真实用户行为（比如点击前先 hover、输入时触发完整的事件序列）：`,
+          code: `import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import LoginForm from './LoginForm';
+
+test('填写并提交登录表单', async () => {
+  const handleSubmit = jest.fn();
+  render(<LoginForm onSubmit={handleSubmit} />);
+
+  // 模拟输入
+  await userEvent.type(screen.getByLabelText('用户名'), 'admin');
+  await userEvent.type(screen.getByLabelText('密码'), '123456');
+
+  // 模拟点击
+  await userEvent.click(screen.getByRole('button', { name: '登录' }));
+
+  expect(handleSubmit).toHaveBeenCalledWith({
+    username: 'admin',
+    password: '123456'
+  });
+});
+
+test('空提交时显示错误', async () => {
+  render(<LoginForm onSubmit={jest.fn()} />);
+
+  await userEvent.click(screen.getByRole('button', { name: '登录' }));
+
+  expect(screen.getByText('用户名不能为空')).toBeInTheDocument();
+});`,
+          language: "tsx",
+        },
+        {
+          title: "异步操作与 Mock",
+          content: `组件里调 API 是家常便饭，测试时不能真去调后端——用 jest.mock 把 API 模块替换掉：`,
+          code: `import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import UserList from './UserList';
+
+// Mock API 模块
+jest.mock('../api', () => ({
+  fetchUsers: jest.fn(() => Promise.resolve([
+    { id: 1, name: '张三' },
+    { id: 2, name: '李四' },
+  ]))
+}));
+
+test('加载并显示用户列表', async () => {
+  render(<UserList />);
+
+  // 等待异步数据加载完成
+  await waitFor(() => {
+    expect(screen.getByText('张三')).toBeInTheDocument();
+    expect(screen.getByText('李四')).toBeInTheDocument();
+  });
+});
+
+test('加载失败时显示错误', async () => {
+  const { fetchUsers } = require('../api');
+  fetchUsers.mockRejectedValueOnce(new Error('网络错误'));
+
+  render(<UserList />);
+
+  await waitFor(() => {
+    expect(screen.getByText('加载失败')).toBeInTheDocument();
+  });
+});`,
+          language: "tsx",
+          tip: "waitFor 会不断重试直到断言通过或超时。处理异步渲染的利器，比写 setTimeout 优雅多了。",
+        },
+      ],
+      quiz: [
+        { question: "React Testing Library 推荐用哪种查询？", options: ["getByTestId", "getByRole", "querySelector", "直接操作 DOM"], answer: 1, explanation: "getByRole 最贴近用户实际交互方式，也是无障碍性最好的查询方式。" },
+        { question: "userEvent 和 fireEvent 的区别？", options: ["完全一样", "userEvent 模拟更真实的用户操作——包含完整事件序列", "fireEvent 更强", "userEvent 更慢"], answer: 1, explanation: "userEvent 会触发完整事件链（如点击包含 hover、focus、click），比 fireEvent 更接近真实用户行为。" },
+        { question: "waitFor 的作用？", options: ["等待一定时间", "不断重试直到条件满足——处理异步渲染", "阻止渲染", "暂停测试"], answer: 1, explanation: "waitFor 接受回调，反复执行直到回调不抛错或超时，是等异步 UI 更新的首选方案。" },
+        { question: "测试中怎么模拟 API 调用？", options: ["真去调后端", "用 jest.mock 替换 API 模块返回假数据", "关闭网络", "跳过不测"], answer: 1, explanation: "jest.mock 把模块整体替换，返回可控的假数据——测组件逻辑而不依赖后端。" },
+      ],
+    },
+    "vue-router": {
+      slug: "vue-router",
+      sections: [
+        {
+          title: "Vue Router 路由配置",
+          content: `Vue Router 是 Vue 官方的路由库。跟 React Router 同理——管理地址栏和页面之间的映射，支持懒加载、嵌套路由、导航守卫：`,
+          code: `// router/index.js
+import { createRouter, createWebHistory } from 'vue-router';
+
+const routes = [
+  {
+    path: '/',
+    name: 'home',
+    component: () => import('@/views/Home.vue'),   // 懒加载
+  },
+  {
+    path: '/user/:id',
+    name: 'user',
+    component: () => import('@/views/User.vue'),
+    props: true,  // 把 params 当 props 传给组件
+  },
+  {
+    path: '/dashboard',
+    component: () => import('@/views/DashboardLayout.vue'),
+    children: [
+      { path: '', name: 'dashboard', component: () => import('@/views/DashboardHome.vue') },
+      { path: 'analytics', name: 'analytics', component: () => import('@/views/Analytics.vue') },
+    ],
+  },
+  { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('@/views/NotFound.vue') },
+];
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
+});
+
+export default router;`,
+          language: "javascript",
+        },
+        {
+          title: "导航与参数获取",
+          content: `Vue 里跳转页面用 router-link 或 router.push，获取参数用 useRoute。模板和逻辑两种方式：`,
+          code: `<!-- 模板中声明式导航 -->
+<router-link to="/about">关于我们</router-link>
+<router-link :to="{ name: 'user', params: { id: 123 } }">用户 123</router-link>
+
+<!-- 子路由的出口 -->
+<router-view />
+
+<!-- 编程式导航 -->
+<script setup>
+import { useRouter, useRoute } from 'vue-router';
+
+const router = useRouter();
+const route = useRoute();
+
+// 跳转
+router.push('/login');
+router.push({ name: 'user', params: { id: 456 } });
+router.replace({ path: '/home' });   // 替换历史
+router.go(-1);  // 后退
+
+// 获取参数
+console.log(route.params.id);        // 路径参数
+console.log(route.query.search);     // ?search=xxx
+</script>`,
+          language: "html",
+        },
+        {
+          title: "导航守卫——权限控制",
+          content: `Vue Router 的导航守卫在跳转前后执行逻辑——最常用的是全局前置守卫 beforeEach，用来检查登录状态：`,
+          code: `import { createRouter } from 'vue-router';
+
+const router = createRouter({ ... });
+
+// 全局前置守卫——每次跳转前走一遭
+router.beforeEach((to, from, next) => {
+  // 登录验证
+  const isLoggedIn = localStorage.getItem('token');
+
+  if (to.meta.requiresAuth && !isLoggedIn) {
+    // 没登录想去需要权限的页面——踹去登录
+    next({ name: 'login', query: { redirect: to.fullPath } });
+  } else if (to.name === 'login' && isLoggedIn) {
+    // 已登录还去登录页——直接送后台
+    next({ name: 'dashboard' });
+  } else {
+    next();  // 放行
+  }
+});
+
+// 路由定义中加元信息
+const routes = [
+  {
+    path: '/admin',
+    component: AdminLayout,
+    meta: { requiresAuth: true },   // 需要登录
+    children: [...]
+  },
+];
+
+// 组件内部守卫——离开前确认
+<script setup>
+import { onBeforeRouteLeave } from 'vue-router';
+onBeforeRouteLeave((to, from) => {
+  if (hasUnsavedChanges.value) {
+    return window.confirm('有未保存的更改，确定离开吗？');
+  }
+});
+</script>`,
+          language: "javascript",
+          tip: "next() 放行的时机很重要——异步操作（如验证 token）完成后再调 next，别还没验完就放行。",
+        },
+        {
+          title: "动态路由——权限路由",
+          content: `后台系统常有不同角色看到不同菜单的需求。动态路由在登录后根据用户角色动态添加路由：`,
+          code: `// router/index.js
+import { createRouter, createWebHistory } from 'vue-router';
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    // 静态路由——所有人都能访问
+    { path: '/', name: 'home', component: Home },
+    { path: '/login', name: 'login', component: Login },
+  ],
+});
+
+// 动态添加路由——登录后调用
+export function addDynamicRoutes(role) {
+  if (role === 'admin') {
+    router.addRoute({
+      path: '/admin',
+      component: AdminLayout,
+      children: [
+        { path: 'users', component: UserManagement },
+        { path: 'settings', component: SystemSettings },
+      ],
+    });
+  }
+
+  router.addRoute({
+    path: '/profile',
+    component: UserProfile,
+  });
+}
+
+// 重置路由（退出时）
+export function resetRouter() {
+  const routes = router.getRoutes();
+  routes.forEach(route => {
+    if (route.name) router.removeRoute(route.name);
+  });
+}`,
+          language: "javascript",
+          tip: "退出登录后得把动态路由清掉——否则新用户可能看到上个用户的菜单。用 removeRoute 或重新创建 router 实例。",
+        },
+      ],
+      quiz: [
+        { question: "Vue Router 全局前置守卫是哪个钩子？", options: ["beforeEnter", "beforeEach", "beforeResolve", "afterEach"], answer: 1, explanation: "router.beforeEach 是全局前置守卫——每次路由跳转前都先走这。" },
+        { question: "route.params 和 route.query 的区别？", options: ["一样", "params 是路径参数 /:id，query 是查询字符串 ?key=value", "query 是路径参数", "params 是 POST 数据"], answer: 1, explanation: "params 嵌在 URL 路径里（/user/123），query 跟在 ? 后面（/user?name=张三）。" },
+        { question: "next() 在导航守卫中的作用？", options: ["跳到下一页", "确认导航——放行或重定向", "停止导航", "刷新页面"], answer: 1, explanation: "next 决定导航去向——next() 放行，next('/login') 重定向，next(false) 取消。" },
+        { question: "router.addRoute 能做什么？", options: ["删除路由", "动态添加路由——按角色按需加载菜单页面", "修改路由", "重置路由"], answer: 1, explanation: "addRoute 根据用户权限动态注册路由，实现不同角色不同菜单。" },
+      ],
+    },
+    "vue-pinia": {
+      slug: "vue-pinia",
+      sections: [
+        {
+          title: "Pinia——Vue 官方状态管理",
+          content: `Pinia 是 Vue 3 官方推荐的状态管理库，代替了老一代的 Vuex。语法更简洁，完美支持 TypeScript，没有 mutations 的概念——直接用 actions 改状态就完事了。
+
+Store 就是存储数据的仓库。每个 store 是一个独立的模块，按功能拆分（用户 store、购物车 store、主题 store），各管各的互不干扰。`,
+        },
+        {
+          title: "定义和使用 Store",
+          content: `setup 风格的 store 写起来最像 Composition API——ref 是状态，函数是 actions，computed 是 getters：`,
+          code: `// stores/user.js
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+
+export const useUserStore = defineStore('user', () => {
+  // State——用 ref
+  const user = ref(null);
+  const token = ref(localStorage.getItem('token') || '');
+
+  // Getters——用 computed
+  const isLoggedIn = computed(() => !!token.value);
+  const userName = computed(() => user.value?.name || '未登录');
+
+  // Actions——普通函数，可以异步
+  async function login(email, password) {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await res.json();
+    user.value = data.user;
+    token.value = data.token;
+    localStorage.setItem('token', data.token);
+  }
+
+  function logout() {
+    user.value = null;
+    token.value = '';
+    localStorage.removeItem('token');
+  }
+
+  return { user, token, isLoggedIn, userName, login, logout };
+});`,
+          language: "javascript",
+          tip: "setup 风格是社区最爱——跟 Composition API 无缝衔接。Options 风格更接近 Vuex 老用户习惯。两种风格都能用，选自己顺手的。",
+        },
+        {
+          title: "在组件中使用",
+          content: `组件里用 store 极其简单——调 useXxxStore 拿到实例，直接访问属性和方法。响应式自动绑定：`,
+          code: `<!-- UserProfile.vue -->
+<script setup>
+import { useUserStore } from '@/stores/user';
+import { storeToRefs } from 'pinia';
+
+const userStore = useUserStore();
+
+// 解构时用 storeToRefs 保持响应式——直接解构会丢失响应性
+const { user, isLoggedIn, userName } = storeToRefs(userStore);
+
+// actions 可以直接解构——它们是函数，不需要响应式
+const { login, logout } = userStore;
+
+async function handleLogin() {
+  await login('test@example.com', '123456');
+}
+</script>
+
+<template>
+  <div v-if="isLoggedIn">
+    <p>欢迎, {{ userName }}</p>
+    <button @click="logout">退出</button>
+  </div>
+  <div v-else>
+    <button @click="handleLogin">登录</button>
+  </div>
+</template>`,
+          language: "html",
+          tip: "store 解构属性时记得用 storeToRefs()——它把 store 里的属性包装成 ref，避免丢掉响应式。只有 actions 可以直接解构。",
+        },
+        {
+          title: "多 Store 互相调用",
+          content: `大型应用中 store 之间需要互相调用——比如购物车 store 需要知道用户是否登录。Pinia 允许 store 引用别的 store：`,
+          code: `// stores/cart.js
+import { defineStore } from 'pinia';
+import { useUserStore } from './user';
+
+export const useCartStore = defineStore('cart', () => {
+  const items = ref([]);
+  const userStore = useUserStore();  // 引用另一个 store
+
+  const totalPrice = computed(() =>
+    items.value.reduce((sum, item) => sum + item.price * item.qty, 0)
+  );
+
+  function addToCart(product) {
+    if (!userStore.isLoggedIn) {
+      throw new Error('请先登录');
+    }
+    items.value.push(product);
+  }
+
+  // 退出时清空购物车——监听 isLoggedIn 的变化
+  watch(() => userStore.isLoggedIn, (loggedIn) => {
+    if (!loggedIn) items.value = [];
+  });
+
+  return { items, totalPrice, addToCart };
+});`,
+          language: "javascript",
+          tip: "store 之间交叉引用要注意循环依赖。如果 A 引用 B 且 B 引用 A，重构逻辑抽到第三个 store 里。",
+        },
+      ],
+      quiz: [
+        { question: "Pinia 中 state、getters、actions 分别对应什么？", options: ["数据、异步函数、计算属性", "数据（ref）、计算属性（computed）、方法（函数）", "跟 Vuex 一样", "没有区别"], answer: 1, explanation: "setup 风格里 ref 是 state，computed 是 getters，普通函数（可异步）是 actions。" },
+        { question: "storeToRefs 干嘛用的？", options: ["创建 store", "解构 store 属性时保持响应式", "销毁 store", "重置 store"], answer: 1, explanation: "直接解构 store 的 state/getters 会失去响应式，storeToRefs 包装成 ref 保持响应式。" },
+        { question: "Pinia 里怎么做异步请求？", options: ["单独的 mutations", "在 actions 里写 async/await", "只能同步", "用插件"], answer: 1, explanation: "Pinia 没有 mutations，异步操作直接在 actions 里 async/await，简洁明了。" },
+        { question: "Pinia 和 Vuex 最大的区别？", options: ["Pinia 更快", "Pinia 没有 mutations——直接在 actions 改状态，体积更小 API 更简", "Vuex 更好", "完全一样"], answer: 1, explanation: "Pinia 移除了 mutations 概念，actions 直接操作 state，配合 Composition API 写起来非常清爽。" },
+      ],
+    },
+    "vue-components": {
+      slug: "vue-components",
+      sections: [
+        {
+          title: "组件通信——Props 和 Emits",
+          content: `Vue 组件通信的核心就两件事：父传子用 props，子传父用 emits。这是 Vue 单向数据流的体现——数据总是从父流向子，子要改数据得通知父去改。
+比喻：老爸给儿子零花钱（props），儿子花完了不能说老爸钱包直接少了——得跟老爸说「我花完了」（emit），老爸自己掏钱包。`,
+        },
+        {
+          title: "Props——父传子",
+          content: `props 就像函数的参数——父组件传什么，子组件显示什么。Vue 支持类型校验和默认值：`,
+          code: `<!-- 子组件 ProductCard.vue -->
+<script setup>
+const props = defineProps({
+  product: { type: Object, required: true },
+  discount: { type: Number, default: 0 },
+  onSale: { type: Boolean, default: false },
+});
+
+// 模板里直接访问 props.product.name
+// script 里也可以用 props.product 访问
+</script>
+
+<template>
+  <div class="card" :class="{ sale: onSale }">
+    <h3>{{ product.name }}</h3>
+    <p>原价: ¥{{ product.price }}</p>
+    <p v-if="discount > 0">折后: ¥{{ product.price - discount }}</p>
+  </div>
+</template>
+
+<!-- 父组件 -->
+<ProductCard
+  :product="{ name: '键盘', price: 399 }"
+  :discount="50"
+  :on-sale="true"
+/>`,
+          language: "html",
+        },
+        {
+          title: "Emits——子传父",
+          content: `子组件通知父组件用 emit。就像按门铃——你按一下，里面的人听到了来决定开不开门：`,
+          code: `<!-- 子组件 Counter.vue -->
+<script setup>
+const props = defineProps({ count: Number });
+const emit = defineEmits(['update', 'reset']);
+
+function increment() {
+  emit('update', props.count + 1);
+}
+</script>
+
+<template>
+  <div>
+    <span>{{ count }}</span>
+    <button @click="increment">+1</button>
+    <button @click="emit('reset')">清零</button>
+  </div>
+</template>
+
+<!-- 父组件 -->
+<script setup>
+import { ref } from 'vue';
+const count = ref(0);
+</script>
+
+<template>
+  <Counter :count="count" @update="count = $event" @reset="count = 0" />
+</template>
+
+<!-- v-model 语法糖——简化 emit update -->
+<!-- 约定：prop 叫 modelValue，emit 叫 update:modelValue -->
+<Counter v-model="count" />
+<!-- 等于 <Counter :modelValue="count" @update:modelValue="count = $event" /> -->
+`,
+          language: "html",
+        },
+        {
+          title: "Slots——内容分发",
+          content: `props 能传数据，但传不了整段 HTML。想让父组件把内容「塞」进子组件的某个位置，就要用 slot——子组件留空位，父组件填内容：`,
+          code: `<!-- 子组件 Modal.vue——留了多个插槽 -->
+<template>
+  <div class="modal">
+    <header>
+      <slot name="header">默认标题</slot>
+    </header>
+    <main>
+      <slot>默认内容</slot>
+    </main>
+    <footer>
+      <slot name="footer">
+        <button @click="$emit('close')">关闭</button>
+      </slot>
+    </footer>
+  </div>
+</template>
+
+<!-- 父组件——用 template 填充具名插槽 -->
+<Modal @close="showModal = false">
+  <template #header>
+    <h2>确认删除</h2>
+  </template>
+
+  <p>你确定要删除这个商品吗？操作不可撤销。</p>
+
+  <template #footer>
+    <button @click="showModal = false">取消</button>
+    <button class="danger" @click="handleDelete">确认删除</button>
+  </template>
+</Modal>`,
+          language: "html",
+          tip: "默认插槽（没有 name 的）直接用内容填充。具名插槽用 #slotName 简写（就是 v-slot:slotName 的语法糖）。",
+        },
+        {
+          title: "Provide / Inject——跨层传数据",
+          content: `props 一层层传太累了——爷爷传孙子得经过爸爸。provide/inject 直接从祖先提供给后代，绕过中间组件：`,
+          code: `<!-- 祖先组件——提供数据 -->
+<script setup>
+import { provide, ref } from 'vue';
+
+const theme = ref('light');
+const toggleTheme = () => {
+  theme.value = theme.value === 'light' ? 'dark' : 'light';
+};
+
+// 提供响应式数据
+provide('theme', theme);
+provide('toggleTheme', toggleTheme);
+</script>
+
+<!-- 孙子组件——注入数据，不用管中间隔了多少层 -->
+<script setup>
+import { inject } from 'vue';
+
+const theme = inject('theme');
+const toggleTheme = inject('toggleTheme');
+</script>
+
+<template>
+  <p>当前主题: {{ theme }}</p>
+  <button @click="toggleTheme">切换</button>
+</template>`,
+          language: "html",
+          tip: "provide/inject 适合主题、语言、用户信息这种全局数据。不要滥用——数据流向不直观，排查问题时不好找来源。",
+        },
+      ],
+      quiz: [
+        { question: "Vue 中父传子用什么？", options: ["emit", "props", "slots", "provide"], answer: 1, explanation: "props 是父组件传给子组件的属性，子组件声明接收。" },
+        { question: "子组件通知父组件数据变化用什么？", options: ["props", "emit", "直接改 props", "provide"], answer: 1, explanation: "子组件不能直接改 props，必须通过 emit 通知父组件去改——保持单向数据流。" },
+        { question: "具名插槽的简写是什么？", options: ["#slotName", "v-slot:slotName → #slotName", "@slotName", ":slotName"], answer: 1, explanation: "v-slot:header 简写为 #header，代码更简洁。" },
+        { question: "provide/inject 相比 props 的优缺点？", options: ["都一样", "跨层传数据方便但数据流向不直观排查困难", "props 更好用", "provide 更快"], answer: 1, explanation: "provide/inject 省去中间传递，但数据来源不明确——适合全局配置，复杂交互还是用 props/emit。" },
+      ],
+    },
+    "css-responsive": {
+      slug: "css-responsive",
+      sections: [
+        {
+          title: "响应式设计——适配所有屏幕",
+          content: `现在用户访问网站的设备五花八门——手机、平板、笔记本、大显示器。响应式设计的目标就是一个网站在各种屏幕上都能好好显示。
+
+核心三件套：media query（媒体查询——根据不同屏幕宽度写不同样式）、相对单位（rem/vw/%，不用固定 px）、弹性布局（flex/grid 自动适应）。`,
+        },
+        {
+          title: "Media Query——给不同屏幕写不同样式",
+          content: `媒体查询就是「如果屏幕宽度满足某个条件，就用这套样式」。常见写法是移动端优先（先写手机样式，再逐步加强到大屏）：`,
+          code: `/* 基础样式——移动端优先（最小的屏幕） */
+.container {
+  padding: 10px;
+  font-size: 14px;
+}
+
+/* 平板及以上 >= 768px */
+@media (min-width: 768px) {
+  .container {
+    padding: 20px;
+    font-size: 16px;
+  }
+}
+
+/* 桌面 >= 1024px */
+@media (min-width: 1024px) {
+  .container {
+    padding: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+}
+
+/* 常用断点：
+   手机: < 768px
+   平板: >= 768px
+   笔记本: >= 1024px
+   大屏: >= 1440px
+*/
+
+/* 也可以用 max-width——桌面端优先，逐步简化 */
+@media (max-width: 767px) {
+  .sidebar { display: none; }  /* 手机端隐藏侧栏 */
+}`,
+          language: "css",
+          tip: "移动端优先写的 CSS 更精简——基础样式就是手机版，大屏再追加。反过来桌面优先的话手机得覆盖一大堆样式。",
+        },
+        {
+          title: "rem 与 vw——告别写死 px",
+          content: `固定 px 是响应式的大忌。rem 相对于根元素（html）的字体大小——改一行代码全局缩放。vw 是视口宽度的百分比，随浏览器窗口大小自动变：`,
+          code: `/* rem——相对根元素字体 */
+html {
+  font-size: 16px;  /* 基准 */
+}
+
+.box {
+  width: 10rem;     /* = 160px */
+  font-size: 1.5rem; /* = 24px */
+}
+
+/* 在媒体查询中改根字体——所有 rem 单位自动缩放 */
+@media (max-width: 767px) {
+  html { font-size: 14px; }  /* 手机端整体缩小 */
+}
+
+/* vw/vh——视口单位的百分比 */
+.hero {
+  height: 60vh;  /* 占视口高度的 60% */
+  width: 100vw;  /* 占视口宽度的 100% */
+  font-size: clamp(1rem, 4vw, 3rem); /* 随视口缩放但限制范围 */
+}
+
+/* %——相对于父元素的百分比 */
+.child { width: 50%; }  /* 父元素宽度的一半 */`,
+          language: "css",
+          tip: "clamp(最小值, 首选值, 最大值) 是响应式字体的神器——在小屏不会太小，大屏不会太大，中间自动缩放。",
+        },
+        {
+          title: "移动端适配——viewport 与触摸",
+          content: `移动端有自己的讲究——不仅要视觉适配，交互也得适配：`,
+          code: `<!-- HTML 头部的 viewport meta 标签——别漏 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+/* 触摸友好——按钮和链接至少 44x44px */
+.btn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px 16px;
+}
+
+/* 媒体查询判断触摸设备 */
+@media (hover: hover) {
+  /* 有鼠标的设备——显示悬停效果 */
+  .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+}
+@media (pointer: coarse) {
+  /* 触摸屏设备——增大点击区域 */
+  .nav-link { padding: 12px 16px; }
+}
+
+/*
+   移动端常见坑：
+   - iOS Safari 的 100vh 会包含地址栏——bottom 对齐用 100dvh
+   - 输入框弹出键盘后布局走样——尽量用 position: fixed 别用 absolute
+   - 图片用 max-width: 100% 避免撑破屏幕
+*/
+img { max-width: 100%; height: auto; }`,
+          language: "css",
+        },
+      ],
+      quiz: [
+        { question: "移动端优先的响应式用 min-width 还是 max-width？", options: ["max-width", "min-width——先写最小屏幕样式再往大增强", "都用", "都不用"], answer: 1, explanation: "移动优先就是先写手机 CSS，再用 min-width 叠加平板和桌面样式。" },
+        { question: "rem 单位相对于什么？", options: ["父元素字体大小", "根元素 html 的字体大小", "视口宽度", "浏览器默认"], answer: 1, explanation: "rem 相对于 html 标签的 font-size——改一个值全局缩放。" },
+        { question: "clamp(1rem, 4vw, 3rem) 是什么意思？", options: ["固定 4vw", "字体在 1rem 到 3rem 之间，首选 4vw——随屏幕缩放但不超范围", "三种字体", "取平均值"], answer: 1, explanation: "clamp 设置最小值、首选值和最大值——小屏保证能看清，大屏不会太夸张。" },
+        { question: "viewport meta 标签漏写了会怎样？", options: ["没事", "移动端页面不会缩放——手机上看到的是缩小版桌面网站", "页面崩溃", "只影响 CSS"], answer: 1, explanation: "缺少 viewport 标签移动浏览器会按桌面宽度渲染再缩小，文字小到看不清。" },
+      ],
+    },
+    "css-animations": {
+      slug: "css-animations",
+      sections: [
+        {
+          title: "CSS 动画的两条路——transition 与 animation",
+          content: `CSS 做动画有两大利器：
+transition——过渡，从一个状态平滑变到另一个状态。触发条件是属性值变化（hover、class 变化），适合简单的交互动画。
+animation——动画，用 keyframes 定义复杂得多的动画序列——可以循环、反向、暂停，适合加载动画、进入特效等。`,
+        },
+        {
+          title: "Transition——平滑过渡",
+          content: `transition 告诉浏览器：这个属性要变了，别直接跳过去，给我平滑地挪过去。可以控制哪些属性过渡、多久、什么节奏：`,
+          code: `/* 基本语法：transition: 属性 时长 缓动函数 延迟 */
+.button {
+  background: #4a90d9;
+  color: white;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+
+  /* 所有属性变化都过渡 0.3s */
+  transition: all 0.3s ease;
+}
+
+.button:hover {
+  background: #3570b0;
+  transform: translateY(-2px);  /* 向上浮 2px */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* 单独给不同属性设不同过渡 */
+.card {
+  width: 200px;
+  transition: width 0.4s ease, transform 0.3s ease 0.1s;
+  /* width 变化 0.4 秒，transform 变化 0.3 秒但延迟 0.1 秒开始 */
+}
+.card:hover {
+  width: 300px;
+  transform: rotate(2deg);
+}
+
+/* 缓动函数速查：
+   ease      慢-快-慢（默认，自然）
+   ease-in    慢起步
+   ease-out   慢收尾
+   ease-in-out 慢-快-慢
+   linear     匀速
+   cubic-bezier() 自定义贝塞尔曲线 */`,
+          language: "css",
+          tip: "transition 写在元素的普通状态上，不要写 hover 里。放到 hover 里会出现离开时没有过渡的 bug。",
+        },
+        {
+          title: "Animation 与 Keyframes——关键帧动画",
+          content: `animation 是 transition 的加强版——能定义多个关键帧，能循环、反向、暂停，能做出复杂的动画效果：`,
+          code: `/* 定义关键帧 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 使用动画 */
+.fade-in {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* 带百分比的详细关键帧 */
+@keyframes pulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* 动画属性速查 */
+.spinner {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 多动画同时播放 */
+.bounce-in {
+  animation:
+    fadeInUp 0.6s ease-out,
+    pulse 2s ease-in-out 0.6s infinite;  /* 0.6s 后开始脉冲循环 */
+}
+
+/* 动画控制 */
+.paused { animation-play-state: paused; }
+
+/* 当有内容变化导致动画需要重置时：去掉再添加 animation 类
+   或使用 animation: none; 然后异步重新设置 */`,
+          language: "css",
+          tip: "动画性能的黄金法则：只动画 transform 和 opacity。这两个属性不会触发重排，GPU 加速，60fps 稳。避开 width/height/position。",
+        },
+        {
+          title: "实用动画案例",
+          content: `日常开发中最常用的几个动画效果——骨架屏、进入动画、加载动画：`,
+          code: `/* 骨架屏闪烁 */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* 列表逐个进入——用 animation-delay 错开 */
+.list-item {
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+.list-item:nth-child(1) { animation-delay: 0.1s; }
+.list-item:nth-child(2) { animation-delay: 0.2s; }
+.list-item:nth-child(3) { animation-delay: 0.3s; }
+/* forwards 保持最终状态不弹回去 */
+
+/* 抽屉滑入 */
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+.drawer { animation: slideInRight 0.3s ease-out; }`,
+          language: "css",
+        },
+      ],
+      quiz: [
+        { question: "transition 和 animation 的区别？", options: ["一样", "transition 简单过渡（A→B），animation 支持多关键帧和循环", "animation 更简单", "transition 能做复杂动画"], answer: 1, explanation: "transition 只在属性值变化时播放一次；animation 用 keyframes 定义多个关键帧，能循环、反向、暂停。" },
+        { question: "CSS 动画性能最佳的属性是？", options: ["width 和 height", "transform 和 opacity——只触发合成不触发重排", "font-size", "position"], answer: 1, explanation: "transform 和 opacity 在合成层上操作，GPU 加速，不会导致浏览器重新计算布局。" },
+        { question: "animation: fadeIn 0.5s ease forwards 的 forwards 做什么？", options: ["循环播放", "动画结束后保持最终状态不跳回", "反向播放", "加速"], answer: 1, explanation: "forwards 让动画停在最后一帧，适合进入动画——元素进入后留在位置上不消失。" },
+        { question: "transition 应该写在哪个状态？", options: ["hover 状态里", "元素的普通状态上", "active 状态", "写在 keyframes 里"], answer: 1, explanation: "transition 写普通状态上保证进出都有过渡。写 hover 里只有鼠标进入时过渡，离开直接跳回。" },
+      ],
+    },
+    "html-forms": {
+      slug: "html-forms",
+      sections: [
+        {
+          title: "表单基础——你能输入的那些玩意",
+          content: `HTML 表单是用户跟网站交互的最常用方式——登录、注册、搜索、支付，全是表单。核心组件包括各种 input 类型、label 标签、button 按钮和 form 容器。`,
+        },
+        {
+          title: "Input 类型全解",
+          content: `input 的 type 属性决定了它是个啥——文本框、密码、邮箱、日期等等。选对类型不光用户体验好，移动端还会弹出对应的键盘：`,
+          code: `<!-- 常用 input 类型 -->
+<form>
+  <!-- 基础文本 -->
+  <label>
+    姓名
+    <input type="text" name="name" placeholder="请输入姓名" required>
+  </label>
+
+  <!-- 邮箱——手机弹出带 @ 的键盘 -->
+  <label>
+    邮箱
+    <input type="email" name="email" placeholder="example@mail.com" required>
+  </label>
+
+  <!-- 密码 -->
+  <label>
+    密码
+    <input type="password" name="password" minlength="6" maxlength="20" required>
+  </label>
+
+  <!-- 数字——只让输数字 -->
+  <label>
+    年龄
+    <input type="number" name="age" min="0" max="150" step="1">
+  </label>
+
+  <!-- 日期——弹出日期选择器 -->
+  <label>
+    生日
+    <input type="date" name="birthday">
+  </label>
+
+  <!-- 滑块 -->
+  <label>
+    价格范围: <span id="price-val">500</span>
+    <input type="range" name="maxPrice" min="0" max="10000" value="500"
+           oninput="document.getElementById('price-val').textContent = this.value">
+  </label>
+
+  <!-- 复选框 -->
+  <label>
+    <input type="checkbox" name="agree" required> 同意用户协议
+  </label>
+
+  <!-- 单选框——同一组用相同 name -->
+  <fieldset>
+    <legend>性别</legend>
+    <label><input type="radio" name="gender" value="male"> 男</label>
+    <label><input type="radio" name="gender" value="female"> 女</label>
+  </fieldset>
+
+  <!-- 下拉选择 -->
+  <label>
+    城市
+    <select name="city">
+      <option value="">请选择</option>
+      <option value="beijing">北京</option>
+      <option value="shanghai">上海</option>
+      <option value="shenzhen">深圳</option>
+    </select>
+  </label>
+
+  <!-- 文本域 -->
+  <label>
+    备注
+    <textarea name="note" rows="4" placeholder="选填"></textarea>
+  </label>
+
+  <button type="submit">提交</button>
+</form>`,
+          language: "html",
+          tip: "type=email 自带浏览器校验邮箱格式，type=number 移动端连小数点都只让输一次。善用原生类型减少 JS 校验代码。",
+        },
+        {
+          title: "表单校验——前后夹击",
+          content: `前端校验给用户即时反馈，后端校验是最后防线——两者缺一不可。前端校验用 HTML5 原生属性配合 JS 自定义校验：`,
+          code: `<!-- HTML5 原生校验属性 -->
+<input type="text" required minlength="2" maxlength="50">
+<input type="email" required>
+<input type="number" min="0" max="150">
+<input type="text" pattern="[A-Za-z]{3,}" title="至少 3 个字母">
+
+<script>
+// 自定义校验与提交处理
+const form = document.querySelector('form');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();  // 阻止默认提交
+
+  // HTML5 原生校验
+  if (!form.checkValidity()) {
+    form.reportValidity();  // 显示浏览器原生的错误气泡
+    return;
+  }
+
+  // 自定义校验
+  const password = form.password.value;
+  const confirm = form.confirmPassword.value;
+  if (password !== confirm) {
+    showError('两次密码不一致');
+    return;
+  }
+
+  // FormData——一行收集所有表单数据
+  const formData = new FormData(form);
+  const data = Object.fromEntries(formData.entries());
+
+  // 提交到后端
+  try {
+    const res = await fetch('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      showError(err.message);
+    } else {
+      alert('注册成功！');
+    }
+  } catch (err) {
+    showError('网络错误，请稍后重试');
+  }
+});
+</script>
+
+<!-- 实时校验——输入时给反馈 -->
+<input type="email" id="email" oninput="validateEmail(this)">
+<span id="email-error" style="color:red;display:none">邮箱格式不正确</span>`,
+          language: "html",
+          warning: "前端校验只是提升体验——任何人可以关掉 JS 或用 curl 绕过。后端必须再做一次严格校验。",
+        },
+        {
+          title: "表单无障碍——每个人都能用",
+          content: `表单的可访问性经常被忽略。几个关键点让表单对所有用户友好：`,
+          code: `<!-- 1. 每个 input 都要有 label——用 for 关联或用 label 包裹 -->
+<label for="username">用户名</label>
+<input type="text" id="username">
+
+<!-- 2. 错误信息用 aria 属性关联 -->
+<input type="email" id="email" aria-describedby="email-hint email-error">
+<span id="email-hint">输入你常用的邮箱地址</span>
+<span id="email-error" role="alert" style="display:none">邮箱格式错误</span>
+
+<!-- 3. 必填字段标清楚 -->
+<label for="name">
+  姓名 <span aria-hidden="true">*</span>
+  <span class="sr-only">（必填）</span>
+</label>
+<input type="text" id="name" required aria-required="true">
+
+<!-- 4. 提交按钮用 button 不要用 div -->
+<button type="submit" disabled>提交中...</button>
+
+<!-- 5. 聚焦状态要明显（别干掉 outline） -->
+input:focus, button:focus {
+  outline: 2px solid #4a90d9;
+  outline-offset: 2px;
+}
+
+<!-- 6. 键盘导航——用 tab 能在所有表单元素间切换，别用 tabindex > 0 打乱顺序 -->`,
+          language: "html",
+          tip: "屏幕阅读器用户靠 label 和 aria 属性理解表单。检查方法：装个 Chrome 的屏幕阅读器插件或直接用 VoiceOver 走一遍。",
+        },
+      ],
+      quiz: [
+        { question: "input type=\"email\" 的好处是什么？", options: ["好看", "浏览器自动校验格式 + 移动端弹出含 @ 的键盘", "更快", "没区别"], answer: 1, explanation: "原生 email 类型自带格式校验，移动端键盘会包含 @ 和 . 按钮——用户体验秒杀 type=text。" },
+        { question: "FormData 的作用？", options: ["创建表单", "一次性收集表单所有字段的键值对", "校验表单", "样式表单"], answer: 1, explanation: "new FormData(form) 自动读取表单里所有带 name 的元素，省去挨个取值的麻烦。" },
+        { question: "前端校验够用吗？", options: ["够了", "不够——前端校验提升体验，后端必须重验，前端可被绕过", "看情况", "不用校验"], answer: 1, explanation: "前端校验任何人都能绕过去，后端校验是最后防线。两次校验不是重复而是各司其职。" },
+        { question: "label 标签为什么要关联 input？", options: ["好看", "点击 label 自动聚焦关联的 input + 屏幕阅读器能读出对应关系", "性能优化", "SEO"], answer: 1, explanation: "label for 关联 input 不仅让点击范围更大，视障用户的屏幕阅读器也能正确配对字段和说明。" },
       ],
     },
   },
@@ -10300,6 +12938,1420 @@ steps:
         { question: "CI/CD 在 MLOps 中的含义？", options: ["仅部署", "持续集成/持续交付——自动化测试、构建、部署模型流水线", "数据清洗", "模型训练"], answer: 1, explanation: "CI/CD 让模型迭代自动化——代码提交后自动跑测试、打包镜像、部署到生产环境。" },
       ],
     },
+    "java-oop": {
+      slug: "java-oop",
+      sections: [
+        {
+          title: "类和对象——兵工厂和生产出来的兵",
+          content: `Java 里 class 就是模具，对象是从模具里倒出来的具体东西。你写个 class 定义了属性（成员变量）和方法，然后 new 一下，就产出一个对象。`,
+          code: `class Student {
+    String name;
+    int age;
+
+    Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    void introduce() {
+        System.out.println("我叫" + name + "，今年" + age + "岁");
+    }
+}
+
+Student s1 = new Student("张三", 18);
+s1.introduce();`,
+          language: "java",
+        },
+        {
+          title: "封装——管好自己的东西",
+          content: `封装说白了就是把数据藏起来不让别人乱碰，只通过你规定的方法来操作。用 private 把字段锁起来，然后用 getter/setter 当窗口——你可以加数据校验、日志啥的。`,
+          code: `class BankAccount {
+    private double balance;
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void deposit(double amount) {
+        if (amount <= 0) throw new IllegalArgumentException("金额得是正数");
+        balance += amount;
+    }
+
+    public void withdraw(double amount) {
+        if (amount > balance) throw new RuntimeException("余额不够");
+        balance -= amount;
+    }
+}`,
+          language: "java",
+        },
+        {
+          title: "继承——子继父业但可以另搞一套",
+          content: `extends 就是继承，子类自动获得父类的属性和方法。你可以直接用，也可以覆盖（override）父类的方法来定制自己的行为。Java 只支持单继承，一个儿子只能有一个爹，但可以通过接口实现多继承的效果。`,
+          code: `class Animal {
+    void speak() {
+        System.out.println("动物叫了一声");
+    }
+}
+
+class Dog extends Animal {
+    @Override
+    void speak() {
+        System.out.println("汪汪！");
+    }
+}`,
+          language: "java",
+        },
+        {
+          title: "抽象类 vs 接口",
+          content: `抽象类是有未完工方法的类，不能直接 new，得子类把抽象方法实现了才行。接口就是一纸合同——规定你「必须会什么」，但不管你怎么做。一个类可以实现多个接口，但只能继承一个抽象类。`,
+          code: `abstract class Shape {
+    abstract double area();
+}
+
+interface Flyable {
+    void fly();
+}
+
+interface Runnable {
+    void run();
+}
+
+class Bird extends Shape implements Flyable, Runnable {
+    @Override double area() { return 0; }
+    @Override public void fly() { System.out.println("飞了"); }
+    @Override public void run() { System.out.println("跑了"); }
+}`,
+          language: "java",
+        },
+        {
+          title: "重写(Override) vs 重载(Overload)",
+          content: `重写是子类换个实现方式（方法签名完全一样），运行时决定调哪个。重载是同一个方法名参数不同，编译时就定好了调哪个。记住一句话：重写看对象，重载看参数。`,
+          code: `class Parent {
+    void say() { System.out.println("parent"); }
+}
+
+class Child extends Parent {
+    @Override void say() { System.out.println("child"); }  // 重写
+
+    void say(String msg) { System.out.println(msg); }      // 重载
+}`,
+          language: "java",
+          warning: "重写时别忘了 @Override 注解，让编译器帮你检查是不是真重写了，避免手滑写错。",
+        },
+      ],
+      quiz: [
+        { question: "private 修饰的变量能被谁访问？", options: ["任何类", "同一个类内部", "子类", "同包的类"], answer: 1, explanation: "private 是最严格的——只能类自己的方法用，子类和外部都碰不到。" },
+        { question: "Override 和 Overload 的本质区别？", options: ["没区别", "重写是运行时多态，重载是编译期确定", "重载只用于 static 方法", "重写不改变参数"], answer: 1, explanation: "重写靠对象实际类型决定调谁（运行时），重载靠参数类型匹配（编译期）。" },
+        { question: "Java 一个类能继承几个父类？", options: ["不限", "一个", "两个", "三个"], answer: 1, explanation: "Java 单继承，一个类只能 extends 一个父类，但可以实现多个接口。" },
+        { question: "抽象类能直接 new 吗？", options: ["能", "不能，得子类实现了抽象方法后才能 new 子类", "能但会报错", "取决于版本"], answer: 1, explanation: "抽象类本身不能实例化，必须被子类继承并实现所有抽象方法后再 new 子类。" },
+        { question: "接口里能不能有具体实现的方法？", options: ["不能", "Java 8+ 可以有 default 方法", "一直都能", "只有 JDK 17 支持"], answer: 1, explanation: "从 Java 8 开始接口可以有 default 和 static 方法带方法体，但要兼容升级老代码才用，别滥用。" },
+      ],
+    },
+    "java-collections": {
+      slug: "java-collections",
+      sections: [
+        {
+          title: "集合框架概览",
+          content: `Java 集合框架就是数据结构的现成实现。两大分支：Collection（单列数据）和 Map（键值对）。常用的一只手数得过来——ArrayList、LinkedList、HashSet、HashMap。`,
+          code: `List<String> list = new ArrayList<>();    // 动态数组，查快
+Set<String> set = new HashSet<>();        // 不重复，去重用
+Map<String, Integer> map = new HashMap<>(); // 键值对，查快
+Queue<String> queue = new LinkedList<>();  // 队列，先进先出`,
+          language: "java",
+        },
+        {
+          title: "ArrayList vs LinkedList——各有所长",
+          content: `ArrayList 底层是数组，按索引查飞快（O(1)），但中间插入/删除要搬动后面元素（O(n)）。LinkedList 底层是双向链表，插入删除快（O(1)），但按索引查得从头走到尾（O(n)）。实际开发里 ArrayList 用得更多。`,
+          code: `// ArrayList 的扩缩容——默认初始 10，满了自动 1.5 倍扩容
+List<String> list = new ArrayList<>();
+list.add("a");
+list.add(1, "b");         // 插到索引 1，后面全后移
+list.get(0);              // O(1) 秒出
+list.remove(0);           // 删了得挪位置
+
+// LinkedList 适合当队列/栈用
+LinkedList<String> linked = new LinkedList<>();
+linked.addFirst("头部");
+linked.addLast("尾部");
+linked.removeFirst();     // O(1)`,
+          language: "java",
+        },
+        {
+          title: "HashMap——数组加链表加红黑树",
+          content: `HashMap 的底层是数组 + 链表 + 红黑树。算出 key 的 hashCode，找到数组位置，撞上了就用链表/红黑树处理。JDK8 后链表超过 8 个会转红黑树提高查找效率。默认容量 16，负载因子 0.75。`,
+          code: `Map<String, Integer> map = new HashMap<>();
+map.put("apple", 3);
+map.put("banana", 5);
+map.get("apple");              // 3
+map.containsKey("banana");     // true
+map.getOrDefault("unknown", 0); // key 不在时返回默认值
+
+// 遍历
+for (Map.Entry<String, Integer> entry : map.entrySet()) {
+    System.out.println(entry.getKey() + ": " + entry.getValue());
+}`,
+          language: "java",
+        },
+        {
+          title: "HashSet——靠 HashMap 养活的",
+          content: `HashSet 底层就是个 HashMap，只用了 key 不要 value，value 统一放一个 dummy 对象。所以它不能重复、无序、能存 null。适合去重、判断存在。`,
+          code: `Set<String> set = new HashSet<>();
+set.add("apple");
+set.add("apple");            // 重复的加不进去
+System.out.println(set.size()); // 1
+
+// 去重列表
+List<String> list = Arrays.asList("a", "b", "a", "c", "b");
+Set<String> unique = new HashSet<>(list);`,
+          language: "java",
+          tip: "要保证 HashSet 正常工作，你的对象必须正确重写 hashCode() 和 equals()，否则「重复」的判断会出 bug。",
+        },
+      ],
+      quiz: [
+        { question: "ArrayList 查找元素的复杂度？", options: ["O(n)", "O(1)", "O(log n)", "O(n²)"], answer: 1, explanation: "底层是数组，按索引直接跳到对应位置，常数时间完成。" },
+        { question: "HashMap 的底层是什么？", options: ["纯数组", "数组 + 链表/红黑树", "纯链表", "二叉树"], answer: 1, explanation: "JDK7 是数组+链表，JDK8 后链表超过 8 个转红黑树以防退化。" },
+        { question: "HashSet 是怎么保证不重复的？", options: ["逐个比较", "底层是 HashMap 用 key 保证唯一", "排序后去重", "用数据库约束"], answer: 1, explanation: "HashSet 就是 HashMap 马甲——add 时看 HashMap 的 key 是不是已存在。" },
+        { question: "LinkedList 什么时候好用？", options: ["按索引查", "频繁头尾插删、当队列/栈用", "大量随机查", "存储大量数据"], answer: 1, explanation: "双向链表头尾操作 O(1)，适合做队列（FIFO）和栈（LIFO）。" },
+        { question: "HashMap 的负载因子 0.75 是什么意思？", options: ["容量为 75", "填到 75% 就扩容", "只能存 75 个元素", "查询成功率 75%"], answer: 1, explanation: "负载因子是填充率阈值——HashMap 装到 75% 满了就自动扩两倍容量，减少哈希冲突。" },
+      ],
+    },
+    "java-exception": {
+      slug: "java-exception",
+      sections: [
+        {
+          title: "异常体系——出错也得分三六九等",
+          content: `Java 的异常分两大类：Checked 异常（编译期逼你处理的，比如 IO 异常）和 Unchecked 异常（运行时炸的，比如空指针、数组越界）。异常类都继承自 Throwable，下面分 Error（严重问题，不用管）和 Exception。`,
+          code: `// Error：太严重，程序不该处理
+// Exception: 程序可以处理的问题
+//   ├── RuntimeException (unchecked)：不强制 try-catch
+//   └── IOException (checked)：编译期必须处理`,
+          language: "java",
+        },
+        {
+          title: "try-catch-finally——把错误兜住",
+          content: `try 里放可能炸的代码，catch 负责救火，finally 无论炸不炸都执行（收尾用）。Java 7 开始支持 try-with-resources，自动关流。`,
+          code: `try {
+    int result = 10 / 0;
+} catch (ArithmeticException e) {
+    System.out.println("除以零了:" + e.getMessage());
+} finally {
+    System.out.println("清理资源");
+}
+
+// try-with-resources（自动关流）
+try (FileReader fr = new FileReader("file.txt")) {
+    // 用完后 fr 自动关，不用写 finally
+}`,
+          language: "java",
+        },
+        {
+          title: "throw 和 throws 的区别",
+          content: `throw 是在方法里面主动丢出异常。throws 是在方法签名上声明——告诉调用方「我这方法可能会炸，你得注意」。`,
+          code: `// throws：声明这个方法可能抛出什么异常
+public void readFile(String path) throws IOException {
+    Files.readString(Path.of(path));
+}
+
+// throw：主动丢一个异常对象
+public void checkAge(int age) {
+    if (age < 0) {
+        throw new IllegalArgumentException("年龄不能是负数: " + age);
+    }
+}`,
+          language: "java",
+        },
+        {
+          title: "自定义异常——造自己的错误类型",
+          content: `当你觉得 Java 自带的异常不够表达错误原因时，自己写一个。继承 Exception（checked）或 RuntimeException（unchecked）。关键是给足错误信息，让调查问题的人一眼看懂发生了什么。`,
+          code: `class InsufficientBalanceException extends RuntimeException {
+    private double balance;
+    private double need;
+
+    InsufficientBalanceException(double balance, double need) {
+        super("余额不足！当前余额: " + balance + "，需要: " + need);
+        this.balance = balance;
+        this.need = need;
+    }
+}
+
+public void transfer(double amount) {
+    if (balance < amount) {
+        throw new InsufficientBalanceException(balance, amount);
+    }
+}`,
+          language: "java",
+          tip: "业务异常带上关键数据（比如余额、订单号），不是光甩一句错误消息，这样查 bug 时能省一半时间。",
+        },
+      ],
+      quiz: [
+        { question: "Checked 和 Unchecked 异常最大的区别？", options: ["记录方式不同", "Checked 编译期必须处理，Unchecked 可选", "Unchecked 不能 catch", "Checked 只能 throw"], answer: 1, explanation: "Checked 异常编译器强制你 try-catch 或 throws 声明，Unchecked 随你处理不处理。" },
+        { question: "throw 和 throws 谁是实际抛出异常？", options: ["throws", "throw", "两个都是", "两个都不是"], answer: 1, explanation: "throw 是在代码里真的把一个异常对象丢出去，throws 只是方法签名上的声明。" },
+        { question: "finally 块什么时候不执行？", options: ["有异常时", "System.exit() 或 JVM 崩了", "只要 try 没异常", "只在 catch 后执行"], answer: 1, explanation: "finally 正常情况下都会执行，除非 JVM 收到 exit 信号或直接崩了。" },
+        { question: "try-with-resources 比传统 try-finally 好在哪？", options: ["更快", "代码更短，自动关资源不用自己写关闭", "不抛异常", "可以不用 catch"], answer: 1, explanation: "它让实现 AutoCloseable 的资源自动关闭，代码简洁不出错，不用在 finally 手写关闭逻辑。" },
+        { question: "自定义业务异常通常继承谁？", options: ["Error", "RuntimeException 或 Exception", "Throwable", "Object"], answer: 1, explanation: "通常继承 RuntimeException（非必须处理）或 Exception（必须处理），看业务需求。" },
+      ],
+    },
+    "java-io": {
+      slug: "java-io",
+      sections: [
+        {
+          title: "字节流——拿数据当字节看",
+          content: `字节流按 byte 读写，适合处理图片、视频、文件复制等二进制数据。InputStream/OutputStream 是基类，FileInputStream、BufferedInputStream 是常用子类。`,
+          code: `// 字节流读文件
+try (FileInputStream fis = new FileInputStream("input.txt");
+     FileOutputStream fos = new FileOutputStream("output.txt")) {
+    byte[] buffer = new byte[1024];
+    int len;
+    while ((len = fis.read(buffer)) != -1) {
+        fos.write(buffer, 0, len);
+    }
+}`,
+          language: "java",
+        },
+        {
+          title: "字符流——处理文本专用",
+          content: `字符流按 char 读写，自动处理字符编码，读文本别用字节流。Reader/Writer 是基类，FileReader、BufferedReader 是常用子类。`,
+          code: `// 字符流逐行读写
+try (BufferedReader br = new BufferedReader(new FileReader("input.txt"));
+     BufferedWriter bw = new BufferedWriter(new FileWriter("output.txt"))) {
+    String line;
+    while ((line = br.readLine()) != null) {
+        bw.write(line);
+        bw.newLine();
+    }
+}`,
+          language: "java",
+        },
+        {
+          title: "缓冲流——加个中间仓库提效",
+          content: `BufferedInputStream 和 BufferedReader 自带缓冲区，一次读一批数据放内存，减少真正的磁盘 IO 次数，速度提升明显。搞大文件读写强烈建议套一层缓冲。`,
+          code: `// 不带缓冲 vs 带缓冲
+FileInputStream fis = new FileInputStream("bigfile.bin");  // 每次 read 都打硬盘
+BufferedInputStream bis = new BufferedInputStream(new FileInputStream("bigfile.bin")); // 一次读 8KB 到内存`,
+          language: "java",
+        },
+        {
+          title: "NIO 简介——非阻塞高性能",
+          content: `NIO（New IO）是 Java 1.4 引入的高性能 IO 方案。核心是 Channel（通道）和 Buffer（缓冲区），支持非阻塞模式。跟老 IO 比，NIO 一个线程能管多个连接，高并发场景必备。Netty、Tomcat 底层都用了 NIO。`,
+          code: `// NIO 读文件
+Path path = Path.of("data.txt");
+String content = Files.readString(path);  // JDK11+
+
+// NIO Channel + Buffer 方式
+FileChannel channel = FileChannel.open(Path.of("data.txt"));
+ByteBuffer buffer = ByteBuffer.allocate(1024);
+channel.read(buffer);`,
+          language: "java",
+          tip: "日常开发用 Files.readString / Files.writeString 最省事，高并发网络编程再去深入学习 NIO 和 Netty。",
+        },
+      ],
+      quiz: [
+        { question: "字节流和字符流选哪个读文本？", options: ["字节流", "字符流", "随便", "都不用"], answer: 1, explanation: "字符流自动处理编码转换读文本，字节流只认识 0 和 1，读中文可能乱码。" },
+        { question: "BufferedReader 的 buffered 是什么意思？", options: ["缓冲区——减少磁盘 IO", "加了权限控制", "只能读压缩文件", "自动备份"], answer: 0, explanation: "缓冲的意思就是中间加了个缓存区，一次从磁盘多读点，后续从内存取而不是每次都打硬盘。" },
+        { question: "NIO 和老 IO 最大的区别？", options: ["速度", "NIO 支持非阻塞和 Channel/Buffer 模式", "老 IO 不支持文件", "NIO 更简单"], answer: 1, explanation: "NIO 把面向 Stream 改成面向 Channel+Buffer，支持非阻塞，一个线程管多路连接。" },
+        { question: "try-with-resources 里声明的资源实现了什么接口？", options: ["Serializable", "AutoCloseable", "Comparable", "Cloneable"], answer: 1, explanation: "实现 AutoCloseable（或 Closeable）接口的资源才能放在 try() 里自动关闭。" },
+        { question: "FileReader 和 FileInputStream 谁适合读中文文本？", options: ["FileInputStream", "FileReader", "两个一样", "都不行"], answer: 1, explanation: "FileReader 是字符流，按 char 读能正确理解 utf-8 编码的中文；FileInputStream 按 byte 读可能把中文拆乱。" },
+      ],
+    },
+    "java-threads": {
+      slug: "java-threads",
+      sections: [
+        {
+          title: "线程是啥——同时干多件事",
+          content: `一个线程就是一条执行流水线，多线程就是多条流水线同时干活。Java 里创建线程两种方式：继承 Thread 类或者实现 Runnable 接口。推荐用 Runnable——Java 单继承，把 extends 留给更有用的类。`,
+          code: `// 方式一：继承 Thread
+class MyThread extends Thread {
+    @Override public void run() {
+        System.out.println("线程跑起来了: " + Thread.currentThread().getName());
+    }
+}
+new MyThread().start();
+
+// 方式二：实现 Runnable（推荐）
+Thread t = new Thread(() -> {
+    System.out.println("用 Lambda 更简洁");
+});
+t.start();`,
+          language: "java",
+        },
+        {
+          title: "线程池——重复利用别新建",
+          content: `线程不是越多越好。创建和销毁线程开销不小，而且线程多了 CPU 光切换上下文就累死了。线程池预先创建一批线程，任务来了分配线程执行，用完回收不销毁。`,
+          code: `// 用 Executors 创建线程池
+ExecutorService pool = Executors.newFixedThreadPool(4);
+
+for (int i = 0; i < 10; i++) {
+    final int taskId = i;
+    pool.submit(() -> {
+        System.out.println("任务 " + taskId + " 由 " + Thread.currentThread().getName() + " 执行");
+    });
+}
+pool.shutdown();  // 不再接新任务，把手头的干完就关`,
+          language: "java",
+        },
+        {
+          title: "synchronized——排队过独木桥",
+          content: `多线程同时改同一个数据会出问题——比如两个线程同时 count++，可能只加了一次。synchronized 就是给代码块上锁，同一时刻只允许一个线程进去。`,
+          code: `class Counter {
+    private int count = 0;
+
+    public synchronized void increment() {
+        count++;
+    }
+
+    public synchronized int getCount() {
+        return count;
+    }
+}
+
+// 同步代码块——锁的范围更灵活
+synchronized (this) {
+    // 只有拿到 this 锁的线程才能进来
+}`,
+          language: "java",
+        },
+        {
+          title: "volatile——保证可见性但不保证原子性",
+          content: `volatile 修饰的变量被一个线程改后，其他线程能立马看到新值（不会读缓存）。但它不保证原子性——count++ 这种「读-改-写」操作还得用 synchronized 或 AtomicInteger。volatile 适合做开关标记。`,
+          code: `class TaskRunner {
+    private volatile boolean running = true;
+
+    public void stop() {
+        running = false;  // 主线程一改，子线程立马感知
+    }
+
+    public void run() {
+        while (running) {
+            // 干活...
+        }
+    }
+}`,
+          language: "java",
+          tip: "volatile 解决的是可见性问题，不是原子性问题。要计数器/累加器保证正确，用 AtomicInteger 或 synchronized。",
+        },
+      ],
+      quiz: [
+        { question: "start() 和 run() 的区别？", options: ["一样", "start 开新线程执行 run，直接调 run 当前线程跑", "run 开了线程", "start 没作用"], answer: 1, explanation: "start() 让 JVM 创建新线程然后在新线程里调 run()。直接调 run() 就是普通方法调用，你在当前线程里跑。" },
+        { question: "线程池的好处？", options: ["跑得更快", "复用线程减少创建销毁开销，控制并发数", "代码更少", "不用多线程"], answer: 1, explanation: "线程池预先造好线程，用完不销毁，避免了频繁建线程的损耗，还能限制同时运行的线程数。" },
+        { question: "synchronized 和 volatile 的核心区别？", options: ["一样", "synchronized 既保证可见性又保证原子性，volatile 只保证可见性", "volatile 更强", "synchronized 更快"], answer: 1, explanation: "synchronized 上锁后其他线程进不来，保证读写不交错。volatile 只是让变量不缓存，不改原子性问题。" },
+        { question: "newFixedThreadPool 固定线程池的线程数指的是？", options: ["总任务数", "同时运行的线程数", "线程优先级", "任务队列长度"], answer: 1, explanation: "固定大小线程池同时最多跑那么多线程，多余的任务在队列里排队等空闲线程。" },
+        { question: "死锁是什么？举个简单例子。", options: ["线程运行完了", "两个线程互相等对方手里的锁，都卡住了", "锁用完了", "线程被 killed"], answer: 1, explanation: "线程 A 拿着锁 1 等锁 2，线程 B 拿着锁 2 等锁 1——互相等，谁也动不了。" },
+      ],
+    },
+    "java-jdbc": {
+      slug: "java-jdbc",
+      sections: [
+        {
+          title: "JDBC 是什么——Java 跟数据库的桥梁",
+          content: `JDBC 是 Java 操作数据库的标准接口。你用同一套 API，换不同数据库只改驱动和连接串就行，代码不用大改。五步走：加载驱动、建连接、创建 Statement、执行 SQL、处理结果。`,
+          code: `// 基本 JDBC 操作
+String url = "jdbc:mysql://localhost:3306/mydb";
+String user = "root";
+String password = "123456";
+
+try (Connection conn = DriverManager.getConnection(url, user, password);
+     Statement stmt = conn.createStatement()) {
+
+    ResultSet rs = stmt.executeQuery("SELECT * FROM users");
+    while (rs.next()) {
+        System.out.println(rs.getString("username"));
+    }
+}`,
+          language: "java",
+        },
+        {
+          title: "PreparedStatement——防 SQL 注入利器",
+          content: `千万不要用字符串拼接 SQL，那是给黑客留门。PreparedStatement 用占位符 ? 代替参数，数据库会先编译 SQL 再填入值——你输入什么特殊字符都没用，数据库分得清指令和数据。`,
+          code: `// PreparedStatement 防注入
+String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+try (Connection conn = DriverManager.getConnection(url, user, password);
+     PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+    pstmt.setString(1, username);
+    pstmt.setString(2, password);
+    ResultSet rs = pstmt.executeQuery();
+}`,
+          language: "java",
+        },
+        {
+          title: "事务——要么全成功要么全取消",
+          content: `转账这种操作不能做一半——钱扣了但没加到对方账户上那是不行的。事务保证一组操作要么全部成功提交，要么全部回滚。JDBC 默认自动提交，要做事务先关自动提交。`,
+          code: `Connection conn = null;
+try {
+    conn = DriverManager.getConnection(url, user, password);
+    conn.setAutoCommit(false);  // 关自动提交
+
+    // 扣张三的钱
+    pstmt1.executeUpdate();
+    // 给李四加钱
+    pstmt2.executeUpdate();
+
+    conn.commit();  // 都成功了一起提交
+} catch (Exception e) {
+    if (conn != null) conn.rollback();  // 出错了全回滚
+}`,
+          language: "java",
+        },
+        {
+          title: "连接池——复用连接别每次建新的",
+          content: `每次访问数据库都建个新连接开销很大（TCP 握手、数据库认证）。连接池预先创建一批连接，用完不关而是归还到池里下次复用。HikariCP 是目前的性能王者。`,
+          code: `// HikariCP 连接池配置
+HikariConfig config = new HikariConfig();
+config.setJdbcUrl("jdbc:mysql://localhost:3306/mydb");
+config.setUsername("root");
+config.setPassword("123456");
+config.setMaximumPoolSize(10);
+
+HikariDataSource ds = new HikariDataSource(config);
+
+try (Connection conn = ds.getConnection()) {
+    // 这个连接是从池里借的，用完自动归还
+}`,
+          language: "java",
+          tip: "生产环境一定要用连接池。HikariCP、Druid 都是成熟选择，别用 DriverManager 直接连。",
+        },
+      ],
+      quiz: [
+        { question: "PreparedStatement 凭什么防 SQL 注入？", options: ["加密了", "编译 SQL 和参数分开，用户输入不会被当成 SQL 执行", "更快的速度", "自动转义"], answer: 1, explanation: "SQL 先编译好结构，参数再填入——用户输入不管写什么都不会改变 SQL 的结构。" },
+        { question: "事务的 ACID 属性指什么？", options: ["四种 SQL 方法", "原子性、一致性、隔离性、持久性", "四种数据库类型", "四种锁机制"], answer: 1, explanation: "ACID 是事务四大保证：Atomicity 原子、Consistency 一致、Isolation 隔离、Durability 持久。" },
+        { question: "连接池解决了什么问题？", options: ["数据多了", "连接复用——避免频繁建连的 TCP 和认证开销", "SQL 更精简", "不需要数据库了"], answer: 1, explanation: "每次建连接都要三次握手 + 数据库认证，连接池预建一批连接循环用，省时又高效。" },
+        { question: "conn.setAutoCommit(false) 之后忘了 commit 会咋样？", options: ["自动提交", "数据可能丢失——连接关了事务自动回滚", "数据库崩溃", "不影响"], answer: 1, explanation: "关自动提交后不 commit 就关连接，这组操作全部回滚——改了半天等于没改。" },
+        { question: "executeQuery() 和 executeUpdate() 区别？", options: ["没区别", "前者查(SELECT)返回 ResultSet，后者改(INSERT/UPDATE/DELETE)返回影响行数", "executeUpdate 更快", "executeQuery 只能查一张表"], answer: 1, explanation: "Query 是查询用返回结果集，Update 是增删改用返回影响了几行。" },
+      ],
+    },
+    "go-structs": {
+      slug: "go-structs",
+      sections: [
+        {
+          title: "结构体定义——Go 里的「类」",
+          content: `Go 没有 class，用 struct 来组织数据。结构体就是一组字段的集合，每个字段有名字和类型。字段名首字母大写表示公开（exported），小写表示私有——这就是 Go 的访问控制方式。`,
+          code: `type User struct {
+    Name  string // 公开字段
+    age   int    // 私有字段（包外访问不到）
+}
+
+func main() {
+    u1 := User{Name: "张三", age: 18}
+    u2 := User{"李四", 20}         // 按顺序赋值，不推荐
+
+    fmt.Println(u1.Name)           // 张三
+    // fmt.Println(u1.age)         // 编译错误：age 在包外不可见
+}`,
+          language: "go",
+        },
+        {
+          title: "方法——给 struct 加行为",
+          content: `Go 的方法定义在函数名前面加一个接收者（receiver）。接收者说白了就是「这个方法属于哪个类型的」。方法的接收者可以是值类型（操作的是副本）也可以是指针类型（操作的是原数据）。`,
+          code: `type Rectangle struct {
+    Width, Height float64
+}
+
+// 值接收者：不会改原数据
+func (r Rectangle) Area() float64 {
+    return r.Width * r.Height
+}
+
+// 指针接收者：会改原数据
+func (r *Rectangle) Scale(factor float64) {
+    r.Width *= factor
+    r.Height *= factor
+}`,
+          language: "go",
+        },
+        {
+          title: "值接收者 vs 指针接收者——什么时候用指针",
+          content: `值接收者拿到的是结构体的一个拷贝，改它不影响原数据。指针接收者拿到的是原始数据的地址，你改的就是真的数据。简单记：要改数据的用指针，结构体大的用指针（避免拷贝），只读的小结构体随便。`,
+          code: `func main() {
+    rect := Rectangle{10, 5}
+
+    fmt.Println(rect.Area())  // 50.0 值接收者
+    rect.Scale(2)             // 指针接收者——Go 自动帮你 &rect
+    fmt.Println(rect.Width)   // 20.0 真的被改了
+}`,
+          language: "go",
+          tip: "Go 里定义一个类型时，所有方法最好统一用指针接收者或都用值接收者，混着用容易让人困惑。",
+        },
+      ],
+      quiz: [
+        { question: "Go 里怎么实现类似面向对象的封装？", options: ["用 class", "字段名首字母大写公开，小写包内私有", "全用 interface", "不能封装"], answer: 1, explanation: "Go 没有 class 和访问修饰符，靠首字母大小写控制可见性——大写 exported，小写 unexported。" },
+        { question: "指针接收者和值接收者的核心区别？", options: ["没区别", "指针接收者能改原结构体值，值接收者操作的是副本", "值接收者更快", "指针接收者只能用于小结构体"], answer: 1, explanation: "值接收者传的是副本不会影响原始数据，指针接收者拿到原数据地址可以修改。" },
+        { question: "Go 结构体字段名首字母小写意味着什么？", options: ["报错", "该字段包外不可访问", "自动生成 getter", "是常量"], answer: 1, explanation: "Go 用首字母大小写做访问控制——小写 = 包内可见，大写 = 公开（exported）。" },
+        { question: "Go 的方法可以定义在哪些类型上？", options: ["只 struct", "本包内定义的所有类型", "任何类型包括 string int", "只 interface"], answer: 1, explanation: "Go 可以为任何本包中定义的类型声明方法，但不能给包外类型（如内置的 int、string）加方法。" },
+      ],
+    },
+    "go-error": {
+      slug: "go-error",
+      sections: [
+        {
+          title: "Go 的错误处理——error 就是个接口",
+          content: `Go 没有 try-catch，error 就是一个普通的接口，只有一个 Error() 方法返回错误消息。函数多返回值是 Go 的经典模式——最后一个返回值放 error，调用方每次都要检查它是不是 nil。`,
+          code: `// error 接口的定义
+type error interface {
+    Error() string
+}
+
+func readFile(path string) ([]byte, error) {
+    data, err := os.ReadFile(path)
+    if err != nil {
+        return nil, fmt.Errorf("读文件失败 %s: %w", path, err)
+    }
+    return data, nil
+}`,
+          language: "go",
+        },
+        {
+          title: "panic 和 recover——天塌了的处理",
+          content: `panic 是 Go 的「崩溃」——程序遇到无法恢复的严重错误时主动挂掉。recover 只能在 defer 中调用，用来抓住 panic 让程序不要彻底崩。普通业务错误不要用 panic，正常 return error 就够了。`,
+          code: `func riskyFunc() {
+    defer func() {
+        if r := recover(); r != nil {
+            fmt.Println("抓住 panic:", r)
+        }
+    }()
+
+    panic("出大事了！")  // defer 里的 recover 会抓住它
+}
+
+func main() {
+    riskyFunc()
+    fmt.Println("程序没崩，继续跑")  // 这行能执行
+}`,
+          language: "go",
+        },
+        {
+          title: "errors 包与自定义错误",
+          content: `标准库的 errors 包提供 New() 和 Join()。fmt.Errorf 配合 %w 可以给错误包上一层上下文。自定义错误就是实现 error 接口的类型。errors.Is 和 errors.As 用来判断错误类型。`,
+          code: `var ErrNotFound = errors.New("没找到")
+
+type ValidationError struct {
+    Field string
+    Value string
+}
+
+func (e *ValidationError) Error() string {
+    return fmt.Sprintf("校验失败: 字段 %s 的值 %s 不合法", e.Field, e.Value)
+}`,
+          language: "go",
+          tip: "用 fmt.Errorf 的 %w 包装错误时，原来的错误还在链里，可以用 errors.Is/As 追溯原始错误。",
+        },
+      ],
+      quiz: [
+        { question: "Go 里 error 是什么？", options: ["特殊语法", "一个接口——只有 Error() 方法", "一个类", "关键字"], answer: 1, explanation: "error 就是一个普通的接口，实现了 Error() string 方法的类型就是 error 类型。" },
+        { question: "panic 和 return error 应该用哪个？", options: ["都行", "可恢复的业务错误 return error，不可恢复的严重故障 panic", "panic 更好", "只用 panic"], answer: 1, explanation: "普通业务错误交给 error 让调用方处理，panic 是真正「没救了」的场景才用。" },
+        { question: "defer 和 recover 什么关系？", options: ["没关联", "recover 只能在 defer 函数里调用才有用", "recover 要写在 panic 前面", "defer 里不能调 recover"], answer: 1, explanation: "recover 只在 defer 中有效——panic 后栈回退到 defer 处，recover 拦住不让程序继续崩。" },
+        { question: "%w 包装错误有什么用？", options: ["好看", "保留原始错误链，可以用 errors.Is/As 追溯", "性能更好", "自动重试"], answer: 1, explanation: "用 %w 包装错误时原始错误不会丢，上级调用方可以用 errors.Is 判断底层是否特定错误。" },
+        { question: "Go 函数多返回值 handle error 的模式叫什么？", options: ["异常处理", "comma ok/error 模式——if err != nil", "try-catch", "面向对象"], answer: 1, explanation: "Go 的惯例是函数返回 (result, error)，调用方立刻检查 err != nil，简洁显式不隐藏错误。" },
+      ],
+    },
+    "go-web": {
+      slug: "go-web",
+      sections: [
+        {
+          title: "net/http 基础——Go 自带的 HTTP 服务",
+          content: `Go 标准库的 net/http 已经能写出生产级的 HTTP 服务，路由靠 http.HandleFunc，处理写在 handler 函数里。一个最简单的 Web 服务不到十行代码。`,
+          code: `func main() {
+    http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+        fmt.Fprintf(w, "Hello, Go Web!")
+    })
+
+    http.HandleFunc("/user", func(w http.ResponseWriter, r *http.Request) {
+        name := r.URL.Query().Get("name")
+        fmt.Fprintf(w, "你好, %s", name)
+    })
+
+    http.ListenAndServe(":8080", nil)
+}`,
+          language: "go",
+        },
+        {
+          title: "路由——请求来了该找谁",
+          content: `标准库的路由比较基础，不支持路径参数和 RESTful 风格。实际项目通常用 gorilla/mux 或者直接上 Gin 框架。Gin 速度快、功能全，路由用 GET()/POST() 等方法很直观。`,
+          code: `// 标准库路由
+http.HandleFunc("/users/", usersHandler)
+
+// Gin 框架路由
+r := gin.Default()
+r.GET("/ping", func(c *gin.Context) {
+    c.JSON(200, gin.H{"message": "pong"})
+})
+r.POST("/user", createUser)
+r.GET("/user/:id", getUser)`,
+          language: "go",
+        },
+        {
+          title: "中间件——请求流水线上的工位",
+          content: `中间件就是请求处理流水线上的关卡——可以在这里鉴权、记日志、设 CORS 头。Gin 里中间件用 c.Next() 把请求传给下一个处理函数。`,
+          code: `func AuthMiddleware() gin.HandlerFunc {
+    return func(c *gin.Context) {
+        token := c.GetHeader("Authorization")
+        if token == "" {
+            c.AbortWithStatusJSON(401, gin.H{"error": "没带 token"})
+            return
+        }
+        c.Next()
+    }
+}
+
+func LoggerMiddleware() gin.HandlerFunc {
+    return func(c *gin.Context) {
+        t := time.Now()
+        c.Next()
+        latency := time.Since(t)
+        log.Printf("%s %s %v", c.Request.Method, c.Request.URL, latency)
+    }
+}`,
+          language: "go",
+        },
+        {
+          title: "Gin 框架入门——十分钟上手",
+          content: `Gin 是目前 Go Web 最火的框架，比标准库多了路由分组、中间件、参数绑定、JSON 验证、错误处理。`,
+          code: `r := gin.Default()
+
+// 路由分组
+v1 := r.Group("/api/v1")
+{
+    v1.GET("/users", listUsers)
+    v1.POST("/users", createUser)
+}
+
+// 参数绑定
+type User struct {
+    Name  string json:"name" binding:"required"
+    Email string json:"email" binding:"required,email"
+}
+
+func createUser(c *gin.Context) {
+    var u User
+    if err := c.ShouldBindJSON(&u); err != nil {
+        c.JSON(400, gin.H{"error": err.Error()})
+        return
+    }
+    c.JSON(201, u)
+}`,
+          language: "go",
+        },
+      ],
+      quiz: [
+        { question: "Go 标准库能写 Web 服务吗？", options: ["不行", "可以，net/http 足以写生产级 HTTP 服务", "只能本地测试", "得依赖第三方库"], answer: 1, explanation: "Go 标准库 net/http 功能齐全，很多公司不用框架直接用标准库照样跑生产。" },
+        { question: "Gin 框架的中介（中间件）是什么概念？", options: ["数据库", "请求处理流水线上的附加处理——鉴权、日志、限流等", "路由规则", "模板引擎"], answer: 1, explanation: "中间件在请求到达 handler 之前和之后执行，适合做鉴权、日志、响应压缩等横切关注点。" },
+        { question: "Gin 里 c.ShouldBindJSON(&u) 做了什么？", options: ["输出 JSON", "把请求体的 JSON 绑定到 Go 结构体上", "发送 JSON 响应", "验证 JSON 语法"], answer: 1, explanation: "ShouldBindJSON 把请求 body 的 JSON 解析到结构体指针里，还能根据 binding tag 做字段校验。" },
+        { question: "r.UserGroup('/api') 的作用？", options: ["创建用户", "路由分组——同一组路由共享前缀和中间件", "启动多个服务", "版本控制"], answer: 1, explanation: "路由分组把相关接口放在一起，共享 URL 前缀和中间件，减少重复代码。" },
+        { question: "Go Web 服务怎么处理路径参数 /user/:id？", options: ["标准库直接支持", "Gin 用 c.Param('id') 获取", "不支持", "只能从 Body 取"], answer: 1, explanation: "标准库没这个功能，Gin 用 :id 定义路径参数，c.Param('id') 获取值。" },
+      ],
+    },
+    "go-database": {
+      slug: "go-database",
+      sections: [
+        {
+          title: "database/sql 标准接口",
+          content: `Go 的 database/sql 包提供了一套操作数据库的标准接口，配合各个数据库的 driver 使用。这不是真正的连接池或 ORM，但给了你一个干净的底层 API。`,
+          code: `import (
+    "database/sql"
+    _ "github.com/go-sql-driver/mysql"  // 导入驱动
+)
+
+func main() {
+    db, err := sql.Open("mysql", "user:pass@tcp(127.0.0.1:3306)/mydb")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer db.Close()
+
+    var name string
+    err = db.QueryRow("SELECT name FROM users WHERE id = ?", 1).Scan(&name)
+}`,
+          language: "go",
+        },
+        {
+          title: "GORM——Go 最流行的 ORM",
+          content: `GORM 是目前 Go 生态最火的 ORM。它把数据库表映射成 Go 结构体，增删改查不再写 SQL 而是用 Go 方法链。支持自动建表、关联关系、Hook、事务。`,
+          code: `type User struct {
+    ID   uint
+    Name string gorm:"size:100;not null"
+    Age  int
+}
+
+// 自动建表
+db.AutoMigrate(&User{})
+
+// 增删改查
+db.Create(&User{Name: "张三", Age: 18})
+
+var user User
+db.First(&user, 1)              // SELECT * FROM users WHERE id = 1
+db.Where("age > ?", 20).Find(&users)
+db.Model(&user).Update("Name", "李四")
+db.Delete(&user, 1)`,
+          language: "go",
+        },
+        {
+          title: "事务——几个操作绑在一起",
+          content: `GORM 的事务包装很简洁。Begin() 开始，错误时 Rollback()，成功 Commit()。Transaction() 回调方式更安全——biz 函数不 panic 就自动提交，panic 就回滚。`,
+          code: `// GORM 事务
+db.Transaction(func(tx *gorm.DB) error {
+    if err := tx.Create(&User{Name: "张三"}).Error; err != nil {
+        return err  // 返回错误自动回滚
+    }
+    if err := tx.Create(&Order{UserID: 1}).Error; err != nil {
+        return err
+    }
+    return nil  // 返回 nil 自动提交
+})`,
+          language: "go",
+          tip: "GORM 的 Transaction() 方法最省心——不需要手动 Begin/Commit/Rollback，内部帮你包好。",
+        },
+      ],
+      quiz: [
+        { question: "sql.Open() 做的是连接还是只是初始化？", options: ["立即建立连接", "只是初始化好配置，真正连上数据库是第一次执行 SQL 时", "创建连接池", "不用配置"], answer: 1, explanation: "sql.Open() 不真正连数据库，只是验证参数并初始化。真正建连接在第一个 Query/Exec 调用时。" },
+        { question: "GORM 的 AutoMigrate 做什么？", options: ["迁移数据库服务器", "自动根据结构体创建或更新表结构", "自动备份数据", "自动删除表"], answer: 1, explanation: "AutoMigrate 对照结构体定义自动建表、加字段、建索引——但不会删已有的列。" },
+        { question: "GORM Transaction 回调返回 error 会怎么处理？", options: ["忽略", "自动回滚", "自动提交", "报错崩溃"], answer: 1, explanation: "Transaction 回调返回 error 时 GORM 自动回滚事务，返回 nil 才提交。" },
+        { question: "GORM db.Where('age > ?', 20).Find(&users) 里 ? 占位符干嘛的？", options: ["通配符", "防 SQL 注入的参数占位符", "表示任意字段", "动态表名"], answer: 1, explanation: "和 JDBC 的 PreparedStatement 同理——参数跟 SQL 结构分离，用户输入不会变成 SQL 执行。" },
+        { question: "Go 连接数据库必须导入带 _ 前缀的 driver 包，这叫什么模式？", options: ["匿名导入 driver", "blank import——只执行包的 init() 函数注册驱动，不直接使用包内容", "隐藏依赖", "懒加载"], answer: 1, explanation: "import _ 只触发 driver 包的 init() 函数把驱动注册进 database/sql，代码里不直接引用包名。" },
+      ],
+    },
+    "go-testing": {
+      slug: "go-testing",
+      sections: [
+        {
+          title: "Test 函数——以 Test 开头的函数",
+          content: `Go 测试就是写 _test.go 文件里的函数，函数名 Test 开头，参数是 *testing.T。一个项目跑 go test 就自动发现所有测试文件执行。无需额外框架。`,
+          code: `// add.go
+func Add(a, b int) int { return a + b }
+
+// add_test.go
+func TestAdd(t *testing.T) {
+    result := Add(2, 3)
+    if result != 5 {
+        t.Errorf("Add(2, 3) = %d; want 5", result)
+    }
+}`,
+          language: "go",
+        },
+        {
+          title: "Table-Driven Tests——用表格批量测",
+          content: `这是 Go 测试的杀手锏——把多组输入输出放进一个表格（slice of struct），循环跑。看起来稍长，但新增用例只需往表里加一行，不用新写函数。`,
+          code: `func TestAdd(t *testing.T) {
+    tests := []struct {
+        name     string
+        a, b     int
+        expected int
+    }{
+        {"正数相加", 2, 3, 5},
+        {"包含负数", -1, 1, 0},
+        {"都是零", 0, 0, 0},
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            result := Add(tt.a, tt.b)
+            if result != tt.expected {
+                t.Errorf("got %d, want %d", result, tt.expected)
+            }
+        })
+    }
+}`,
+          language: "go",
+        },
+        {
+          title: "Benchmark——跑得够不够快",
+          content: `Benchmark 函数名以 Benchmark 开头，参数是 *testing.B。跑 go test -bench=. 测性能。b.N 是 Go 自动算的执行次数。`,
+          code: `func BenchmarkAdd(b *testing.B) {
+    for i := 0; i < b.N; i++ {
+        Add(1, 2)
+    }
+}
+// go test -bench=.
+
+// go test -bench=. -benchmem 还能看内存分配`,
+          language: "go",
+          tip: "基准测试前用 b.ResetTimer() 排除初始化开销，让测量更准。",
+        },
+      ],
+      quiz: [
+        { question: "Go 测试函数的命名规则？", options: ["随意", "Test 开头，参数 *testing.T", "test 开头", "方法名必须 test"], answer: 1, explanation: "Go 测试必须是 TestXxx 格式，测试文件 _test.go 结尾，测试函数签名接收 *testing.T。" },
+        { question: "Table-Driven Test 好在哪？", options: ["跑得更快", "一个函数测多组用例，新增用例只加一行表数据", "不用写代码", "自动生成"], answer: 1, explanation: "把所有测试用例放进一个 slice 里循环跑，测新场景不写新函数，维护成本低。" },
+        { question: "Benchmark 里 b.N 是什么？", options: ["固定值 1000", "Go 自动调整的执行次数直到测量稳定", "测试用例数", "循环次数上限"], answer: 1, explanation: "Go 的 benchmark 框架自动调 b.N 的值，找到足够多次数让计时稳定。" },
+        { question: "go test -v 里的 -v 干嘛？", options: ["版本号", "verbose——详细输出每个测试结果", "验证代码", "生成报告"], answer: 1, explanation: "-v 让测试输出每个测试函数的通过/失败状态，不加 v 只打印最终的 PASS/FAIL。" },
+        { question: "go test 怎么跑指定包下的所有测试？", options: ["go test ./...", "go test all", "go test .", "go test -all"], answer: 0, explanation: "./... 递归当前目录下所有子包——「跑所有包的所有测试」。" },
+      ],
+    },
+    "rust-structs": {
+      slug: "rust-structs",
+      sections: [
+        {
+          title: "struct——数据的架子",
+          content: `Rust 的 struct 有三种写法：普通 struct（命名字段）、元组 struct（类似命名的元组）、单元 struct（零字段，当标记用）。用 impl 块给 struct 添加方法。`,
+          code: `struct User {
+    name: String,
+    age: u8,
+}
+
+// 元组结构体
+struct Point(i32, i32);
+
+// 单元结构体
+struct Marker;
+
+impl User {
+    fn new(name: String, age: u8) -> Self {
+        User { name, age }
+    }
+
+    fn is_adult(&self) -> bool {
+        self.age >= 18
+    }
+}`,
+          language: "rust",
+        },
+        {
+          title: "enum——带标签的联合体",
+          content: `Rust 的 enum 比 C/Java 的枚举强太多——每个变体都能携带数据，配合 match 做模式匹配。Option 和 Result 就是 Rust 用 enum 实现的两个核心类型。`,
+          code: `enum IpAddr {
+    V4(u8, u8, u8, u8),
+    V6(String),
+}
+
+let home = IpAddr::V4(127, 0, 0, 1);
+let loopback = IpAddr::V6(String::from("::1"));`,
+          language: "rust",
+        },
+        {
+          title: "Option——可能有值也可能没有",
+          content: `Rust 没有 null，用 Option<T> 表示值可能为空。有值就是 Some(T)，空就是 None。必须用 match 或 if let 检查后才能取到里面的值——编译器逼着你不遗漏 null 检查。`,
+          code: `fn find_user(id: u32) -> Option<String> {
+    if id == 1 {
+        Some(String::from("张三"))
+    } else {
+        None
+    }
+}
+
+match find_user(1) {
+    Some(name) => println!("找到了: {}", name),
+    None => println!("没找到"),
+}`,
+          language: "rust",
+        },
+        {
+          title: "Result——要么成功要么报错",
+          content: `Result<T, E> 是 Rust 错误处理的基础——Ok(T) 表示成功，Err(E) 表示失败。跟 Option 一样必须显式处理两种情况，编译器帮你防住忘记处理错误。`,
+          code: `fn divide(a: f64, b: f64) -> Result<f64, String> {
+    if b == 0.0 {
+        Err(String::from("除数不能为零"))
+    } else {
+        Ok(a / b)
+    }
+}
+
+match divide(10.0, 0.0) {
+    Ok(result) => println!("结果: {}", result),
+    Err(e) => println!("错误: {}", e),
+}`,
+          language: "rust",
+        },
+      ],
+      quiz: [
+        { question: "Rust 的 Option<T> 相当于什么？", options: ["null", "可能有值(Some)或没值(None)的安全 null 替代", "空列表", "布尔"], answer: 1, explanation: "Option 是 Rust 对「可能为空」的安全编码——没有 null，编译器强迫你处理两种可能性。" },
+        { question: "Result<T, E> 的 Ok 和 Err 代表什么？", options: ["真和假", "成功(Ok)和失败(Err)", "是和否", "大和小"], answer: 1, explanation: "Result 是 Rust 错误处理的官方方式——Ok 包裹正常结果，Err 包裹错误信息。" },
+        { question: "Rust enum 比 C enum 强在哪里？", options: ["更快", "每个变体可以带数据，配合 match 做穷尽模式匹配", "更简单", "没有区别"], answer: 1, explanation: "Rust enum 变体可以存不同类型数据，match 时编译器检查是否所有变体都处理了。" },
+        { question: "impl 块在 Rust 里做什么？", options: ["导入模块", "给类型实现方法", "定义 trait", "声明宏"], answer: 1, explanation: "impl 是为 struct 或 enum 添加方法的地方——定义函数签名然后实现。" },
+        { question: "Rust 为什么不让你直接用 null？", options: ["不支持", "null 是无数 bug 的来源，Option 强制你显式处理空值", "历史原因", "内存不够"], answer: 1, explanation: "Rust 设计者认为 null 引用是「十亿美元的错误」——Option 让编译器在你可能遗漏 null 检查时报错。" },
+      ],
+    },
+    "rust-collections": {
+      slug: "rust-collections",
+      sections: [
+        {
+          title: "Vec——动态数组",
+          content: `Vec<T> 是 Rust 最常用的集合，类似 Java ArrayList。存在堆上，自动扩容。push 追加，pop 弹末尾，[index] 按索引取（越界会 panic），get(index) 安全取返回 Option。`,
+          code: `let mut v: Vec<i32> = Vec::new();
+v.push(1);
+v.push(2);
+v.push(3);
+
+let third = &v[2];        // 越界就 panic
+let third = v.get(2);     // 返回 Option<&i32>
+
+for i in &v {
+    println!("{}", i);    // 遍历
+}`,
+          language: "rust",
+        },
+        {
+          title: "HashMap——键值对",
+          content: `HashMap<K, V> 存储键值对，键不能重复。插入用 insert()，取出用 get() 返回 Option。entry() 方法是非常实用的模式——键存在就改值，不存在就插入。`,
+          code: `use std::collections::HashMap;
+
+let mut scores = HashMap::new();
+scores.insert(String::from("Blue"), 10);
+scores.insert(String::from("Yellow"), 50);
+
+let team = String::from("Blue");
+let score = scores.get(&team).copied().unwrap_or(0);
+
+// entry 模式——有则改无则插
+scores.entry(String::from("Blue")).or_insert(0);`,
+          language: "rust",
+        },
+        {
+          title: "String——别被名字骗了",
+          content: `Rust 的 String 是可变的堆上 UTF-8 字符串，不是简单字符数组。&str 是字符串切片，不可变。push_str 追加，+ 运算连接，format! 宏也是最常用的组合方式。`,
+          code: `let mut s = String::from("Hello");
+s.push_str(", World!");
+s.push('!');
+
+let s2 = "Rust".to_string();
+
+// 字符串拼接
+let combined = format!("{} {}", s, s2);`,
+          language: "rust",
+        },
+        {
+          title: "迭代器——map/filter 流水线",
+          content: `Rust 的迭代器是惰性的——你不调用消费方法（collect、sum、for）它不会干活。map、filter、take 串起来处理数据非常简洁。`,
+          code: `let nums = vec![1, 2, 3, 4, 5, 6];
+
+let squares: Vec<i32> = nums.iter()
+    .map(|x| x * x)
+    .filter(|x| x % 2 == 0)
+    .collect();
+
+let sum: i32 = nums.iter().sum();`,
+          language: "rust",
+        },
+      ],
+      quiz: [
+        { question: "Vec.get(100) 返回什么？", options: ["直接报错", "None——Option 安全地表示索引超出", "第 100 个元素", "空 Vec"], answer: 1, explanation: "get 返回 Option，超出范围返回 None 而不是 panic——比直接索引安全。" },
+        { question: "HashMap 的 entry() 方法什么用？", options: ["删除条目", "有则改无则插——一次处理存在和不存在两种情况", "遍历", "算长度"], answer: 1, explanation: "entry 返回 Entry 枚举，or_insert() 是「没有就插，有的话返回引用」的优雅写法。" },
+        { question: "String 和 &str 的本质区别？", options: ["一样", "String 是可变堆上字符串有所有权，&str 是借用的切片", "String 更短", "只有 &str 能用"], answer: 1, explanation: "String 拥有堆内存，可以修改；&str 只是借用现有字符串的一部分，不能改。" },
+        { question: "Rust 迭代器什么时候执行？", options: ["声明时立即执行", "惰性——调用消费方法(collect/sum/for)才执行", "编译时", "每次循环"], answer: 1, explanation: "Rust 迭代器是惰性的——map filter 链不产生中间结果，到 collect 才真正跑起流水线。" },
+        { question: "format! 宏和 + 拼接字符串的区别？", options: ["没区别", "format! 不转移所有权更安全，+ 会 move 左值", "format! 更慢", "只能用 +"], answer: 1, explanation: "format! 宏借用所有参数不 move，比 + 用着更自由——不会吃完 String 后变量就不能用了。" },
+      ],
+    },
+    "rust-error": {
+      slug: "rust-error",
+      sections: [
+        {
+          title: "Result 与 ? 运算符",
+          content: `Rust 的 ? 是错误传播的语法糖——遇到 Err 就 early return，Ok 才把值拿出来继续。省去了手写 match 判断的麻烦。? 只能在返回 Result 或 Option 的函数里用。`,
+          code: `fn read_user() -> Result<String, std::io::Error> {
+    let content = std::fs::read_to_string("user.txt")?;
+    Ok(content)
+}
+
+// 等价于手写你的
+fn read_user_manual() -> Result<String, std::io::Error> {
+    let content = match std::fs::read_to_string("user.txt") {
+        Ok(s) => s,
+        Err(e) => return Err(e),
+    };
+    Ok(content)
+}`,
+          language: "rust",
+        },
+        {
+          title: "Option——有就做没就过",
+          content: `Option 也能用 ? 做 early return。Some 取出值继续，None 直接返回。想给 Option 和 Result 的 None 加自定义错误消息可以用 ok_or()。`,
+          code: `fn get_username(db: &HashMap<u32, String>, id: u32) -> Option<String> {
+    let name = db.get(&id)?;
+    Some(name.to_uppercase())
+}
+
+// Option 转 Result
+let user = find_user(42)
+    .ok_or("用户不存在")?;  // None 变 Err`,
+          language: "rust",
+        },
+        {
+          title: "thiserror——一行代码写自定义错误",
+          content: `thiserror 是最舒服的自定义错误库，用 derive 宏一行搞定错误枚举。配合 #[error] 属性定制错误消息，#[from] 自动实现类型转换。`,
+          code: `use thiserror::Error;
+
+#[derive(Error, Debug)]
+enum MyError {
+    #[error("IO 错误: {0}")]
+    Io(#[from] std::io::Error),
+    #[error("用户 {0} 不存在")]
+    UserNotFound(u32),
+    #[error("数字转换失败")]
+    ParseError,
+}`,
+          language: "rust",
+          tip: "thiserror 用于库代码，anyhow 用于应用代码——前者自动实现 Error trait，后者自动添加上下文。",
+        },
+      ],
+      quiz: [
+        { question: "? 运算符返回什么？", options: ["布尔", "碰到 Ok 继续，碰到 Err 提前返回错误", "None", "什么都不返回"], answer: 1, explanation: "? 是早返语法——Ok 值直接拿，Err 立刻从当前函数 return Err。" },
+        { question: "现在最流行的 Rust 自定义错误库是什么？", options: ["thiserror", "anyhow", "failure", "没有"], answer: 0, explanation: "thiserror 通过 derive 宏让写自定义错误极其简洁，是 Rust 社区事实标准。" },
+        { question: "Option 的 ok_or() 方法干嘛的？", options: ["忽略 None", "把 Option 转 Result——None 变 Err，Some 变 Ok", "删除值", "比较数值"], answer: 1, explanation: "ok_or 让 Option 中的 None 代表错误，传入自定义错误信息，转换后可以配合 ? 传播。" },
+        { question: "thiserror 里 #[from] 属性有什么用？", options: ["导入", "自动实现 From trait，让 ? 自动把被包装的错误转成自定义错误", "格式化字符串", "创建新类型"], answer: 1, explanation: "#[from] 自动生成 From trait 实现，代码中写 ? 时底层会自动转换成自定义错误类型。" },
+        { question: "Result 和 Option 都能用 ? 吗？", options: ["只能 Result", "都可以——但函数返回类型得匹配", "只能 Option", "都不能"], answer: 1, explanation: "? 的返回类型跟函数签名一致就行——返回 Result 的用 Result 里 ?，返回 Option 的用 Option 里 ?。" },
+      ],
+    },
+    "rust-traits": {
+      slug: "rust-traits",
+      sections: [
+        {
+          title: "Trait 定义与实现——定义共同行为",
+          content: `Trait 就是一套行为约定——定义了什么方法必须有，但不规定怎么实现。类似 Java 接口但 Rust 的抽象能力更强。任何类型实现了这个 trait 就必须按照签名实现所有方法。`,
+          code: `trait Summarizable {
+    fn summarize(&self) -> String;
+
+    // 默认实现
+    fn default_summary(&self) -> String {
+        String::from("(阅读更多...)")
+    }
+}
+
+struct Article {
+    title: String,
+    content: String,
+}
+
+impl Summarizable for Article {
+    fn summarize(&self) -> String {
+        format!("{} - {}...", self.title, &self.content[0..50])
+    }
+}`,
+          language: "rust",
+        },
+        {
+          title: "泛型约束——限制泛型的范围",
+          content: `泛型本身没有约束的话什么类型都能传。trait bound（trait 约束）限制了泛型参数必须实现了某些 trait 才能用这个函数。写法两种：T: Trait1 + Trait2 或者 where 从句。`,
+          code: `fn notify<T: Summarizable>(item: &T) {
+    println!("摘要: {}", item.summarize());
+}
+
+// where 语法——约束多了更清爽
+fn complex<T, U>(t: &T, u: &U) -> String
+where
+    T: Summarizable + Clone,
+    U: std::fmt::Display,
+{
+    format!("{} - {}", t.summarize(), u)
+}`,
+          language: "rust",
+        },
+        {
+          title: "Trait 对象——运行时多态",
+          content: `泛型是编译期确定类型（静态分发），trait 对象是用 &dyn Trait 或 Box<dyn Trait> 实现运行时多态。就像 Java 的接口引用——可以指向任何实现了这个接口的对象。`,
+          code: `fn print_summary(item: &dyn Summarizable) {
+    println!("{}", item.summarize());
+}
+
+let article = Article { title: "...".into(), content: "...".into() };
+let tweet = Tweet { username: "...".into(), content: "...".into() };
+
+print_summary(&article);
+print_summary(&tweet);  // 不同类型都可以传`,
+          language: "rust",
+          tip: "泛型(static dispatch)性能好但编译多份代码，trait 对象(dynamic dispatch)运行时选但有 vtable 开销。优先泛型。",
+        },
+      ],
+      quiz: [
+        { question: "Trait 在 Rust 中相当于什么概念？", options: ["类", "接口/协议——定义一组必须实现的方法", "枚举", "模块"], answer: 1, explanation: "Trait 是行为抽象——Java 的 interface、Go 的 interface、Rust 的 trait 都是同类概念。" },
+        { question: "Trait 约束（bound）的作用？", options: ["限制泛型——只有实现了特定 trait 的类型才能用", "加速编译", "自动实现方法", "隐藏类型"], answer: 0, explanation: "Trait bound 限定泛型类型 T 必须具备哪些能力，不满足约束编译器直接报错。" },
+        { question: "&dyn Trait 和泛型 T: Trait 的根本区别？", options: ["没区别", "&dyn Trait 运行时多态有虚表开销，泛型编译期静态分发没有", "只能用 &dyn", "泛型更灵活"], answer: 1, explanation: "dyn 是动态分发——运行时通过 vtable 确定调哪个实现；泛型是静态分发——编译期生成具体版本的代码。" },
+        { question: "Rust 的 trait 跟 Go 的 interface 像不像？", options: ["完全不像", "非常像——都是定义行为协议，类型隐式实现 trait/interface", "Rust 只有泛型", "Go 没有这个"], answer: 1, explanation: "都是声明一组方法签名，任何类型实现了这些方法就「自动」是这个 trait/interface 的实现者。" },
+        { question: "impl Trait for Type 中的 for 是什么含义？", options: ["循环", "为类型 Type 实现 Trait", "替代 for 循环", "等待"], answer: 1, explanation: "impl ... for Type 是「为这个类型实现这个 trait」的固定语法。" },
+      ],
+    },
+    "php-oop": {
+      slug: "php-oop",
+      sections: [
+        {
+          title: "类与对象——PHP 面向对象基础",
+          content: `PHP 的面向对象和 Java 很像，但更灵活。用 class 定义，new 创建实例。成员变量可以加访问修饰符 public/protected/private。构造函数是 __construct()，析构是 __destruct()。`,
+          code: `class User {
+    private string $name;
+    private int $age;
+
+    public function __construct(string $name, int $age) {
+        $this->name = $name;
+        $this->age = $age;
+    }
+
+    public function isAdult(): bool {
+        return $this->age >= 18;
+    }
+}
+
+$u = new User("张三", 25);
+echo $u->isAdult() ? "成年" : "未成年";`,
+          language: "php",
+        },
+        {
+          title: "继承与 Trait——多继承的替代方案",
+          content: `PHP 和 Java 一样单继承，但多了 trait 这个法宝。trait 把可复用的方法块打包，一个类可以 use 多个 trait，相当于横向代码复用。trait 之间也能 use 别的 trait。`,
+          code: `class Animal {
+    public function eat() {
+        echo "吃东西";
+    }
+}
+
+trait Flyable {
+    public function fly() { echo "飞"; }
+}
+
+trait Runnable {
+    public function run() { echo "跑"; }
+}
+
+class Bird extends Animal {
+    use Flyable, Runnable;
+}
+
+$bird = new Bird();
+$bird->eat();   // 继承来的
+$bird->fly();   // trait 带来的
+$bird->run();   // trait 带来的`,
+          language: "php",
+        },
+        {
+          title: "Namespace 与自动加载",
+          content: `PHP 的 namespace 解决类名冲突，和文件目录对应。use 语句导入命名空间。配合 Composer 的 autoload 机制，不用 require 文件，new 类时自动加载。`,
+          code: `// App/Models/User.php
+namespace App\\Models;
+
+class User {
+    public function getName() {
+        return "张三";
+    }
+}
+
+// 使用
+use App\\Models\\User;
+
+$u = new User();`,
+          language: "php",
+        },
+        {
+          title: "魔术方法——你不知道但系统知道的",
+          content: `__ 开头的魔术方法由 PHP 引擎在特定时机自动调用。最常见的是 __construct（构造）和 __toString（echo 对象时自动调）。__get/__set 在访问不存在的属性时触发。`,
+          code: `class User {
+    private array $data = [];
+
+    public function __construct(string $name) {
+        $this->data["name"] = $name;
+    }
+
+    public function __get(string $key) {
+        return $this->data[$key] ?? null;
+    }
+
+    public function __set(string $key, $value) {
+        $this->data[$key] = $value;
+    }
+}`,
+          language: "php",
+          tip: "魔术方法很灵活但别滥用以防代码难调试。清晰的 getter/setter 比 __get/__set 更好维护。",
+        },
+      ],
+      quiz: [
+        { question: "PHP trait 和 class 的区别？", options: ["不能实化 trait", "trait 是给类横向掺代码用的不能自己 new，类可以 new", "trait 更快", "没有区别"], answer: 1, explanation: "trait 只能被 use 混入到类里，不能像类一样直接 new。解决 PHP 单继承复用的难题。" },
+        { question: "PHP namespace 主要解决什么问题？", options: ["性能", "类名冲突——不同包可能有同名的类", "类型安全", "自动部署"], answer: 1, explanation: "命名空间隔离不同包中的同名类，避免引入两个第三方库时类名撞车。" },
+        { question: "__construct 和普通方法的区别？", options: ["一样", "构造函数——new 类时自动执行", "更快", "只能调用一次"], answer: 1, explanation: "__construct 是类的构造方法，new 类时 PHP 自动调用，用来初始化对象的初始状态。" },
+        { question: "composer autoload 做了什么？", options: ["下载文件", "按命名空间自动加载类文件，不用手动 require", "部署代码", "压缩代码"], answer: 1, explanation: "Composer 生成 autoload 文件，new 类时自动根据命名空间找到对应的 PHP 文件加载。" },
+        { question: "use 语句和 require 的区别？", options: ["一样", "use 是命名空间导入(别名)，require 是把文件内容拉进来执行", "use 导入文件", "require 是别名"], answer: 1, explanation: "use 只影响命名空间的简写引用不加载文件，require/include 才真正加载执行 PHP 文件。" },
+      ],
+    },
+    "php-mysql": {
+      slug: "php-mysql",
+      sections: [
+        {
+          title: "PDO——PHP 统一数据库抽象层",
+          content: `PDO 是 PHP 操作数据库的标准接口，可以连 MySQL、PostgreSQL、SQLite 等。比 mysql_* 函数安全太多——支持预处理语句防 SQL 注入。`,
+          code: `$pdo = new PDO("mysql:host=localhost;dbname=mydb;charset=utf8mb4", "root", "pass");
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+// 查询
+$stmt = $pdo->query("SELECT * FROM users");
+$users = $stmt->fetchAll(PDO::FETCH_ASSOC);`,
+          language: "php",
+        },
+        {
+          title: "预处理语句——彻底防 SQL 注入",
+          content: `PDO 预处理语句用 ? 或 :name 占符参数，数据跟 SQL 结构彻底分离——无论用户输入的是什么特殊字符都不可能变成 SQL 命令。这是防注入的唯一正确方式，没有之一。`,
+          code: `$sql = "SELECT * FROM users WHERE name = :name AND age > :age";
+$stmt = $pdo->prepare($sql);
+$stmt->execute([
+    'name' => $_GET['name'],
+    'age' => 18,
+]);
+$results = $stmt->fetchAll();
+
+// 用 ? 占位符
+$stmt = $pdo->prepare("INSERT INTO users (name, age) VALUES (?, ?)");
+$stmt->execute(["张三", 25]);`,
+          language: "php",
+        },
+        {
+          title: "事务——保证数据一致性",
+          content: `PDO 的事务操作很直接：beginTransaction 开始，commit 提交，出问题就 rollBack。关键操作（转账、下单扣库存）都得包在事务里。`,
+          code: `try {
+    $pdo->beginTransaction();
+    $pdo->exec("UPDATE accounts SET balance = balance - 100 WHERE id = 1");
+    $pdo->exec("UPDATE accounts SET balance = balance + 100 WHERE id = 2");
+    $pdo->commit();
+} catch (Exception $e) {
+    $pdo->rollBack();
+    echo "转账失败: " . $e->getMessage();
+}`,
+          language: "php",
+        },
+      ],
+      quiz: [
+        { question: "PDO 预处理语句怎么防 SQL 注入？", options: ["过滤输入字符", "SQL 结构和数据分开传输——用户输入永远不会被当 SQL 执行", "限制输入长度", "加密 input"], answer: 1, explanation: "prepare 先把 SQL 结构发给数据库编译好，execute 再传参数——参数就是纯数据，管你写什么都不会影响 SQL 语义。" },
+        { question: "PDO 默认错误模式是什么？", options: ["抛异常", "静默失败——需要手动查 error", "直接报错", "写入日志"], answer: 1, explanation: "PDO 默认错误静默处理，必须显式设 ERRMODE_EXCEPTION 才能在出错时抛异常。" },
+        { question: "PDO 事务回滚发生在什么情况？", options: ["提交后", "出异常或主动调 rollBack()", "连接关闭时", "从不回滚"], answer: 1, explanation: "事务未提交前抛出异常应立刻回滚，或者手动判断条件不对调 rollBack() 撤销操作。" },
+        { question: "PDO 和 mysqli 怎么选？", options: ["一样", "PDO 支持多数据库更全面，mysqli 只 MySQL 但提供 MySQL 高级特性", "mysqli 更安全", "PDO 只能 MySQL"], answer: 1, explanation: "PDO 跨数据库，换数据库只用改连接串。mysqli 有 MySQL 独有功能。多数场景 PDO 更合适。" },
+        { question: "fetchAll(PDO::FETCH_ASSOC) 返回什么？", options: ["对象", "关联数组——key 是列名 value 是列值", "数字索引数组", "JSON"], answer: 1, explanation: "FETCH_ASSOC 让结果行以关联数组形式返回，key 是字段名。默认 FETCH_BOTH 同时有数字和关联索引。" },
+      ],
+    },
+    "php-laravel": {
+      slug: "php-laravel",
+      sections: [
+        {
+          title: "Laravel 路由——URL 到处理函数的映射",
+          content: `Laravel 的路由把所有 HTTP 请求映射到对应的处理函数或控制器。routes/web.php 里定义，支持 GET/POST/PUT/DELETE，还有路由参数、命名路由、路由分组。`,
+          code: `// routes/web.php
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('/user/{id}', [UserController::class, 'show']);
+Route::post('/user', [UserController::class, 'store']);
+
+// 控制器
+class UserController extends Controller {
+    public function show($id) {
+        $user = User::findOrFail($id);
+        return view('user.show', compact('user'));
+    }
+}`,
+          language: "php",
+        },
+        {
+          title: "Blade 模板——PHP 和 HTML 的干净结合",
+          content: `Blade 是 Laravel 自带的模板引擎。语法简单：{{ }} 输出变量并自动转义，@if、@foreach、@extends、@yield 等指令。还能定义组件和复用布局。`,
+          code: `<!-- layout.blade.php -->
+<html>
+<body>
+    @yield('content')
+</body>
+</html>
+
+<!-- user.blade.php -->
+@extends('layout')
+
+@section('content')
+    <h1>{{ $user->name }}</h1>
+    <p>{{ $user->email }}</p>
+    @if($user->age >= 18)
+        <span>成年人</span>
+    @endif
+@endsection`,
+          language: "blade",
+        },
+        {
+          title: "Eloquent ORM——数据库映射成对象",
+          content: `Eloquent 是 Laravel 的 Active Record ORM，每个数据库表对应一个 Model 类。不再写 SQL，用链式方法查数据。关联关系（hasOne/hasMany/belongsTo）定义直观。`,
+          code: `class User extends Model {
+    protected $fillable = ['name', 'email', 'password'];
+
+    public function posts() {
+        return $this->hasMany(Post::class);
+    }
+}
+
+// 增删改查
+User::create(['name' => '张三', 'email' => 'zhang@example.com']);
+$user = User::find(1);
+$users = User::where('age', '>', 18)->orderBy('name')->get();
+$user->update(['name' => '李四']);
+$user->delete();`,
+          language: "php",
+          tip: "Eloquent 会默默把蛇形表名变成驼峰类名——users 表对应 User Model，order_items 对应 OrderItem。",
+        },
+      ],
+      quiz: [
+        { question: "Laravel 路由文件在哪？", options: ["app/routes.php", "routes/web.php", "bootstrap/routes.php", "public/index.php"], answer: 1, explanation: "routes/web.php 是页面路由，routes/api.php 是 API 路由。" },
+        { question: "Blade 的 {{ $var }} 和 {!! $var !!} 区别？", options: ["一样", "{{ }} 自动转义防 XSS，{!! !!} 不转义直接输出 HTML", "{!! !!} 更快", "{{ }} 不转义"], answer: 1, explanation: "{{ }} 自动 htmlspecialchars 转义防 XSS——除非你确信内容是安全的 HTML，否则永远用 {{ }}。" },
+        { question: "Eloquent ORM 的表名约定是什么？", options: ["同名", "蛇形复数自动对应——User Model → users 表", "驼峰形式", "大写表名"], answer: 1, explanation: "Eloquent 会自动把 Model 类名转成蛇形复数形式作为对应表名。" },
+        { question: "Laravel CSRF 保护的工作原理？", options: ["加密请求", "表单中 @csrf 生成 token，服务器验证 token 是否匹配", "限制 IP", "CAPTCHA"], answer: 1, explanation: "Laravel 给每个会话生成随机 token，表单提交时验证，防止第三方网站冒充用户请求。" },
+        { question: "findOrFail(1) 和 find(1) 的区别？", options: ["一样", "findOrFail 没找到会自动抛 404 异常，find 返回 null", "findOrFail 更快", "find 不支持"], answer: 1, explanation: "findOrFail 找不到记录立刻抛出 ModelNotFoundException 返回 404，适合一定要有记录的场景。" },
+      ],
+    },
+    "php-security": {
+      slug: "php-security",
+      sections: [
+        {
+          title: "SQL 注入——老问题新解法",
+          content: `SQL 注入是 PHP 历史上最大的安全坑。防止方法只有一个：用 PDO 预处理语句或 ORM，绝不用字符串拼接 SQL。任何用户输入都当毒药看待——先消毒再下锅。`,
+          code: `// 危险写法——永远别写
+$sql = "SELECT * FROM users WHERE id = " . $_GET['id'];
+
+// 安全写法——PDO 预处理
+$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+$stmt->execute([$_GET['id']]);
+
+// Laravel Eloquent 自动防注入
+User::find($_GET['id']);
+User::where('name', $_GET['name'])->get();`,
+          language: "php",
+        },
+        {
+          title: "XSS——跨站脚本攻击",
+          content: `XSS 就是攻击者在你的页面上植入 JavaScript 代码，偷 cookie、模仿用户操作。防 XSS 的核心原则：所有用户输出的内容都转义。Blade 用 {{ }} 自动转义，原生 PHP 用 htmlspecialchars。`,
+          code: `// 危险——用户输入直接输出
+echo $_GET['username'];
+
+// 安全——先转义
+echo htmlspecialchars($_GET['username'], ENT_QUOTES, 'UTF-8');
+
+// Blade 自动转义
+{{ $username }}   // 安全的
+{!! $username !!} // 不转义——慎用`,
+          language: "php",
+        },
+        {
+          title: "CSRF——伪造请求跨站攻击",
+          content: `CSRF 是骗子用你已经登录的浏览器偷偷执行恶意操作。比如你在银行网站登录了，骗子页面偷偷发转账请求。防护：关键操作都要验证 token。Laravel 的 @csrf 指令就是干这个的。`,
+          code: `// Laravel Blade 表单
+<form method="POST" action="/transfer">
+    @csrf
+    <input name="amount">
+    <button>转账</button>
+</form>`,
+          language: "blade",
+        },
+        {
+          title: "密码与敏感数据处理",
+          content: `密码绝对不能存明文，也不能用 MD5 或 SHA1。PHP 用 password_hash()（底层 bcrypt）加密，password_verify() 验证。永远用这个内置函数，别自己造轮子。`,
+          code: `// 哈希密码
+$hash = password_hash($plainPassword, PASSWORD_BCRYPT);
+
+// 验证密码
+if (password_verify($plainPassword, $hash)) {
+    echo "密码正确";
+}
+
+// 检查是否需要重新加盐
+if (password_needs_rehash($hash, PASSWORD_BCRYPT)) {
+    $hash = password_hash($plainPassword, PASSWORD_BCRYPT);
+}`,
+          language: "php",
+          warning: "不要用 md5() 或 sha1() 存密码——它们对现代 GPU 来说秒破。password_hash 才是唯一正确的选择。",
+        },
+      ],
+      quiz: [
+        { question: "防 SQL 注入最有效的方法？", options: ["过滤特殊字符", "PDO 预处理语句——数据和 SQL 分离", "限制输入长度", "加 WAF"], answer: 1, explanation: "预处理语句是治本的方案——SQL 结构先编译好，参数只当数据填入，无论写什么都不会改变 SQL 语义。" },
+        { question: "XSS 攻击的原理？", options: ["偷服务器文件", "往页面注入 JavaScript 脚本执行恶意操作", "暴力破解密码", "DDoS 攻击"], answer: 1, explanation: "攻击者把 script 代码混进用户输入里，页面输出时脚本被执行——偷 cookie/劫持会话。" },
+        { question: "PHP 最安全的密码处理方法？", options: ["md5", "password_hash + password_verify", "sha1", "base64 编码"], answer: 1, explanation: "password_hash 使用 bcrypt 或 argon2——自带随机盐 + 自适应成本 + 抵抗彩虹表。" },
+        { question: "Laravel @csrf 做了什么？", options: ["加密数据", "生成隐藏表单字段包含 CSRF token，服务器验证匹配", "压缩请求", "跳转页面"], answer: 1, explanation: "@csrf 生成一个隐藏的 _token 字段，Laravel middleware 验证请求 token 和 session token 是否一致。" },
+        { question: "htmlspecialchars 默认会转义单引号吗？", options: ["会", "不会——需要加 ENT_QUOTES 才转义单引号", "只转义双引号", "取决于 PHP 版本"], answer: 1, explanation: "默认只转义双引号，加 ENT_QUOTES 才同时转义单引号——用在属性值里很重要。" },
+      ],
+    },
   },
   // ============ Mobile ============
   mobile: {
@@ -11401,6 +15453,743 @@ var body: some View {
         { question: "SwiftUI 和 UIKit 的关系？", options: ["相同", "SwiftUI 是新一代声明式 UI 框架，UIKit 是传统的命令式框架", "UIKit 是新框架", "SwiftUI 只能 iOS"], answer: 1, explanation: "SwiftUI 是 2019 年推出的声明式 UI 框架，用更简洁的代码描述界面，逐步替代 UIKit。" },
         { question: "@State 属性包装器干什么的？", options: ["持久化", "标记一个变量是状态源——变了自动刷新 UI", "网络请求", "数据存储"], answer: 1, explanation: "@State 是 SwiftUI 响应式 UI 的核心——View 中标记的变量值一改，SwiftUI 自动重新计算 body。" },
         { question: "VStack 和 HStack 分别表示什么？", options: ["列表和网格", "垂直堆叠和水平堆叠布局", "滚动视图和静态视图", "导航和标签"], answer: 1, explanation: "VStack 垂直排列子视图，HStack 水平排列——SwiftUI 最基础的布局组件。" },
+      ],
+    },
+    "swift-oop": {
+      slug: "swift-oop",
+      sections: [
+        {
+          title: "类与结构体——用 class 还是 struct？",
+          content: `Swift 里 class 是引用类型（改一个地方到处变），struct 是值类型（每次赋值都给一个拷贝）。大部分场景 Apple 推荐用 struct——线程安全、不会意外改数据。class 适合需要继承或者引用语义的时候。`,
+          code: `struct Point {
+    var x: Double
+    var y: Double
+
+    mutating func moveBy(dx: Double, dy: Double) {
+        x += dx; y += dy
+    }
+}
+
+class Square {
+    var side: Double
+    init(side: Double) { self.side = side }
+    var area: Double { side * side }
+}
+
+var p1 = Point(x: 0, y: 0)
+var p2 = p1           // 拷贝一个独立副本
+p2.x = 10             // 不影响 p1`,
+          language: "swift",
+        },
+        {
+          title: "枚举——带原始值和关联值",
+          content: `Swift 枚举两种玩法：Raw Value（每个 case 绑一个固定类型值）和 Associated Value（每个 case 可以附带不同类型的数据）。配合 switch 穷尽匹配。`,
+          code: `enum Direction: String {
+    case north = "北"
+    case south = "南"
+    case east, west
+}
+
+enum Result {
+    case success(data: String)
+    case error(code: Int, message: String)
+}
+
+let result = Result.success(data: "完成")
+switch result {
+case .success(let data): print("成功: \(data)")
+case .error(let code, let msg): print("错误 \(code): \(msg)")
+}`,
+          language: "swift",
+        },
+        {
+          title: "协议——类型之间的共同约定",
+          content: `Swift 的 Protocol 超强——可以给 struct/class/enum 都定协议约束。还能在协议里写默认实现（protocol extension）。常见的内置协议：Equatable、Codable、Identifiable。`,
+          code: `protocol Drawable {
+    func draw()
+}
+
+extension Drawable {
+    func printName() { print("我是可绘制的") }
+}
+
+struct Circle: Drawable {
+    func draw() { print("画一个圆") }
+}
+
+let c = Circle()
+c.draw()       // 画一个圆
+c.printName()  // 我是可绘制的（默认实现）`,
+          language: "swift",
+        },
+        {
+          title: "扩展——给已有类型加点料",
+          content: `Swift 的 extension 可以给任何类型（包括系统的）加方法、计算属性、遵循协议，但不能加存储属性。这跟 Obj-C 的 category 类似，但 Swift 的更强更安全。`,
+          code: `extension Int {
+    var squared: Int { self * self }
+    func isMultiple(of number: Int) -> Bool { self % number == 0 }
+}
+
+let num = 5
+print(num.squared)       // 25
+print(num.isMultiple(of: 2)) // false`,
+          language: "swift",
+          tip: "继承、协议、扩展是 Swift OOP 的三大法宝——组合使用方式比 Java 多很多自由度。",
+        },
+      ],
+      quiz: [
+        { question: "Swift 用 struct 还是 class 的默认选择？", options: ["class", "struct——值类型安全，Apple 优先推荐", "随便", "enum"], answer: 1, explanation: "Swift 社区推荐默认用 struct，值类型不可变不共享，线程安全。需要继承或引用语义再用 class。" },
+        { question: "extension 能添加存储属性吗？", options: ["能", "不能——只能加计算属性和方法", "取决于版本", "只能加方法"], answer: 1, explanation: "extension 只能添加计算属性、方法和协议遵循，存储属性只能在原始定义区声明。" },
+        { question: "Swift Protocol 跟 Java Interface 最像的是什么？", options: ["类", "定义方法签名契约，任何类型实现就遵循协议", "枚举", "结构体"], answer: 1, explanation: "都是定义一组能力要求，符合协议的类型必须实现。Swift 还多了 protocol extension 给默认实现。" },
+        { question: "struct 里 mutating 关键字的作用？", options: ["无意义", "标记方法会修改 struct 自身属性", "加速方法", "线程锁"], answer: 1, explanation: "struct 的实例默认不可变——给修改自身值的方法必须加 mutating 关键词。" },
+        { question: "Swift 枚举带原始值(RawValue)和关联值最大的区别？", options: ["一样", "原始值是每个 case 的固定常量，关联值是运行时动态附带的", "原始值更灵活", "关联值只限 String"], answer: 1, explanation: "RawValue 是 enum case 的固定数据，Associated Value 是每个 case 实例不同数据。一个编译期确定，一个运行时动态附带。" },
+      ],
+    },
+    "swift-async": {
+      slug: "swift-async",
+      sections: [
+        {
+          title: "async/await——告别回调地狱",
+          content: `Swift 5.5 引入 async/await，把异步代码写成同步的感觉。async 标记函数是异步的，await 在调用点等待结果——不阻塞线程，背后是幕后的 Task 调度。`,
+          code: `func fetchUser(id: Int) async throws -> User {
+    let url = URL(string: "https://api.example.com/user/\(id)")!
+    let (data, _) = try await URLSession.shared.data(from: url)
+    return try JSONDecoder().decode(User.self, from: data)
+}
+
+// 并发执行多个请求
+async let user = fetchUser(id: 1)
+async let posts = fetchPosts(userId: 1)
+let result = try await (user, posts)`,
+          language: "swift",
+        },
+        {
+          title: "Task——异步操作的容器",
+          content: `Task 是从同步世界跳到异步世界的桥梁。在同步代码中用 Task { } 启动异步任务。Task 有优先级、支持取消，是 Swift 并发框架的基本单元。`,
+          code: `Task {
+    do {
+        let user = try await fetchUser(id: 1)
+        print(user.name)
+    } catch {
+        print("请求失败: \(error)")
+    }
+}
+
+// 取消任务
+let task = Task {
+    // 持续检查 Task.isCancelled
+    for i in 0..<100 {
+        if Task.isCancelled { break }
+        // 干活...
+    }
+}
+task.cancel()`,
+          language: "swift",
+        },
+        {
+          title: "Actor——串行执行的线程安全容器",
+          content: `Actor 是类似 class 的类型，但它是顺序执行的——同一时刻只有一个调用访问 actor 内部状态，天然线程安全。用 await 调用 actor 的方法。`,
+          code: `actor BankAccount {
+    var balance: Double = 0
+
+    func deposit(amount: Double) {
+        balance += amount
+    }
+
+    func getBalance() -> Double {
+        return balance
+    }
+}
+
+let account = BankAccount()
+await account.deposit(amount: 100)
+let total = await account.getBalance()`,
+          language: "swift",
+        },
+        {
+          title: "MainActor——UI 更新在主线程",
+          content: `MainActor 是专为 UI 设计的全局 Actor。标记 @MainActor 的函数或类自动在主线程执行。更新 SwiftUI 的 @State 或 UIKit 的 UI 组件必须上 MainActor。`,
+          code: `@MainActor
+class ViewModel: ObservableObject {
+    @Published var users: [User] = []
+
+    func loadUsers() async {
+        let result = try await fetchUsers()
+        users = result  // 自动在主线程更新 UI
+    }
+}`,
+          language: "swift",
+          tip: "SwiftUI 里 View 的 body 自动在主线程——但你网络调用回来的闭包切回主线程用 await MainActor.run {}。",
+        },
+      ],
+      quiz: [
+        { question: "Swift async/await 与 GCD 的核心区别？", options: ["一样", "async/await 是结构化并发编译器保证，GCD 是手动管理队列", "GCD 更快", "async/await 不能取消"], answer: 1, explanation: "async/await 编译器帮你管理 suspend/resume，不用手动管理队列，代码线性写。" },
+        { question: "Actor 的作用是？", options: ["类", "线程安全的串行容器——同一时刻只有一个函数访问 actor 内部状态", "全局变量", "UI 组件"], answer: 1, explanation: "Actor 是并发安全的数据容器——内部状态串行访问不怕竞态，编译期帮你锁。" },
+        { question: "Task { } 是做什么的？", options: ["定义枚举", "在非 async 代码里启动一个异步任务", "创建 actor", "创建 class"], answer: 1, explanation: "Task 是异步任务容器——在同步代码中启动 async 函数，就像建立异步上下文。" },
+        { question: "MainActor 保证什么？", options: ["性能最快", "代码在主线程执行——安全更新 UI", "异步", "只用于网络"], answer: 1, explanation: "MainActor 标记函数跑在主线程。UI 框架严格要求 UI 更新在主线程，否则 crash。" },
+        { question: "async let 和 await 的区别？", options: ["一样", "async let 启动并发子任务，await 等待结果阻塞当前", "async let 更快", "没有区别"], answer: 1, explanation: "async let 声明一个并发子任务立即执行不过等结果；await 在需要使用时等子任务完成拿值。" },
+      ],
+    },
+    "swiftui-basics": {
+      slug: "swiftui-basics",
+      sections: [
+        {
+          title: "声明式 UI——描述界面长什么样不是怎么画",
+          content: `SwiftUI 的核心思想：界面 = 状态的函数。你只管描述 UI 在不同状态下长什么样子，SwiftUI 自动算出状态变化时需要刷新视图的哪一块。不用手动管 addSubview、removeFromSuperview。`,
+          code: `struct ContentView: View {
+    var body: some View {
+        VStack {
+            Text("SwiftUI")
+                .font(.largeTitle)
+                .foregroundColor(.blue)
+            Image(systemName: "star.fill")
+        }
+    }
+}`,
+          language: "swift",
+        },
+        {
+          title: "@State——视图自己的状态",
+          content: `@State 是 View 的私有状态源，变化时 SwiftUI 自动重绘 body。官方建议把 @State 设为 private。值类型 struct 里用 @State 必须 setter 调用时整个 View 会重新生成。`,
+          code: `struct CounterView: View {
+    @State private var count = 0
+
+    var body: some View {
+        VStack {
+            Text("Count: \(count)")
+            Button("加一") { count += 1 }
+        }
+    }
+}`,
+          language: "swift",
+        },
+        {
+          title: "@Binding——子视图借父视图的状态",
+          content: `@Binding 是子视图从父视图拿到的读写引用。父视图传 $ 前缀变量，子视图用 @Binding 接收——两边共享同一份数据，子改了父也能感知。`,
+          code: `struct ParentView: View {
+    @State private var text = ""
+
+    var body: some View {
+        ChildView(text: $text)  // 传 $ 给子视图
+    }
+}
+
+struct ChildView: View {
+    @Binding var text: String
+
+    var body: some View {
+        TextField("输入", text: $text)
+    }
+}`,
+          language: "swift",
+        },
+        {
+          title: "布局组件——VStack/HStack/ZStack",
+          content: `SwiftUI 三大布局容器：VStack 垂直排列、HStack 水平排列、ZStack 前后叠放。用 .padding()、Spacer()、.frame() 调整间距和大小，类似 Flexbox 但声明式。`,
+          code: `VStack(alignment: .leading, spacing: 10) {
+    HStack {
+        Image(systemName: "person")
+        Text("用户资料")
+        Spacer()
+        Button("编辑") {}
+    }
+    Divider()
+    Text("这是内容区域")
+}
+.padding()`,
+          language: "swift",
+          tip: "SwiftUI 最多只能嵌套 10 层子视图——超过用 Group 或 ForEach 包裹就不会被编译器限制了。",
+        },
+      ],
+      quiz: [
+        { question: "声明式 UI 和命令式 UI 的核心区别？", options: ["性能不同", "声明式描述 UI 长什么样由框架更新，命令式手动逐条绘", "声明式更慢", "命令式不用代码"], answer: 1, explanation: "声明式只描述 UI=状态函数的映射关系，SwiftUI 自动跟踪状态并更新界面。" },
+        { question: "@State 属性包装器起什么作用？", options: ["存储到磁盘", "标记视图私有的可变状态——改变时自动重绘 body", "只是注释", "加快编译"], answer: 1, explanation: "@State 是 View 的反应式状态引擎——只要被改了，关联视图自动刷新。" },
+        { question: "VStack 和 HStack 分别排列方向？", options: ["都是垂直", "VStack 垂直，HStack 水平", "都是水平", "VStack 对角线"], answer: 1, explanation: "V=vertical 垂直排列，H=horizontal 水平排列，ZStack 前后层叠。" },
+        { question: "@Binding 与 @State 的区别？", options: ["一样", "@State 是数据源(拥有)，@Binding 是借用父视图引用(不拥有)", "@Binding 性能更好", "@State 只能父视图用"], answer: 1, explanation: "@State 创建并持有状态(owner)，@Binding 只是借父视图状态的读写引用(reference)。" },
+        { question: "SwiftUI 视图 body 最多嵌套多少层？", options: ["无限制", "10 层——用 Group 或 @ViewBuilder 绕开限制", "5 层", "100 层"], answer: 1, explanation: "SwiftUI 的 ViewBuilder 只支持最多 10 个直接的子视图，嵌套递归或用 Group/ForEach 突破。" },
+      ],
+    },
+    "kotlin-android": {
+      slug: "kotlin-android",
+      sections: [
+        {
+          title: "Kotlin 与 Android——天生的拍档",
+          content: `Kotlin 是 Google 官方钦定的 Android 首选语言。比 Java 简洁——不用写分号、属性自动生成 getter/setter、null 安全（编译期防止 NullPointerException）。`,
+          code: `class User(
+    val name: String,
+    var age: Int? = null  // 可空类型
+)
+
+fun main() {
+    val u = User("张三")
+    println(u.name)          // 自动 getter
+    println(u.age?.toString() ?: "未知")  // 安全调用 + Elvis
+}`,
+          language: "kotlin",
+        },
+        {
+          title: "Activity 与生命周期",
+          content: `Activity 是 Android 应用的「一页」。它有生命周期：onCreate 创建、onStart 可见、onResume 获得焦点、onPause 失去焦点、onStop 不可见、onDestroy 销毁。管理好生命周期是 Android 开发的基本功。`,
+          code: `class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        textView.text = "Hello Kotlin!"
+    }
+}`,
+          language: "kotlin",
+        },
+        {
+          title: "Jetpack Compose——声明式 UI",
+          content: `Jetpack Compose 是 Android 的 SwiftUI 等价物——也是声明式 UI。@Composable 函数画出界面，State 变化时自动重组。不再需要 XML 布局文件。`,
+          code: `@Composable
+fun Greeting(name: String) {
+    var count by remember { mutableStateOf(0) }
+
+    Column {
+        Text("Hello, $name!")
+        Button(onClick = { count++ }) {
+            Text("点击次数: $count")
+        }
+    }
+}`,
+          language: "kotlin",
+        },
+        {
+          title: "ViewModel——管数据不丢",
+          content: `ViewModel 专门存 UI 相关数据并活过旋转屏幕等配置变更。LiveData 或 StateFlow 当数据容器，UI 层 observe 变化自动刷新。`,
+          code: `class UserViewModel : ViewModel() {
+    private val _user = MutableLiveData<User>()
+    val user: LiveData<User> = _user
+
+    fun loadUser(id: Int) {
+        viewModelScope.launch {
+            _user.value = api.getUser(id)
+        }
+    }
+}`,
+          language: "kotlin",
+          tip: "ViewModel 不持有 Activity 的引用——旋转屏幕 Activity 被重建但 ViewModel 活得好好，数据不丢。",
+        },
+      ],
+      quiz: [
+        { question: "Kotlin 相比 Java 的优势？", options: ["完全一样", "null 安全、扩展函数、协程、简洁语法", "更慢", "不兼容 Java"], answer: 1, explanation: "Kotlin 编译期 null 检查防 NPE，内置协程支持并发，简洁语法省大量模板代码。" },
+        { question: "Activity 生命周期中可见到不可见经过哪两步？", options: ["onCreate → onDestroy", "onPause → onStop——失去焦点然后完全不可见", "onStart → onStop", "onResume → onPause"], answer: 1, explanation: "Activity 从获得焦点到完全看不见经历 onPause(半透明覆盖) → onStop(全屏覆盖/离开)。" },
+        { question: "Jetpack Compose 比 XML 布局好在哪里？", options: ["不依赖 Kotlin", "声明式——UI 自动跟随 State，不用手动更新视图", "更快", "不需要代码"], answer: 1, explanation: "Compose 用 @Composable 函数 define UI，状态变化时自动重组——告别 findViewById 和 setText。" },
+        { question: "ViewModel 解决的核心问题？", options: ["缓存网络数据", "保留 UI 数据经历配置变更(旋转屏幕)不丢失", "加密", "下载文件"], answer: 1, explanation: "屏幕旋转导致 Activity 重建，ViewModel 不跟着死——数据还在，UI 重建后重新绑定即可。" },
+        { question: "Kotlin 里 ? 和 ?: 分别是什么？", options: ["注释和赋值", "可选类型安全调用和 Elvis 操作符默认值", "三元和二元", "空指针和延迟"], answer: 1, explanation: "a?.b 只在 a 不为 null 时访问 b；a ?: default 当 a 为 null 时返回 default 值。" },
+      ],
+    },
+    "kotlin-coroutines": {
+      slug: "kotlin-coroutines",
+      sections: [
+        {
+          title: "suspend——可暂停的函数",
+          content: `Kotlin 协程最独特的就是 suspend 修饰符。suspend 函数表示可以暂停线程（不阻塞），等数据到了再恢复。挂起时线程可以去干别的事，实现了真正的轻量级并发。`,
+          code: `suspend fun fetchUser(id: Int): User {
+    return withContext(Dispatchers.IO) {
+        // 网络请求——线程不会卡死
+        api.getUser(id)
+    }
+}
+
+// 启动协程
+fun main() = runBlocking {
+    val user = fetchUser(1)
+    println(user.name)
+}`,
+          language: "kotlin",
+        },
+        {
+          title: "Flow——冷数据流",
+          content: `Flow 是 Kotlin 的异步数据流——相当于 RxJava 的 Observable 但更轻。冷流（调 collect 才执行数据生产），支持 map、filter、flatMap 等操作。`,
+          code: `fun getUsers(): Flow<User> = flow {
+    for (i in 1..10) {
+        delay(100)
+        emit(User(id = i, name = "用户$i"))
+    }
+}
+
+getUsers()
+    .filter { it.id % 2 == 0 }
+    .map { it.name.uppercase() }
+    .collect { println(it) }`,
+          language: "kotlin",
+        },
+        {
+          title: "Channel——热数据通道",
+          content: `Channel 是协程之间的管道通信——一个协程往 channel 里发，另一个从 channel 里收。类似 Go 的 channel。适合生产者-消费者模式。`,
+          code: `val channel = Channel<Int>()
+
+launch {     // 生产者
+    for (i in 1..5) {
+        channel.send(i)
+    }
+    channel.close()
+}
+
+launch {     // 消费者
+    for (i in channel) {
+        println("收到: $i")
+    }
+}`,
+          language: "kotlin",
+        },
+        {
+          title: "协程作用域——管好协程的生命周期",
+          content: `协程必须在 CoroutineScope 里运行。viewModelScope 用于 ViewModel，lifecycleScope 用于 Activity/Fragment——生命周期结束时自动取消所有协程防止泄漏。`,
+          code: `// ViewModel 里的协程——ViewModel 销毁自动取消
+viewModelScope.launch {
+    val data = fetchData()
+    _state.value = data
+}
+
+// 带异常处理
+viewModelScope.launch {
+    try {
+        fetchData()
+    } catch (e: Exception) {
+        handleError(e)
+    }
+}`,
+          language: "kotlin",
+          tip: "永远别用 GlobalScope——挂靠在全局生命周期不会被自动清理，内存泄漏的罪魁祸首。",
+        },
+      ],
+      quiz: [
+        { question: "suspend 函数不阻塞线程的原理是什么？", options: ["线程暂停", "协程可以暂停/恢复——挂起时不占用线程资源", "sleep", "阻塞等待"], answer: 1, explanation: "suspend 函数在挂起点暂停协程寄存下来，底层调度器把线程派给其他协程，响应完成时再恢复。" },
+        { question: "Flow 是热流还是冷流？", options: ["热——发射后消费不管", "冷——有人 collect 才开始生产数据", "两者都是", "不确定"], answer: 1, explanation: "Flow 默认冷——不收集就停。StateFlow/SharedFlow 是热流——不管有没有监听都发射数据。" },
+        { question: "viewModelScope 的作用？", options: ["全局生命周期", "绑定 ViewModel 生命周期——清除时取消所有协程防泄漏", "加速协程", "去除异常"], answer: 1, explanation: "viewModelScope 绑定 ViewModel 的生命周期——ViewModel 销毁时自动 cancel 所有子协程。" },
+        { question: "Kotlin Channel 和 Go channel 像不像？", options: ["不一样", "非常像——都是协程/goroutine 间的安全通信管道", "Kotlin 没有", "Go 没有"], answer: 1, explanation: "都是 CSP 并发模型的体现——不共享内存来通信，而是通过管道通信来共享数据。" },
+        { question: "Dispatchers.IO 和 Dispatchers.Default 的区别？", options: ["一样", "IO 专门为阻塞 IO(网络/文件)设计，Default 为 CPU 密集计算", "Default 更多线程", "IO 不能用于网络"], answer: 1, explanation: "IO 调度器为阻塞任务动态开线程，Default 调度器跟 CPU 核心数绑定用于计算。" },
+      ],
+    },
+    "kotlin-spring": {
+      slug: "kotlin-spring",
+      sections: [
+        {
+          title: "Kotlin 集成 Spring Boot",
+          content: `Spring Boot 从 2.0 开始对 Kotlin 有一等公民支持。Kotlin 写 Spring 省掉大量模板代码——data class 替代 @Data、扩展函数、null 安全消除 NPE 风险。`,
+          code: `@SpringBootApplication
+class Application
+
+fun main(args: Array<String>) {
+    runApplication<Application>(*args)
+}
+
+@RestController
+@RequestMapping("/api/users")
+class UserController(val service: UserService) {
+
+    @GetMapping("/{id}")
+    fun getUser(@PathVariable id: Long): User =
+        service.findById(id) ?: throw NotFoundException()
+}`,
+          language: "kotlin",
+        },
+        {
+          title: "data class 替代 @Data 与构造注入",
+          content: `data class 一行替代 Java 里需要 @Entity + @Data + @AllArgsConstructor 的模板。Spring 的构造器注入在 Kotlin 里优雅到极致——一行属性声明就搞定。`,
+          code: `// 请求体——Kotlin 自动序列化
+data class CreateUserRequest(val name: String, val email: String)
+
+// JPA Entity
+@Entity
+data class User(
+    @Id @GeneratedValue val id: Long = 0,
+    val name: String,
+    val email: String
+)
+
+// Service——构造器自动注入
+@Service
+class UserService(val userRepo: UserRepository) {
+    fun findAll(): List<User> = userRepo.findAll()
+}`,
+          language: "kotlin",
+        },
+        {
+          title: "Ktor 对比——轻量级替代",
+          content: `Ktor 是 JetBrains 自己的异步 Web 框架——基于协程全异步。和 Spring 比 Ktor 轻量得多，适合微服务和 API 网关。Spring 适合重型企业架构。`,
+          code: `// Ktor 应用
+fun Application.module() {
+    routing {
+        get("/") {
+            call.respondText("Hello Ktor!")
+        }
+
+        get("/user/{id}") {
+            val id = call.parameters["id"]
+            call.respond(findUser(id))
+        }
+    }
+}`,
+          language: "kotlin",
+          tip: "小服务或团队熟悉 Kotlin 协程选 Ktor 更轻盈；企业系统复用 Spring 生态更稳妥。",
+        },
+      ],
+      quiz: [
+        { question: "Kotlin 写 Spring 最大的优势？", options: ["更快的启动", "无需 getter/setter 的 data class 和 null 安全避免 NPE", "更多功能", "完全替代 Java"], answer: 1, explanation: "Kotlin 的 data class 自动生成 equals/hashCode/copy，安全调用防 NPE，代码量削一半。" },
+        { question: "Ktor 和 Spring Boot 选哪个？", options: ["只 Spring", "Ktor 轻量异步适合微服务，Spring 企业级生态完整", "只 Ktor", "两个一样"], answer: 1, explanation: "Ktor 基于协程全异步轻量级，适合 API 服务。Spring 生态庞大，适合企业大型项目。" },
+        { question: "Kotlin 的 data class 做了什么？", options: ["定义一个数据库", "自动生成 eq/hash/copy/toString/componentN——一行顶 Java 二十行", "创建 XML", "管理生命周期"], answer: 1, explanation: "data class 是专门存放数据的类编译器自动生成常用方法，省掉 Java 的 @Data 注解。" },
+        { question: "Spring 构造器注入在 Kotlin 里怎么简化？", options: ["手动写 constructor", "类参数直接写属性——Spring 自动把它进构造器注入依赖", "不需要注入", "用 @Inject"], answer: 1, explanation: "Kotlin 主构造器的参数既是构造函数参数又是类属性，Spring 4.3+ 单构造函数自动 @Autowired。" },
+        { question: "Kotlin runApplication 函数是什么？", options: ["测试", "启动 Spring Boot 的 Kotlin 风格入口函数", "运行脚本", "编译"], answer: 1, explanation: "runApplication 是 Kotlin 的 Spring Boot 启动器——一行代码替代 SpringApplication.run。" },
+      ],
+    },
+    "flutter-state": {
+      slug: "flutter-state",
+      sections: [
+        {
+          title: "Provider——Google 推荐的简单状态管理",
+          content: `Provider 是 Google 官方推荐的最简单状态管理方案。原理是 InheritedWidget 的封装——通过 ChangeNotifier 和 Provider widget 把数据传给子组件并自动刷新。`,
+          code: `class Counter extends ChangeNotifier {
+    int _count = 0;
+    int get count => _count;
+
+    void increment() {
+        _count++;
+        notifyListeners();
+    }
+}
+
+// 主入口
+runApp(
+    ChangeNotifierProvider(
+        create: (_) => Counter(),
+        child: MyApp(),
+    ),
+);
+
+// 消费方——自动刷新
+final counter = context.watch<Counter>();
+Text('\${counter.count}');`,
+          language: "dart",
+        },
+        {
+          title: "Riverpod——Provider 的改良版",
+          content: `Riverpod 是 Provider 作者改写的新方案——解决了 Provider 的 context 依赖问题，支持懒创建、同类型多实例、自动销毁、编译时安全。推荐新项目直接用 Riverpod。`,
+          code: `final counterProvider = StateNotifierProvider<Counter, int>((ref) => Counter());
+
+// 组件中
+final count = ref.watch(counterProvider);
+Text('$count');
+
+// Riverpod 里改状态
+ref.read(counterProvider.notifier).increment();`,
+          language: "dart",
+        },
+        {
+          title: "Bloc——更完整的状态管理模式",
+          content: `Bloc 模式把 UI 分成 Event→Bloc→State 三部曲。UI 发送事件，Bloc 处理事件后送出新状态，UI 根据状态重建。职责分明、测试友好但模板代码较多。`,
+          code: `// Event
+abstract class CounterEvent {}
+class Increment extends CounterEvent {}
+
+// Bloc
+class CounterBloc extends Bloc<CounterEvent, int> {
+    CounterBloc() : super(0) {
+        on<Increment>((event, emit) => emit(state + 1));
+    }
+}
+
+// UI
+BlocBuilder<CounterBloc, int>(
+    builder: (context, count) => Text('$count'),
+)`,
+          language: "dart",
+          tip: "小项目用 Provider 或 Riverpod，中型项目选 Riverpod，大型团队需要严格的事件/状态分离选 Bloc。",
+        },
+      ],
+      quiz: [
+        { question: "Flutter Provider 的核心是什么？", options: ["数据库", "ChangeNotifier——数据变自动通知 UI 刷新", "路由", "文件管理"], answer: 1, explanation: "Provider 基于 ChangeNotifier——改状态后调用 notifyListeners，所有 listen 它的 widget 自动重渲染。" },
+        { question: "Riverpod 比 Provider 好在哪？", options: ["支持跨 context 访问—不依赖 BuildContext", "Provider 更快", "完全替代不需要", "一样"], answer: 1, explanation: "Riverpod 可以从任何地方读写状态不依赖 context，支持多个同类型 provider 共存。" },
+        { question: "Bloc 模式的流程是什么？", options: ["Widget→State→Event", "UI 发 Event→Bloc 处理→Bloc 输出新 State→UI 重建", "直接改状态", "无状态"], answer: 1, explanation: "Event 进、State 出——Bloc 接收事件处理后发射新状态，UI 响应状态变化。" },
+        { question: "notifyListeners() 的作用？", options: ["通知网络", "告诉所有监听者数据变了要刷新 UI", "销毁资源", "初始化变量"], answer: 1, explanation: "notifyListeners 是 ChangeNotifier 的核心——调用后所有 context.watch 的 widget 自动重绘。" },
+        { question: "Flutter 三种状态管理方案各自适用场景？", options: ["都一样", "Provider 小项目，Riverpod 中大型，Bloc 大团队", "都只用于大型", "都只用于小型"], answer: 1, explanation: "Provider 简单直接，Riverpod 更安全灵活，Bloc 事件/状态分离适合大型重团队。" },
+      ],
+    },
+    "flutter-navigation": {
+      slug: "flutter-navigation",
+      sections: [
+        {
+          title: "Navigator——推栈式路由",
+          content: `Flutter 导航是推栈模式——push 进栈显示新页面，pop 出栈回到上一页。Navigator.of(context).push(route)，导航到新页面；Navigator.of(context).pop() 返回。`,
+          code: `// 跳转到新页面
+Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => DetailPage()),
+);
+
+// 返回
+Navigator.pop(context);
+
+// 跳到根并清除所有中间页面
+Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(builder: (_) => HomePage()),
+    (route) => false,
+);`,
+          language: "dart",
+        },
+        {
+          title: "命名路由——给路由起名字",
+          content: `命名路由把页面路由集中管理。MaterialApp 中配置 routes 或 onGenerateRoute，跳转时 pushNamed("routeName")。适合页面少的应用。`,
+          code: `MaterialApp(
+    initialRoute: '/',
+    routes: {
+        '/': (_) => HomePage(),
+        '/detail': (_) => DetailPage(),
+    },
+);
+
+// 跳转
+Navigator.pushNamed(context, '/detail');
+
+// 带参数
+Navigator.pushNamed(context, '/detail', arguments: {'id': 42});
+final args = ModalRoute.of(context)!.settings.arguments as Map;`,
+          language: "dart",
+        },
+        {
+          title: "GoRouter——现代路由的首选",
+          content: `GoRouter 是 Flutter 社区后来居上的路由库——支持深链接、参数解析、重定向、嵌套路由。比 Navigator 更灵活和声明式。`,
+          code: `final router = GoRouter(
+    initialLocation: '/',
+    routes: [
+        GoRoute(
+            path: '/',
+            builder: (_, __) => HomePage(),
+        ),
+        GoRoute(
+            path: '/user/:id',
+            builder: (_, state) => UserPage(id: state.pathParameters['id']!),
+        ),
+    ],
+);
+
+// 使用
+context.go('/');
+context.go('/user/42');
+context.push('/detail');`,
+          language: "dart",
+        },
+      ],
+      quiz: [
+        { question: "Flutter 导航的基础模型是什么？", options: ["标签式切换", "栈——push 进栈 pop 出栈", "抽屉式", "手势滑动"], answer: 1, explanation: "Navigator 就像一堆卡片摞在一起，新页面 push 压在顶上，回退 pop 把最顶那张弹出。" },
+        { question: "GoRouter 比 Navigator 强在哪？", options: ["更好看", "深链接、路径参数、重定向——支持声明式路由", "无需 context", "只能在 Web 用"], answer: 1, explanation: "GoRouter 按路径匹配路由，天然支持 URL 参数、深层导航链接、路由守卫。" },
+        { question: "Navigator.pop(context) 做了什么？", options: ["打开新页面", "关闭当前页面回到上一个页面", "退出应用", "清除所有页面"], answer: 1, explanation: "pop 把栈顶那个页面弹掉——当前页面从栈里移除，露出被它盖住的上一页。" },
+        { question: "How to pass arguments to named routes?", options: ["Only URL", "pushNamed(route, arguments: data)", "只能全局变量", "不能"], answer: 1, explanation: "Navigator.pushNamed 的 arguments 参数可以传任意对象到路由页面。" },
+        { question: "pushAndRemoveUntil 中的 (route) => false 什么意思？", options: ["保留所有页面", "清空所有之前页面——当前页变成根", "删除当前", "随机删除"], answer: 1, explanation: "pushAndRemoveUntil 保留本页然后清空下面所有页面——新页面成了新的根。" },
+      ],
+    },
+    "flutter-network": {
+      slug: "flutter-network",
+      sections: [
+        {
+          title: "http 包——基本的异步请求",
+          content: `Flutter 的 http 包提供基本的 HTTP 请求。get、post 返回 Future<Response>。这是最轻量级的网络请求方式。`,
+          code: `import 'package:http/http.dart' as http;
+
+Future<void> fetchUsers() async {
+    final response = await http.get(
+        Uri.parse('https://api.example.com/users'),
+        headers: {'Authorization': 'Bearer token'},
+    );
+
+    if (response.statusCode == 200) {
+        print(response.body);
+    } else {
+        throw Exception('加载失败: \${response.statusCode}');
+    }
+}`,
+          language: "dart",
+        },
+        {
+          title: "Dio——http 的强力替代",
+          content: `Dio 是 Flutter 社区最流行的网络库。支持拦截器、超时、文件上传、请求重试、拦截器日志等高级功能。比 http 包强大多了。`,
+          code: `final dio = Dio(BaseOptions(
+    baseUrl: 'https://api.example.com',
+    connectTimeout: Duration(seconds: 5),
+    receiveTimeout: Duration(seconds: 3),
+));
+
+// 拦截器
+dio.interceptors.add(InterceptorsWrapper(
+    onRequest: (options, handler) {
+        options.headers['Authorization'] = 'Bearer token';
+        handler.next(options);
+    },
+    onError: (error, handler) {
+        print('请求失败: $error');
+        handler.next(error);
+    },
+));
+
+// 请求
+final response = await dio.get('/users');
+final response = await dio.post('/user', data: {'name': '张三'});`,
+          language: "dart",
+        },
+        {
+          title: "JSON 解析——fromJson/toJson 模式",
+          content: `Flutter 没有反射，JSON 解析不能像 Gson 自动处理——得手动写解析代码。惯例是加 fromJson 工厂函数和 toJson 方法。用 json_serializable 包可以自动生成避免手写。`,
+          code: `class User {
+    final int id;
+    final String name;
+    final String email;
+
+    User({required this.id, required this.name, required this.email});
+
+    factory User.fromJson(Map<String, dynamic> json) {
+        return User(
+            id: json['id'],
+            name: json['name'],
+            email: json['email'],
+        );
+    }
+
+    Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'email': email,
+    };
+}
+
+// 解析列表
+final data = jsonDecode(response.body);
+final users = (data as List).map((j) => User.fromJson(j)).toList();`,
+          language: "dart",
+        },
+        {
+          title: "异常处理——try-catch 兜底",
+          content: `网络请求是异常的高发区——超时、服务器挂了、数据格式不对都是家常便饭。Dio 的 Error 携带了状态码和响应信息，要分类处理。`,
+          code: `try {
+    final response = await dio.get('/users');
+    final users = (response.data as List)
+        .map((j) => User.fromJson(j))
+        .toList();
+} on DioException catch (e) {
+    switch (e.type) {
+        case DioExceptionType.connectionTimeout:
+            print('连接超时');
+            break;
+        case DioExceptionType.badResponse:
+            print('服务器错误: \${e.response?.statusCode}');
+            break;
+        default:
+            print('网络异常: $e');
+    }
+}`,
+          language: "dart",
+        },
+      ],
+      quiz: [
+        { question: "Dio 比 http 包多了什么？", options: ["没区别", "拦截器、请求/响应拦截、超时、文件上传、重试", "更简单", "同样功能"], answer: 1, explanation: "Dio 基于 http 但又加了拦截器链、请求重试、文件分块上传、全局配置等生产力特性。" },
+        { question: "Flutter 为什么不能像 Java 的 Gson 自动 JSON 反序列化？", options: ["性能不好", "Dart 不支持反射——没有运行时获取类的元数据的能力", "不需要", "不支持 JSON"], answer: 1, explanation: "Flutter 禁用了 dart:mirrors 反射包提高性能减小体积，所以得手动写解析。" },
+        { question: "Dio 拦截器能做什么？", options: ["改变 UI", "统一加 Token、日志打印、请求重试——装饰每个请求", "路由控制", "状态管理"], answer: 1, explanation: "拦截器是一个请求/响应处理的管道——统一加 Header、打印日志、加密/解密。" },
+        { question: "jsonDecode 返回什么类型？", options: ["String", "dynamic——需手动转型或判 is List / is Map", "User", "File"], answer: 1, explanation: "jsonDecode 返回 dynamic 类型——可能是 Map 也可能是 List，要根据 JSON 结构判断。" },
+        { question: "DioExceptionType 有什么用？", options: ["格式化错误", "分类网络故障——超时、DNS 失败、服务器错误等区分处理", "重试请求", "记录日志"], answer: 1, explanation: "通过 DioExceptionType 判断故障类型，做出不同处理——超时重试、服务器错误报给用户。" },
       ],
     },
   },
@@ -13672,6 +18461,324 @@ def factor(self):
         { question: "词法分析的输入和输出分别是什么？", options: ["输入AST，输出代码", "输入字符流，输出记号流", "输入记号，输出AST", "输入代码，输出可执行文件"], answer: 1, explanation: "词法分析器将源代码字符流转换为记号（Token）流，是编译的第一步。" },
         { question: "抽象语法树（AST）的作用是什么？", options: ["存储变量", "表示程序的结构化表示", "执行代码", "优化性能"], answer: 1, explanation: "AST 是程序的树状结构表示，保留了程序的语法结构，便于后续分析和代码生成。" },
         { question: "编译器前端主要做什么？", options: ["代码生成", "词法分析 -> 语法分析 -> 语义分析（生成中间代码）", "代码优化", "链接"], answer: 1, explanation: "前端把源码转换成中间表示——词法分析拆 token、语法分析建 AST、语义分析检查类型。" },
+      ],
+    },
+    "c-pointers": {
+      slug: "c-pointers",
+      sections: [
+        {
+          title: "指针是什么——就是存放地址的变量",
+          content: `指针其实就是存地址的变量。int x = 10; int *p = &x; ——p 里存的是 x 的内存地址，*p 是解引用取出地址里的值。懂了这句就懂了指针一半。`,
+          code: `int x = 10;
+int *p = &x;    // p 指向 x
+printf("%d\n", *p);  // *p = 10 解引用取值
+*p = 20;             // 通过指针改 x
+printf("%d\n", x);   // x = 20`,
+          language: "c",
+        },
+        {
+          title: "多级指针——指针指向另一个指针",
+          content: `二级指针存的是另一个指针的地址。int **pp = &p; ——pp 指向 p，p 指向 x。每多一个 * 就多一层间接访问。最多到三级，再多了你自己也晕。`,
+          code: `int x = 10;
+int *p = &x;     // 一级
+int **pp = &p;   // 二级——存 p 的地址
+int ***ppp = &pp; // 三级
+
+printf("%d\n", ***ppp);   // 10 三层解引用
+**pp = 20;                // 等于 *p = x = 20`,
+          language: "c",
+          tip: "多级指针主要在动态二维数组和函数传参改指针时用到一、二级。三级指针以上往往是设计问题。",
+        },
+        {
+          title: "函数指针——把函数当参数传递",
+          content: `函数名就是函数的地址——函数指针可以指向函数，然后通过指针调用。这让你可以把函数当作参数传给另一个函数（回调、排序比较函数、事件处理器）。`,
+          code: `// 定义函数指针类型
+typedef int (*Operation)(int, int);
+
+int add(int a, int b) { return a + b; }
+int multiply(int a, int b) { return a * b; }
+
+int calculate(Operation op, int x, int y) {
+    return op(x, y);  // 通过指针调用函数
+}
+
+printf("%d\n", calculate(add, 5, 3));       // 8
+printf("%d\n", calculate(multiply, 5, 3));  // 15`,
+          language: "c",
+        },
+        {
+          title: "void 指针——通用快递员",
+          content: `void * 是个万能指针——能指向任何类型的数据，但不能直接用 * 解引用，得先强制转换成具体类型。内存分配函数 malloc 返回的就是 void *，需要你自己 cast。`,
+          code: `int x = 42;
+double y = 3.14;
+
+void *vp;
+
+vp = &x;
+printf("%d\n", *(int*)vp);      // 42
+
+vp = &y;
+printf("%f\n", *(double*)vp);   // 3.14
+
+// malloc 也是 void指针
+int *arr = (int*)malloc(10 * sizeof(int));`,
+          language: "c",
+        },
+      ],
+      quiz: [
+        { question: "int *p = &x 中，p 存的是什么？", options: ["x 的值", "x 的内存地址", "随机值", "p 自己"], answer: 1, explanation: "p 存的是 x 的地址——指针就是存地址的变量。" },
+        { question: "二级指针 int **pp = &p 中 pp 指向了什么？", options: ["x", "一级指针 p 的地址", "随机地址", "x 的值"], answer: 1, explanation: "二级指针是存「另一个指针」的地址——pp 指向 p，p 指向 x。" },
+        { question: "函数指针怎么声明？", options: ["int *func()", "int (*func)(int, int)——func 是指向函数的指针", "int func(int, int)", "int *func(int)"], answer: 1, explanation: "int (*func)(int, int) 的 * 包裹指针名后用括号定义参数和返回值类型。" },
+        { question: "void 指针为什么解引用前要 cast？", options: ["更快", "编译器不知道实际类型大小——得先转成具体类型", "不需要", "自动转换"], answer: 1, explanation: "void * 擦除类型信息——只有你知道它实际是什么类型，编译器缺需要知道大小才能读写。" },
+        { question: "malloc 为什么返回 void *？", options: ["设计错误", "通用——你分配的空间你要什么类型自己 cast", "漏内存", "固定大小"], answer: 1, explanation: "malloc 只管分配字节不管类型——返回 void * 让你按需转成 int*, double* 等。" },
+      ],
+    },
+    "c-memory": {
+      slug: "c-memory",
+      sections: [
+        {
+          title: "malloc 和 free——手动管理内存",
+          content: `C 不会帮你清理垃圾——你用 malloc/calloc 申请的内存，必须用 free 还回去。忘了 free 就会内存泄漏——程序占的内存越来越多直到撑爆。`,
+          code: `// malloc——申请内存
+int *arr = (int*)malloc(100 * sizeof(int));
+if (arr == NULL) {
+    printf("内存分配失败\n");
+    return -1;
+}
+
+// 使用完后释放
+free(arr);
+arr = NULL;   // 防止悬空指针
+
+// calloc——申请并设零
+int *arr2 = (int*)calloc(100, sizeof(int));`,
+          language: "c",
+        },
+        {
+          title: "内存泄漏——吃肉忘记吐骨头",
+          content: `内存泄漏的典型症状：忘了 free、循环里 malloc 不释放、错误分支跳走了忘了清理。用 valgrind 工具能帮你检测泄漏——跑的时候告诉你在哪分配了没释放的内存。`,
+          code: `// 危险写法——内存泄漏
+void process() {
+    int *data = malloc(1000 * sizeof(int));
+    if (something_wrong) {
+        return;          // BUG: 没 free 就跑了！
+    }
+    // ... 用 data ...
+    free(data);
+}
+
+// 安全写法——统一出口
+void process() {
+    int *data = malloc(1000 * sizeof(int));
+    if (data == NULL) return;
+
+    if (something_wrong) {
+        free(data);     // 每个 return 都先 free
+        return;
+    }
+    free(data);
+}`,
+          language: "c",
+          warning: "每次 malloc 匹配一个 free——这是铁律。在 return 或 goto 前看看有没有遗漏的 free。",
+        },
+        {
+          title: "valgrind——内存检测神器",
+          content: `valgrind 是 C/C++ 程序的最强体检工具。能检测内存泄漏、越界访问、未初始化变量、use-after-free 等问题。Memcheck 是最常用的 valgrind 工具。`,
+          code: `# 编译时加 -g 保留调试符号
+gcc -g -o myapp myapp.c
+
+# valgrind 检测内存问题
+valgrind --leak-check=full ./myapp
+
+# 输出会告诉你：
+# 1. 哪个文件多少行分配了没释放的内存
+# 2. 有没有 use-after-free
+# 3. 有没有越界读写`,
+          language: "bash",
+          tip: "valgrind --leak-check=full 找出泄漏后定位到源代码行号，配合 -g 编译追踪准确。",
+        },
+      ],
+      quiz: [
+        { question: "malloc 失败时返回什么？", options: ["0", "NULL——分配失败返回空指针", "随机值", "自动退出"], answer: 1, explanation: "内存分配不够时 malloc 返回 NULL，必须检查——直接解引用 NULL 程序就炸。" },
+        { question: "valgrind 主要用来检查什么？", options: ["语法错误", "内存泄漏、越界、use-after-free", "编译错误", "性能优化"], answer: 1, explanation: "valgrind Memcheck 工具是 C/C++ 内存调试的标配——抓泄漏、无效读写、未初始化变量。" },
+        { question: "free(arr) 后为什么建议设 arr = NULL？", options: ["释放更多内存", "防止悬空指针——free 后指针还存着老地址不小心再读写就炸", "加快释放", "不影响"], answer: 1, explanation: "free 后指针不变但内存被回收了，这时候再用 *arr 行为未定义——置 NULL 后至少能发现。" },
+        { question: "内存泄漏最可能导致什么问题？", options: ["不影响", "程序占内存持续升高——最终 OOM 崩溃", "编译慢", "速度变快"], answer: 1, explanation: "内存只申请不释放，进程常驻时内存曲线一路飙升，直到系统 OOM killer 干掉进程。" },
+        { question: "calloc 比 malloc 多做了什么？", options: ["速度更快", "自动把分配的内存区域全清零", "分配更多", "不释放"], answer: 1, explanation: "calloc(count, size) 分配 count*size 个字节并初始化为 0——malloc 分配后内存是随机值。" },
+      ],
+    },
+    "cpp-stl": {
+      slug: "cpp-stl",
+      sections: [
+        {
+          title: "vector——动态数组的最爱",
+          content: `std::vector 是 C++ 使用最多的容器。底层是连续动态数组，自动扩缩容。push_back 尾部追加 emplace_back 省一次拷贝。比 C 数组安全数倍——范围越界能 check。`,
+          code: `#include <vector>
+#include <iostream>
+
+std::vector<int> v = {1, 2, 3};
+v.push_back(4);
+v.emplace_back(5);     // 省一次拷贝构造
+
+for (const auto& x : v) {
+    std::cout << x << " ";  // range-based for
+}
+
+v.pop_back();          // 删末尾
+v[2] = 10;             // 按索引读写`,
+          language: "cpp",
+        },
+        {
+          title: "map——自动键序的红黑树字典",
+          content: `std::map 底层是红黑树，键自动排序（字典序）。用 [] 取值——键不存在时自动创建默认值。不想自动插入用 find() 或 at()。std::unordered_map 是哈希表版更快但无序。`,
+          code: `#include <map>
+
+std::map<std::string, int> scores;
+scores["Alice"] = 95;
+scores["Bob"] = 87;
+
+// C++17 结构化绑定遍历
+for (const auto& [name, score] : scores) {
+    std::cout << name << ": " << score << "\n";
+}
+
+// find 不会自动插入
+auto it = scores.find("Alice");
+if (it != scores.end()) {
+    std::cout << it->second;  // 95
+}`,
+          language: "cpp",
+        },
+        {
+          title: "set——自动去重的集合",
+          content: `std::set 是红黑树实现的有序集合，元素不能重复。insert 插入（重复的失败），find 找，erase 删。unordered_set 是哈希版本去重更快但不排序。`,
+          code: `std::set<int> s = {3, 1, 2, 3, 1};
+for (int x : s) std::cout << x << " ";  // 1 2 3——自动排序并去重
+
+// 集合运算
+std::set<int> a = {1, 2, 3};
+std::set<int> b = {2, 3, 4};
+
+std::set<int> inter;
+std::set_intersection(a.begin(), a.end(), b.begin(), b.end(),
+                      std::inserter(inter, inter.begin()));
+// inter = {2, 3}`,
+          language: "cpp",
+        },
+        {
+          title: "algorithm——神仙算法包",
+          content: `<algorithm> 里算法多到数不清——sort、find、lower_bound、binary_search、unique、reverse。都用迭代器操作，任何容器都能套。不会用 algorithm 就是在浪费 C++。`,
+          code: `#include <algorithm>
+
+std::vector<int> v = {5, 2, 8, 1, 9};
+
+std::sort(v.begin(), v.end());
+// v = {1, 2, 5, 8, 9}
+
+auto it = std::find(v.begin(), v.end(), 8);
+if (it != v.end()) std::cout << "找到了";
+
+// 二分查找（容器必须有序）
+bool exists = std::binary_search(v.begin(), v.end(), 5);
+
+// unique 压缩重复元素
+auto last = std::unique(v.begin(), v.end());
+v.erase(last, v.end());`,
+          language: "cpp",
+        },
+      ],
+      quiz: [
+        { question: "vector 和 array 的核心区别？", options: ["一样", "vector 动态大小自动扩缩容，array 编译期固定大小", "array 更快", "vector 是链表"], answer: 1, explanation: "vector 是动态数组——运行时加删改元素，array 像 C 数组定长。" },
+        { question: "map 和 unordered_map 的本质区别？", options: ["一样", "map 红黑树排好序 O(log n)，unordered_map 哈希 O(1) 无序", "unordered_map 更慢", "map 是哈希表"], answer: 1, explanation: "map 底层红黑树自动按 key 排序 log n 查找；unordered_map 底层哈希桶 O(1) 但无序。" },
+        { question: "std::sort 排序用的是什么算法？", options: ["冒泡", "快速排序 + 插入排序 + 堆排序混合 O(n log n)", "选择排序", "O(n²)"], answer: 1, explanation: "标准库 sort 是 introsort（快排/堆排/插入排序混合），复杂度 O(n log n)。" },
+        { question: "emplace_back 和 push_back 的区别？", options: ["一样", "emplace_back 直接在容器内存构造，省一次临时对象的拷贝或移动", "push_back 更快", "只用于 map"], answer: 1, explanation: "emplace_back 转发参数在容器末尾内存原地构造——少一次临时对象的创建+移动。" },
+        { question: "迭代器是什么？", options: ["指针", "STL 容器元素的统一遍历接口——增删改查无差别访问", "算法库", "数据成员"], answer: 1, explanation: "迭代器是 STL 的桥梁——统一容器遍历方式。所有 algorithm 通过迭代器操作不关心具体容器是什么。" },
+      ],
+    },
+    "cpp-modern": {
+      slug: "cpp-modern",
+      sections: [
+        {
+          title: "auto——编译器自己推类型",
+          content: `C++11 的 auto 让编译器自己推断变量类型。迭代器类型那么长不用自己写了，lambda 类型只能写 auto，函数返回也可以用 auto 特别是配合 -> 尾返回类型。`,
+          code: `// auto 解绑手写类型
+auto i = 42;              // int
+auto s = "hello"s;        // std::string
+
+std::vector<int> v = {1, 2, 3};
+for (auto it = v.begin(); it != v.end(); ++it) {
+    // 没有 auto 得写 std::vector<int>::iterator
+}
+
+// 范围 for 配合 auto 最好
+for (auto& x : v) {
+    x *= 2;
+}`,
+          language: "cpp",
+        },
+        {
+          title: "lambda 表达式——行内函数",
+          content: `lambda 是 C++11 引入的匿名函数。[捕获](参数){函数体}。捕获外部变量用 [=] 值捕获或 [&] 引用捕获。[this] 捕获类成员。配合 algorithm 做回调的最爱。`,
+          code: `std::vector<int> v = {5, 2, 8};
+
+// 自定义排序 lambda
+std::sort(v.begin(), v.end(), [](int a, int b) {
+    return a > b;  // 降序
+});
+
+int threshold = 5;
+auto it = std::find_if(v.begin(), v.end(), [threshold](int x) {
+    return x > threshold;  // 捕获外部变量 threshold
+});`,
+          language: "cpp",
+        },
+        {
+          title: "智能指针——自动释放内存",
+          content: `C++11 给了三种智能指针，告别手动 delete。unique_ptr 独占所有权不能复制（move 可以）；shared_ptr 共享所有权（引用计数）；weak_ptr 旁观不参与计数打破循环引用。`,
+          code: `// unique_ptr——独占
+auto ptr = std::make_unique<User>("张三");
+ptr->getName();
+// auto p2 = ptr;  // 编译错误——unique 不能复制
+
+// shared_ptr——共享
+auto sptr1 = std::make_shared<int>(42);
+auto sptr2 = sptr1;  // 两者指向同一块内存
+// 最后一个 shared_ptr 析构时才真正释放
+
+// weak_ptr——破解循环引用
+std::weak_ptr<int> w = sptr1;
+if (auto sp = w.lock()) {
+    // weak_ptr 升级成 shared_ptr 安全访问
+}`,
+          language: "cpp",
+        },
+        {
+          title: "移动语义——搬家别复制",
+          content: `C++11 引入右值引用(T&&)和 std::move——把数据所有权从一个对象移到另一个对象，不用深拷贝。临时对象、函数返回值自动触发移动。如果类没有移动构造函数回退到拷贝。`,
+          code: `std::vector<int> v1 = {1, 2, 3};
+std::vector<int> v2 = std::move(v1);  // v1 空了，v2 拿走了所有权
+
+// 移动构造函数
+class Buffer {
+    int* data;
+    size_t size;
+public:
+    Buffer(int sz) : data(new int[sz]), size(sz) {}
+
+    Buffer(Buffer&& other) noexcept
+        : data(other.data), size(other.size) {
+        other.data = nullptr;   // 清空源对象
+    }
+};`,
+          language: "cpp",
+          tip: "带 std::move 的不是真移移，是给编译器一个「当右值处理」的信号。移完后源对象不应再用，除了可用 reset。",
+        },
+      ],
+      quiz: [
+        { question: "auto 什么时候必用？", options: ["看习惯", "lambda 类型无法写出——只能 auto 接收", "总是", "从不"], answer: 1, explanation: "lambda 表达式的类型是编译器生成的匿名类——人没法写出类型名，只能 auto 接收。" },
+        { question: "unique_ptr 为什么不能赋值给另一个 unique_ptr？", options: ["bug", "独占所有权——同一时刻只有一个 unique_ptr 持有数据", "性能", "没有重载"], answer: 1, explanation: "unique 是独占——不能复制，只能 std::move 转移所有权到另一个。" },
+        { question: "std::move 实际做了什么？", options: ["移动数据", "把左值标记成右值——告诉编译器「可以转移这个」", "释放内存", "交换内存"], answer: 1, explanation: "std::move 不移动——只是 static_cast 到右值引用，实际移动操作由类的移动构造函数完成。" },
+        { question: "shared_ptr 的引用计数什么时候释放内存？", options: ["离开作用域就释放", "最后一个 shared_ptr 析构时引用计数归零才 delete", "永远不会", "手动 delete"], answer: 1, explanation: "shared_ptr 内部维护引用计数——每份拷贝 +1，析构 -1，计数降到 0 才 delete。" },
+        { question: "C++11 哪三个智能指针标配？", options: ["std::ptr", "unique_ptr, shared_ptr, weak_ptr", "auto_ptr", "unique_ptr, auto_ptr, scope_ptr"], answer: 1, explanation: "C++11 正式推这三个——unique 独占，shared 共享，weak 破解循环引用。" },
       ],
     },
   },
