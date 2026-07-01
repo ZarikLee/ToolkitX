@@ -6,12 +6,15 @@ import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import { categories, type TutorialCategory } from "@/data/tutorials";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { getVisitCount, incrementVisitCount } from "@/lib/visit-counter";
 
 export default function LearnLayout({ children, category }: { children: React.ReactNode; category?: TutorialCategory }) {
+  const [visits] = useState(() => incrementVisitCount());
+
   return (
-    <div className="min-h-screen" style={{ background: "var(--background)", color: "var(--foreground)" }}>
+    <div className="min-h-screen flex flex-col" style={{ background: "var(--background)", color: "var(--foreground)" }}>
       {/* Header - fixed height */}
-      <header className="border-b h-14 flex items-center" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
+      <header className="border-b h-14 flex items-center shrink-0" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
         <div className="max-w-[1400px] mx-auto px-4 flex items-center justify-between gap-4 w-full">
           <Link href="/" className="shrink-0">
             <span className="text-xl font-bold" style={{ color: "var(--on-surface)" }}>ToolkitX</span>
@@ -24,7 +27,19 @@ export default function LearnLayout({ children, category }: { children: React.Re
       </header>
 
       {/* Content */}
-      {children}
+      <div className="flex-1">{children}</div>
+
+      {/* Footer */}
+      <footer className="border-t shrink-0" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
+        <div className="max-w-[1400px] mx-auto px-4 py-1.5 flex items-center justify-between text-xs" style={{ color: "var(--outline)" }}>
+          <div className="flex items-center gap-2">
+            <span className="font-semibold" style={{ color: "var(--secondary)" }}>ToolkitX</span>
+            <span>·</span>
+            <span>28 个技术栈 · 访问量：{visits}</span>
+          </div>
+          <span>&copy; 2026 ToolkitX</span>
+        </div>
+      </footer>
     </div>
   );
 }
