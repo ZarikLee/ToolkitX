@@ -20,7 +20,16 @@ export default function LearnLayout({ children, category }: { children: React.Re
             <span className="text-xl font-bold" style={{ color: "var(--on-surface)" }}>ToolkitX</span>
           </Link>
           {category && <HeaderSearch activeCategory={category} />}
+          {!category && <div className="flex-1 max-w-md" />}
           <div className="flex items-center gap-2 shrink-0">
+            <div className="flex rounded border overflow-hidden" style={{ borderColor: "var(--outline-variant)" }}>
+              <span className="px-3 py-1.5 text-xs font-medium" style={{ background: "var(--secondary)", color: "var(--on-secondary)" }}>
+                知识库
+              </span>
+              <Link href="/?mode=tools" className="px-3 py-1.5 text-xs font-medium transition-colors" style={{ color: "var(--on-surface-variant)" }}>
+                工具箱
+              </Link>
+            </div>
             <ThemeToggle />
           </div>
         </div>
@@ -30,7 +39,7 @@ export default function LearnLayout({ children, category }: { children: React.Re
       <div className="flex-1">{children}</div>
 
       {/* Footer */}
-      <footer className="border-t shrink-0" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
+      <footer className="border-t sticky bottom-0 z-10 shrink-0" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
         <div className="max-w-[1400px] mx-auto px-4 py-1.5 flex items-center justify-between text-xs" style={{ color: "var(--outline)" }}>
           <div className="flex items-center gap-2">
             <span className="font-semibold" style={{ color: "var(--secondary)" }}>ToolkitX</span>
