@@ -22602,7 +22602,14 @@ const slugMap: Record<string, Record<string, string>> = {
 export function getTutorialContent(categoryId: string, slug: string): TutorialContent | undefined {
   const mappedCategory = categoryMap[categoryId] || categoryId;
   const mappedSlug = slugMap[categoryId]?.[slug] || slug;
-  return tutorialContents[mappedCategory]?.[mappedSlug];
+  // Try mapped category first
+  let result = tutorialContents[mappedCategory]?.[mappedSlug];
+  if (result) return result;
+  // Fallback: search all sections for the slug
+  for (const section of Object.values(tutorialContents)) {
+    if (section[mappedSlug]) return section[mappedSlug];
+  }
+  return undefined;
 }
 
 export default tutorialContents;
