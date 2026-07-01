@@ -29,7 +29,7 @@ export function SubPageLayout({
         {/* Header */}
         <div className="flex items-center gap-3 mb-2 animate-fade-in">
           <Link
-            href="/"
+            href="/?mode=tools"
             className="btn-close"
             title="返回首页"
           >

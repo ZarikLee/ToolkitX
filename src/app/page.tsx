@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   Search,
   Terminal,
@@ -58,8 +59,10 @@ const iconMap: Record<string, React.ReactNode> = {
 
 type Mode = "knowledge" | "tools";
 
-export default function HomePage() {
-  const [mode, setMode] = useState<Mode>("knowledge");
+function HomePageContent() {
+  const searchParams = useSearchParams();
+  const initialMode = (searchParams.get("mode") as Mode) || "knowledge";
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [visitCount, setVisitCount] = useState(0);
@@ -292,5 +295,13 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen" style={{ background: "var(--background)" }} />}>
+      <HomePageContent />
+    </Suspense>
   );
 }
