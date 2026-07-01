@@ -1629,6 +1629,88 @@ HAVING AVG(salary) > 10000;`,
         { question: "GROUP BY 后面跟上多个列是什么意思？", options: ["报错", "按多列组合分组", "只按最后一列分组", "随机分组"], answer: 1, explanation: "多列分组就是按列的排列组合来分，比如按部门+职位分组，同一个部门同一个职位的算一组。" },
       ],
     },
+    "mongodb-intro": {
+      slug: "mongodb-intro",
+      sections: [
+        {
+          title: "MongoDB 是什么——文档数据库",
+          content: `MongoDB 是个 NoSQL 数据库，跟传统的 MySQL、PostgreSQL 完全不是一个路数。传统关系型数据库用「表」存数据，数据像 Excel 表格一样一行一行排列，每个字段都得提前定义好。MongoDB 用「文档」存数据——说白了就是存 JSON 对象。
+
+啥意思呢？比如你要存一个用户信息：
+
+关系型数据库得先建表，定义好 id 是整数、name 是字符串、email 是字符串……然后往里面插数据。MongoDB 直接扔一个 JSON 进去就行，不用提前定义结构。
+
+这就是 NoSQL 的理念：No = Not Only，不只有 SQL。数据结构灵活，字段可以随时加，不用担心 ALTER TABLE 那种麻烦事。`,
+        },
+        {
+          title: "文档、集合、数据库——三层结构",
+          content: `MongoDB 的结构分三层，对应关系型数据库很容易理解：
+
+- 数据库（Database）：跟 MySQL 里的 database 一回事
+- 集合（Collection）：相当于 MySQL 里的「表」
+- 文档（Document）：相当于 MySQL 里的「行」，但它是 JSON 格式
+
+一个集合里可以放结构完全不同的文档，比如这个文档有 name 和 age，另一个文档有 name 和 address，完全没问题。这在关系型数据库里是不可能的。
+
+文档用 BSON 格式存储（Binary JSON），支持 JSON 没有的数据类型，比如日期、ObjectId、二进制等。`,
+          code: `// 一个用户文档长这样
+{
+  _id: ObjectId("507f1f77bcf86cd799439011"),
+  name: "张三",
+  age: 25,
+  email: "zhangsan@example.com",
+  tags: ["编程", "游戏", "跑步"],
+  address: {
+    city: "北京",
+    street: "朝阳区"
+  },
+  createdAt: ISODate("2026-06-28T10:00:00Z")
+}`,
+          language: "javascript",
+          tip: "ObjectId 是 MongoDB 默认的主键，12 字节，包含时间戳、机器标识、进程 ID 和随机数，全球唯一。",
+        },
+        {
+          title: "安装与连接",
+          content: `本地开发装个 MongoDB 社区版就行。Mac 用 brew，Ubuntu 用 apt，Windows 直接下载安装包。
+
+装好后，mongosh 是 MongoDB 的命令行客户端（新版本替代了老旧的 mongo shell）。Compass 是官方图形界面，能可视化查看数据和执行查询，新手友好。`,
+          code: `# Mac 安装
+brew install mongodb-community
+brew services start mongodb-community
+
+# Ubuntu 安装
+sudo apt-get install mongodb-community
+
+# 连接数据库
+mongosh                    # 连接本地默认端口 27017
+mongosh "mongodb://localhost:27017/mydb"  # 连接指定数据库`,
+          language: "bash",
+        },
+        {
+          title: "MongoDB vs 关系型——啥时候用啥",
+          content: `不是所有场景都适合 MongoDB。理解它们各自的优势才能选对工具：
+
+MongoDB 更适合的场景：
+- 数据结构经常变化，字段不固定
+- 数据之间有嵌套关系（一个订单里面嵌着商品列表）
+- 需要水平扩展——数据量大到一台机器撑不住，MongoDB 的分片集群很成熟
+- 快速迭代开发，不想花时间设计表结构
+
+关系型数据库（MySQL/PostgreSQL）更适合：
+- 数据之间有复杂的多表关联（JOIN）
+- 需要严格的事务保证（银行转账这类）
+- 数据结构稳定，不会频繁变化
+- 需要复杂的聚合查询和报表`,
+        },
+      ],
+      quiz: [
+        { question: "MongoDB 里「集合」对应关系型数据库的什么？", options: ["行", "表", "数据库", "字段"], answer: 1, explanation: "集合（Collection）= 表（Table），里面装着一堆文档（Document）。" },
+        { question: "MongoDB 的文档用什么格式存储？", options: ["XML", "JSON（实际是 BSON）", "CSV", "YAML"], answer: 1, explanation: "文档用 BSON（Binary JSON）存，支持更多数据类型。写查询时跟操作 JSON 一样。" },
+        { question: "MongoDB 默认监听哪个端口？", options: ["3306", "5432", "27017", "6379"], answer: 2, explanation: "27017 是 MongoDB 默认端口——3306 是 MySQL，5432 是 PostgreSQL，6379 是 Redis。" },
+        { question: "ObjectId 由哪些部分组成？", options: ["随机字符串", "时间戳 + 机器标识 + 进程 ID + 随机数", "自增数字", "UUID"], answer: 1, explanation: "12 字节的 ObjectId 包含这些信息，保证了分布式环境下 ID 的唯一性。" },
+        { question: "什么场景更适合用 MongoDB 而非 MySQL？", options: ["银行转账", "数据结构常变、快速迭代、需要水平扩展", "纯表格数据", "固定结构的数据"], answer: 1, explanation: "MongoDB 的灵活 schema 和分片能力在快速变化和超大数据量场景下比关系型数据库有优势。" },
+      ],
+    },
     "mongodb-crud": {
       slug: "mongodb-crud",
       sections: [
@@ -2148,6 +2230,832 @@ db.users.stats()                   // 集合的详细统计`,
         { question: "选分片键最重要的原则是？", options: ["字段名短", "基数高、分布均匀、查询能覆盖", "必须是 _id", "必须是数字"], answer: 1, explanation: "基数高确保均匀分布，查询能覆盖避免广播到所有分片。" },
         { question: "mongos 的作用是什么？", options: ["存储数据", "路由——客户端连它，它根据分片键转发请求", "备份数据", "监控"], answer: 1, explanation: "mongos 是分片集群的入口，客户端连 mongos 而不是直接连分片，mongos 负责把请求路由到正确的分片上。" },
         { question: "哈希分片相比范围分片，优势是？", options: ["范围查询更快", "数据分布更均匀，写入不倾斜", "总能用索引", "不需要分片键"], answer: 1, explanation: "哈希分片把数据打散分布到各分片，写入压力均匀。但牺牲了范围查询的效率。" },
+      ],
+    },
+    "subqueries": {
+      slug: "subqueries",
+      sections: [
+        {
+          title: "子查询是个啥",
+          content: `子查询说白了就是套娃——一个 SELECT 语句里再塞一个 SELECT。外层查询把内层查询的结果当条件用。为什么不用 JOIN 呢？有些场景子查询写起来更直觉，读代码的人一眼就懂「先找出这些人，再查他们的订单」。
+
+子查询分两大类：非关联子查询（内层不依赖外层，跑一次就行）和关联子查询（内层用了外层的列，外层每行内层都得跑一遍）。`,
+        },
+        {
+          title: "IN 和 EXISTS 子查询",
+          content: `IN 就是「在不在这个名单里」，EXISTS 就是「存不存在」。多数时候能互换，但 EXISTS 遇到大表有优势——找到第一条匹配就收手，不用生成完整列表：`,
+          code: `-- IN 子查询：找有订单的用户
+SELECT username FROM users
+WHERE id IN (SELECT DISTINCT user_id FROM orders);
+
+-- NOT IN：找没下过单的用户
+SELECT username FROM users
+WHERE id NOT IN (SELECT user_id FROM orders);
+
+-- EXISTS：效率比 IN 高的场景
+SELECT username FROM users u
+WHERE EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id);
+
+-- NOT EXISTS：找没下过单的用户
+SELECT username FROM users u
+WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id);`,
+          language: "sql",
+          tip: "如果子查询结果里可能包含 NULL，尽量用 EXISTS 代替 IN。NOT IN 遇到 NULL 会全盘返回空——这是很多人踩过的坑。",
+        },
+        {
+          title: "关联子查询",
+          content: `关联子查询的特点是内层引用了外层的列——等于外层每走一行，内层就拿这行的值去跑一遍。听起来慢，但配合 EXISTS 有时比 JOIN 还快。
+
+ANY 和 ALL 又是啥呢？ANY 就是「比集合里任意一个大/小就行」，ALL 是「比集合里所有都大/小」：`,
+          code: `-- 查工资高于本部门平均工资的员工（关联子查询）
+SELECT name, salary, dept_id
+FROM employees e
+WHERE salary > (
+  SELECT AVG(salary) FROM employees
+  WHERE dept_id = e.dept_id
+);
+
+-- ANY：工资比 A 部门任意一个人高就行
+SELECT name FROM employees
+WHERE salary > ANY (SELECT salary FROM employees WHERE dept_id = 'A');
+
+-- ALL：工资比 A 部门所有人都高
+SELECT name FROM employees
+WHERE salary > ALL (SELECT salary FROM employees WHERE dept_id = 'A');
+
+-- 关联子查询做 UPDATE
+UPDATE orders o SET status = 'vip'
+WHERE amount > (SELECT AVG(amount) FROM orders WHERE user_id = o.user_id);`,
+          language: "sql",
+          warning: "子查询别套太深，三层的 SQL 已经很难读了。能拆成两步就用 WITH（CTE）拆，代码可维护性比炫技重要。",
+        },
+        {
+          title: "WITH 子句（CTE）",
+          content: `CTE 就是起个临时名字给子查询用——代码可读性直接起飞。还能把一个 CTE 套另一个，叫递归 CTE，树形结构的好帮手：`,
+          code: `-- 普通 CTE：看起来像先定义了一个临时表
+WITH high_value_users AS (
+  SELECT id, username FROM users WHERE level = 'vip'
+)
+SELECT h.username, o.amount
+FROM high_value_users h
+JOIN orders o ON h.id = o.user_id
+WHERE o.amount > 1000;
+
+-- 递归 CTE：查组织结构树（从大老板往下找所有下属）
+WITH RECURSIVE org_tree AS (
+  SELECT id, name, manager_id, 1 AS depth
+  FROM employees WHERE manager_id IS NULL
+  UNION ALL
+  SELECT e.id, e.name, e.manager_id, t.depth + 1
+  FROM employees e
+  JOIN org_tree t ON e.manager_id = t.id
+)
+SELECT * FROM org_tree ORDER BY depth, manager_id;`,
+          language: "sql",
+          tip: "递归 CTE 跑循环时要注意深度——MySQL 默认递归最多 1000 层，处理特别深的树结构得留意。",
+        },
+      ],
+      quiz: [
+        { question: "关联子查询和外层查询是什么关系？", options: ["没关联", "内层用外层的列，外层每行内层都执行一次", "外层用内层的列", "执行顺序相反"], answer: 1, explanation: "关联子查询的内层引用了外层的列，外层每走到一行，内层都会用这行的值重新执行。" },
+        { question: "NOT IN 碰上空值会出现什么问题？", options: ["报错", "返回空结果", "忽略空值", "把空值当正常值"], answer: 1, explanation: "NOT IN 子查询结果里如果有 NULL，整个 NOT IN 就返回空，因为任何值跟 NULL 比较都是 unknown。" },
+        { question: "EXISTS 和 IN 哪个更快？", options: ["IN 总是更快", "EXISTS 总是更快", "看情况：子查询大结果集时 EXISTS 更优", "完全一样"], answer: 2, explanation: "EXISTS 找到第一条就停，IN 需要先生成整个子查询结果。子查询返回行多时 EXISTS 有优势。" },
+        { question: "WITH 子句（CTE）主要解决什么问题？", options: ["加速查询", "让复杂 SQL 拆成小块，可读性更好", "替代索引", "替代 JOIN"], answer: 1, explanation: "CTE 给子查询起个名字，把大 SQL 拆成几步，代码看起来清晰，也方便多次引用同一个子查询。" },
+        { question: "ANY 和 ALL 的区别是什么？", options: ["没区别", "ANY 满足集合中随便一个就行，ALL 必须满足集合中所有", "ALL 只用于数字", "ANY 只用于字符串"], answer: 1, explanation: "> ANY(1,3,5) 大于 1 就行，> ALL(1,3,5) 必须大于 5。一个是部分门槛，一个是最高门槛。" },
+      ],
+    },
+    "indexes": {
+      slug: "indexes",
+      sections: [
+        {
+          title: "索引是啥——数据库的目录页",
+          content: `一本书没有目录，想找「索引」这个词得从头翻到尾。数据库也一样——没索引就叫全表扫描，几百万行数据一行行看，慢得要死。
+
+索引本质是 B+Tree 这种数据结构，把一列或多列的值排好序存起来。查数据时先搜索引找到页码，再根据页码精确捞数据——不用扫全表。代价是占用额外磁盘空间，写操作变慢（因为索引也要同步更新）。`,
+        },
+        {
+          title: "建索引和 EXPLAIN 分析",
+          content: `EXPLAIN 是 SQL 优化的眼睛——它告诉你怎么查的：走的哪个索引、扫了多少行、有没有用到文件排序。看到 type=ALL（全表扫描）一般就得加索引了：`,
+          code: `-- 创建索引
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_orders_user_date ON orders(user_id, created_at);
+CREATE UNIQUE INDEX idx_users_username ON users(username);
+
+-- 查看执行计划
+EXPLAIN SELECT * FROM users WHERE email = 'alice@example.com';
+-- 关注字段：type(访问类型), key(用了哪个索引), rows(预计扫描行数), Extra
+
+EXPLAIN FORMAT=JSON SELECT * FROM users WHERE email = 'alice@example.com';
+-- 更详细，能看到具体开销
+
+-- 删除索引
+DROP INDEX idx_users_email ON users;
+
+-- 查看表上现有索引
+SHOW INDEX FROM users;`,
+          language: "sql",
+          tip: "EXPLAIN 的 type 列是个宝：const > eq_ref > ref > range > index > ALL。出现 ALL 就是全表扫，基本必须优化。",
+        },
+        {
+          title: "覆盖索引和回表",
+          content: `覆盖索引就是查询需要的所有列都在索引里，不用额外回表拿数据——等于在索引上就把活干完了，性能顶天。
+
+回表的意思是索引里找到主键，还得根据主键去聚簇索引里读完整数据。这就是为啥 SELECT * 比 SELECT 具体列慢——覆盖索引完全用不上。
+
+还有最左前缀原则：联合索引 (a, b, c) 相当于免费附赠 (a) 和 (a,b) 的索引，但如果单独查 b 或 c 就用不上：`,
+          code: `-- 覆盖索引示例
+CREATE INDEX idx_users_cover ON users(name, age, city);
+
+-- 这个查询走覆盖索引，不回表
+SELECT name, age, city FROM users WHERE name = 'Alice';
+
+-- 这个需要回表拿 email 和 phone
+SELECT * FROM users WHERE name = 'Alice';
+
+-- 最左前缀：联合索引 (name, age, city)
+-- 能用索引：WHERE name = 'Alice'
+-- 能用索引：WHERE name = 'Alice' AND age = 30
+-- 能用索引：WHERE name = 'Alice' AND age = 30 AND city = 'Beijing'
+-- 不能用：WHERE age = 30（跳过了 name）
+-- 不能用：WHERE city = 'Beijing'（跳过了前两列）`,
+          language: "sql",
+          tip: "设计索引时把区分度高的列放前面，比如 (status, user_id) 不如 (user_id, status)，因为 user_id 区分度高，索引选择性更好。",
+        },
+        {
+          title: "索引优化套路",
+          content: `索引不是越多越好——每多一个索引，INSERT/UPDATE/DELETE 就多一份开销。记住几个原则就行：
+
+1. WHERE、JOIN、ORDER BY 常用列——先加索引
+2. 联合索引比多个单列索引更靠谱——MySQL 一次查询基本只能用一条索引
+3. 不用在超低区分度的列上建索引（比如性别、布尔字段），优化器可能直接全表扫
+4. 查询时别在索引列上套函数——WHERE DATE(created_at) = '2026-01-01' 用不上索引，写成 WHERE created_at >= '2026-01-01' AND created_at < '2026-01-02'
+5. 前缀索引适合长字符串列——只索引前 20 个字符也能筛掉大部分不匹配的行`,
+        },
+      ],
+      quiz: [
+        { question: "EXPLAIN 里 type=ALL 代表什么？", options: ["用了索引", "全表扫描，得加索引优化", "覆盖索引", "唯一索引"], answer: 1, explanation: "ALL 就是一行行翻——最慢的方式，通常意味当前查询没用到合适的索引。" },
+        { question: "最左前缀原则是什么意思？", options: ["只建最左边的索引", "联合索引按最左列开头才生效", "索引建在最左边", "索引只能按最左边查"], answer: 1, explanation: "联合索引 (a,b,c) 只有查询条件以 a 开头（a 或 a,b 或 a,b,c）才能发挥索引作用。" },
+        { question: "覆盖索引解决了什么问题？", options: ["覆盖更多数据", "查询字段全在索引里，不用回表拿数据", "覆盖多个表", "覆盖所有索引列"], answer: 1, explanation: "需要查的列都在索引里，数据库直接在索引树上就拿到了结果，省掉根据主键再查聚簇索引的回表步骤。" },
+        { question: "为什么 SELECT 具体列比 SELECT * 可能更快？", options: ["* 是全量数据", "具体列可能走覆盖索引，不用回表", "具体列更快编译", "* 需要转换类型"], answer: 1, explanation: "如果需要的列都在索引里，覆盖索引直接返回了。但 SELECT * 总有列不在索引里，必须回表。" },
+        { question: "联合索引 (a,b,c) 里，WHERE a=? AND c=? 能用上索引吗？", options: ["能", "只能用到 a 列的索引，c 用不上", "完全用不了", "只用到 c 列"], answer: 1, explanation: "a 开头所以能用到索引，但中间跳了 b，c 就发挥不了 index 过滤作用——只能做条件过滤但不走索引查找。" },
+      ],
+    },
+    "transactions": {
+      slug: "transactions",
+      sections: [
+        {
+          title: "事务是啥——打包操作",
+          content: `事务就是把一组 SQL 操作打包成一个整体——要么全成功，要么全撤销。银行转账就是典型：扣 A 的钱和加 B 的钱必须同时成功，不能扣了 A 的钱 B 没收到。
+
+事务有四个特性，简称 ACID：
+- 原子性（Atomicity）：一荣俱荣一损俱损，不成功就回滚
+- 一致性（Consistency）：数据从一种合法状态变到另一种合法状态
+- 隔离性（Isolation）：并发事务互不干扰
+- 持久性（Durability）：事务提交了的数据就丢不了`,
+        },
+        {
+          title: "基本事务操作",
+          content: `MySQL 里默认每条 SQL 自动提交。想手动控制事务得先关了自动提交或者包在 BEGIN/COMMIT 里。ROLLBACK 就是后悔药——提交之前反悔了全撤回去：`,
+          code: `-- 关闭自动提交（MySQL 会话级）
+SET autocommit = 0;
+
+-- 事务基本操作
+BEGIN;           -- 开始事务（也可用 START TRANSACTION）
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+COMMIT;          -- 提交：确认干活
+
+-- 回滚：反悔了
+BEGIN;
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+-- 突然发现转错了！
+ROLLBACK;        -- 回到 BEGIN 那一刻的状态
+
+-- 设置回滚点（大事务里很实用）
+BEGIN;
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+SAVEPOINT after_debit;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+-- 发现后面这段有问题，只回滚到 savepoint
+ROLLBACK TO SAVEPOINT after_debit;
+COMMIT;`,
+          language: "sql",
+          tip: "大事务别一次性搞太多行——会锁表太久影响别人。拆成小批次提交，每 1000 行左右提交一次。",
+        },
+        {
+          title: "隔离级别",
+          content: `隔离级别控制并发事务之间的可见性——你能看到别人还没提交的数据吗？标准 SQL 定义了四种级别：
+
+READ UNCOMMITTED——最松，能看到别人还没提交的内容（脏读），基本不用
+READ COMMITTED——只能看别人提交了的数据，Oracle 和 PG 默认级别。问题是同一个事务里查两次可能结果不同（不可重复读）
+REPEATABLE READ——事务开始后查多少次数据都一样，MySQL InnoDB 默认。但可能产生幻读（两次查询之间别人插了新行）
+SERIALIZABLE——最严，事务一个个串行执行，彻底杜绝并发问题，但性能最差`,
+          code: `-- 查看和设置隔离级别
+SHOW VARIABLES LIKE 'transaction_isolation';
+
+SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;
+SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;`,
+          language: "sql",
+          warning: "别随便改隔离级别。MySQL InnoDB 的 REPEATABLE READ 已经够应付 95% 的场景了。",
+        },
+        {
+          title: "锁——行锁和表锁",
+          content: `多个事务同时改同一行数据怎么办？靠锁机制。InnoDB 默认用行锁——哪行被改就锁哪行，不锁别的行，并发性能好。
+
+遇到死锁别慌——两个事务互相等对方的锁释放，数据库会检测到然后回滚其中一个。应用层拿到死锁异常重试就行了：`,
+          code: `-- 排他锁（for update——除了我别人不能改）
+BEGIN;
+SELECT * FROM accounts WHERE id = 1 FOR UPDATE;
+-- 此时其他事务不能对这行加排他锁，但可以读快照
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+COMMIT;
+
+-- 共享锁（lock in share mode——别人也能读但不能改）
+BEGIN;
+SELECT * FROM accounts WHERE id = 1 LOCK IN SHARE MODE;
+COMMIT;
+
+-- 查看当前锁争用
+SHOW ENGINE INNODB STATUS;  -- 找 LATEST DETECTED DEADLOCK 段`,
+          language: "sql",
+          tip: "减少死锁的套路：按相同顺序更新多行（先锁 id=1 再 id=2，别倒过来）、事务尽量短、合适索引（没索引的行锁会升级成表锁）。",
+        },
+      ],
+      quiz: [
+        { question: "COMMIT 和 ROLLBACK 的区别？", options: ["一样", "COMMIT 确认保存，ROLLBACK 撤销回滚", "COMMIT 更快", "ROLLBACK 只回滚部分"], answer: 1, explanation: "COMMIT 把事务里的变更永久写进去，ROLLBACK 全撤销——后悔药。" },
+        { question: "InnoDB 默认隔离级别是什么？", options: ["READ UNCOMMITTED", "READ COMMITTED", "REPEATABLE READ", "SERIALIZABLE"], answer: 2, explanation: "MySQL InnoDB 默认 REPEATABLE READ，保证了同一个事务里多次读的数据一致。" },
+        { question: "什么是脏读？", options: ["读取损坏数据", "读到别的事务还没提交的数据", "读取过期数据", "读取重复数据"], answer: 1, explanation: "脏读就是事务 A 读到了事务 B 还没提交的修改——万一 B 回滚了，A 读到的就是垃圾数据。" },
+        { question: "SELECT FOR UPDATE 干了什么？", options: ["加速查询", "读取时对查询行加排他锁", "更新数据", "删除数据"], answer: 1, explanation: "FOR UPDATE 在读取的同时就给这些行上排他锁，防止别人在你提交前修改——常用于扣库存这种场景。" },
+        { question: "死锁是怎么产生的？", options: ["锁太多了", "两个事务互相等对方的锁释放", "数据库崩溃", "连接太多"], answer: 1, explanation: "事务 A 锁了行 1 等行 2，事务 B 锁了行 2 等行 1——互相卡死，数据库检测到后回滚其中一个。应用层收到异常重试就好。" },
+      ],
+    },
+    "window-functions": {
+      slug: "window-functions",
+      sections: [
+        {
+          title: "窗口函数是啥",
+          content: `窗口函数跟聚合函数有点像，但聚合是把一堆行压成一行，窗口函数是每行都给一个计算结果——不压缩行数。就像给每行开一扇窗，透过窗能看到周围的数据。
+
+OVER() 就是那扇窗——它定义了你从当前行能看到哪些行（分区+排序）。窗口函数能做排名、前后对比、累计求和这些聚合做不到的事。`,
+        },
+        {
+          title: "排名函数",
+          content: `排名有三个兄弟：
+ROW_NUMBER()——不管分数一样不一样，从 1 开始一路编号到底
+RANK()——分数一样就并列，比如两个第一，下一个是第三
+DENSE_RANK()——也是并列，但下一个接着排（两个第一，下一个是第二）`,
+          code: `-- 按工资排名
+SELECT name, department, salary,
+  ROW_NUMBER() OVER (ORDER BY salary DESC) AS rn,
+  RANK() OVER (ORDER BY salary DESC) AS rk,
+  DENSE_RANK() OVER (ORDER BY salary DESC) AS dr
+FROM employees;
+-- 结果：两个最高工资并列 80000
+-- ROW_NUMBER: 1, 2, 3...
+-- RANK: 1, 1, 3...
+-- DENSE_RANK: 1, 1, 2...
+
+-- 按部门内排名
+SELECT name, department, salary,
+  RANK() OVER (PARTITION BY department ORDER BY salary DESC) AS dept_rank
+FROM employees;
+-- 每个部门内部各自排名`,
+          language: "sql",
+          tip: "大部分时候 RANK 和 DENSE_RANK 用哪个取决于业务需求——发奖金用 RANK（并排都第一，下一个第三是合理的），选前 N 个人用 ROW_NUMBER 严格限人数。",
+        },
+        {
+          title: "LEAD 和 LAG——前后看看",
+          content: `LAG 回头看上一行，LEAD 往前看下一行。经典场景是算环比——这个月跟下个月差多少，或者找连续登录天数：`,
+          code: `-- 看每个员工和工资最高的同事差多少
+SELECT name, department, salary,
+  LEAD(name, 1) OVER (PARTITION BY department ORDER BY salary DESC) AS next_richer,
+  LAG(name, 1) OVER (PARTITION BY department ORDER BY salary DESC) AS prev_poorer,
+  salary - LEAD(salary, 1) OVER (PARTITION BY department ORDER BY salary DESC) AS salary_gap
+FROM employees;
+
+-- 找连续登录天数（经典面试题）
+WITH user_dates AS (
+  SELECT user_id, login_date,
+    LAG(login_date) OVER (PARTITION BY user_id ORDER BY login_date) AS prev_date
+  FROM user_logins
+)
+SELECT user_id, login_date,
+  CASE WHEN DATEDIFF(login_date, prev_date) = 1 THEN '连续' ELSE '断了' END AS is_consecutive
+FROM user_dates;`,
+          language: "sql",
+        },
+        {
+          title: "PARTITION BY 和窗口聚合",
+          content: `PARTITION BY 就是把数据分成几个小团体（部门、地区等），窗口函数在各自团体内独立运算：`,
+          code: `-- 累计金额（跑流水）
+SELECT order_date, amount,
+  SUM(amount) OVER (ORDER BY order_date) AS running_total,
+  SUM(amount) OVER (ORDER BY order_date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS weekly_roll
+FROM orders;
+
+-- 移动平均（窗口帧的含义）
+-- ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING 前后各两行
+-- ROWS UNBOUNDED PRECEDING 从第一行到当前
+-- ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING 当前到末尾
+
+-- 每个部门工资占比
+SELECT name, department, salary,
+  salary * 100.0 / SUM(salary) OVER (PARTITION BY department) AS pct_of_dept
+FROM employees;`,
+          language: "sql",
+        },
+      ],
+      quiz: [
+        { question: "窗口函数和 GROUP BY 聚合有什么区别？", options: ["没区别", "窗口函数每行都有结果，聚合函数多行压成一行", "窗口函数更快", "聚合函数用于排序"], answer: 1, explanation: "聚合把一堆行打包输出一行，窗口函数保留每一行同时附上窗口计算的值——不改变行数。" },
+        { question: "RANK() 和 ROW_NUMBER() 的区别？", options: ["一样", "RANK 允许并列跳过后续序号，ROW_NUMBER 严格递增", "ROW_NUMBER 更快", "RANK 只在 MySQL 能用"], answer: 1, explanation: "ROW_NUMBER 不给并列——1,2,3,4；RANK 遇到并列给相同序号并跳过相应位数——1,1,3,4。" },
+        { question: "LAG(column, 2) 是什么意思？", options: ["往后看两行", "往前看两行", "汇总两行", "跳过两行"], answer: 0, explanation: "LAG 是回头看上一行（往前回溯），参数 2 表示回去两行而不是一行。" },
+        { question: "PARTITION BY department 在窗口函数里做啥？", options: ["按部门排序", "按部门分组——各算各的窗口", "过滤部门", "去重部门"], answer: 1, explanation: "PARTITION BY 把数据分成几个区域（部门），每个区域内独立计算窗口函数——相当于每个部门都有一块自己的小窗口。" },
+        { question: "OVER (ORDER BY date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) 描述了什么？", options: ["前后 6 行", "当前行往前 6 行加当前行——共 7 行窗口", "未来 6 行", "全部行"], answer: 1, explanation: "6 PRECEDING 往前数 6 行，CURRENT ROW 是当前行，合起来就是包含当前行在内的最近 7 行——典型滑窗，用来算 7 日移动平均。" },
+      ],
+    },
+    "mysql-admin": {
+      slug: "mysql-admin",
+      sections: [
+        {
+          title: "用户和权限管理",
+          content: `MySQL 的用户管理说白了就是「谁能从哪儿登录、能干什么」。用户 'alice'@'localhost' 和 'alice'@'%' 是两个完全不同的用户——localhost 是本地登录，% 是任意 IP。很多人踩过这个坑——远程连不上以为是密码错了：`,
+          code: `-- 创建用户
+CREATE USER 'alice'@'localhost' IDENTIFIED BY 'StrongPass123!';
+CREATE USER 'alice'@'%' IDENTIFIED BY 'StrongPass123!';
+
+-- 授权（给 alice 操作 mydb 数据库的全部权限）
+GRANT ALL PRIVILEGES ON mydb.* TO 'alice'@'%';
+-- 只读权限
+GRANT SELECT ON mydb.* TO 'bob'@'%';
+-- 刷新权限表
+FLUSH PRIVILEGES;
+
+-- 查看用户权限
+SHOW GRANTS FOR 'alice'@'%';
+
+-- 撤销权限
+REVOKE DELETE ON mydb.* FROM 'alice'@'%';
+
+-- 改密码
+ALTER USER 'alice'@'%' IDENTIFIED BY 'NewStrongPass456!';
+
+-- 删用户
+DROP USER 'alice'@'%';`,
+          language: "sql",
+          warning: "生产环境别用 GRANT ALL ON *.* TO 'root'@'%'——等于把银行金库密码贴大门上。按最小权限原则来，用啥给啥。",
+        },
+        {
+          title: "备份与恢复——mysqldump",
+          content: `备份就像数据库的存档——出了事有回档可以读。mysqldump 是最常用的备份工具，原理是把数据库结构+数据导出成一堆 SQL 语句。缺点是大表巨慢，生产库建议用 xtrabackup 这类物理备份：`,
+          code: `# 备份单库
+mysqldump -u root -p mydb > mydb_20260101.sql
+
+# 备份所有库
+mysqldump -u root -p --all-databases > all_dbs.sql
+
+# 只备份表结构不要数据
+mysqldump -u root -p --no-data mydb > schema.sql
+
+# 只备份数据不要结构
+mysqldump -u root -p --no-create-info mydb > data.sql
+
+# 远程备份
+mysqldump -h 192.168.1.100 -u root -p mydb > remote_backup.sql
+
+# 恢复
+mysql -u root -p mydb < mydb_20260101.sql
+# 或者登录后
+mysql> source /path/to/mydb_20260101.sql;`,
+          language: "bash",
+          tip: "mysqldump 不加 --single-transaction 会锁表导致业务中断。备份脚本一定记得加——配合 cron 每天凌晨跑就是最简单的备份方案。",
+        },
+        {
+          title: "主从复制",
+          content: `主从复制就是一台主库写，多台从库读——读多写少的业务，从库能把读请求分流，还能当备份：`,
+          code: `# 主库配置 my.cnf
+[mysqld]
+server-id = 1
+log_bin = /var/log/mysql/mysql-bin.log
+binlog_format = ROW
+
+# 创建复制用户
+CREATE USER 'repl'@'%' IDENTIFIED BY 'repl_password';
+GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';
+
+# 查看主库状态（记下 File 和 Position）
+SHOW MASTER STATUS;
+
+# 从库配置 my.cnf
+[mysqld]
+server-id = 2
+relay_log = /var/log/mysql/mysql-relay-bin.log
+read_only = ON
+
+# 从库执行
+CHANGE MASTER TO
+  MASTER_HOST='192.168.1.100',
+  MASTER_USER='repl',
+  MASTER_PASSWORD='repl_password',
+  MASTER_LOG_FILE='mysql-bin.000001',
+  MASTER_LOG_POS=107;
+
+START SLAVE;
+SHOW SLAVE STATUS\\G;  -- 看 IO 和 SQL 线程是不是 Yes`,
+          language: "bash",
+          tip: "从库设 read_only=ON 防止误在里面写数据——Super 用户不受限制但普通连接不行，等于给从库加了保护锁。",
+        },
+        {
+          title: "慢查询日志",
+          content: `慢查询日志就是记录跑得慢的 SQL——打开它再配合 pt-query-digest 分析，能揪出性能瓶颈。生产环境记得设合理的阈值，别一行不差记录浪费磁盘：`,
+          code: `-- 启用慢查询日志
+SET GLOBAL slow_query_log = ON;
+SET GLOBAL slow_query_log_file = '/var/log/mysql/slow.log';
+SET GLOBAL long_query_time = 1;   -- 超过 1 秒就算慢
+
+-- my.cnf 永久配置
+[mysqld]
+slow_query_log = ON
+slow_query_log_file = /var/log/mysql/slow.log
+long_query_time = 1
+log_queries_not_using_indexes = ON   -- 没走索引的也记录
+
+-- 分析慢查询
+mysqldumpslow -s t -t 10 /var/log/mysql/slow.log  -- 按时间排前10
+pt-query-digest /var/log/mysql/slow.log           -- 更专业的工具`,
+          language: "bash",
+          tip: "慢不代表一定有问题——定时批量处理自然慢。重点关注频繁出现的慢查询和没走索引的查询，那是真正的性能杀手。",
+        },
+      ],
+      quiz: [
+        { question: "MySQL 里 'alice'@'localhost' 和 'alice'@'%' 是什么关系？", options: ["同一个用户", "两个独立的用户", "后者包含前者", "不能同时存在"], answer: 1, explanation: "MySQL 用户名和来源 IP 一起确定唯一用户，不同来源不同身份，权限也是分开管的。" },
+        { question: "mysqldump 备份数据加上 --single-transaction 的作用？", options: ["用事务避免锁表", "单表备份", "单线程备份", "只备份数据"], answer: 0, explanation: "开启一个事务拿到一致性快照，备份不锁表，不影响业务运行。不加这个参数备份时可能会锁表。" },
+        { question: "主从复制里 relay_log 是干嘛的？", options: ["错误日志", "从库用来中继主库 binlog 到本地执行", "慢查询日志", "操作审计"], answer: 1, explanation: "IO 线程把主库 binlog 拉过来存到 relay log，SQL 线程再一条条执行 relay log 里的内容，这样完成复制。" },
+        { question: "slow_query_log 对生产有什么影响？", options: ["数据库变快", "占用磁盘、轻微性能消耗", "增大缓存", "减少连接数"], answer: 1, explanation: "每条慢 SQL 都写日志有磁盘 IO 开销，但比起问题排查的价值来说是值的。合理设 long_query_time，别设太低。" },
+        { question: "SHOW SLAVE STATUS 里 IO 线程和 SQL 线程都显示 Yes 代表什么？", options: ["从库挂了", "复制链路正常", "主库有问题", "需要重启"], answer: 1, explanation: "IO=Yes 表示主库 relay log 正常接收，SQL=Yes 表示 relay log 里的 SQL 正常执行，双 Yes 就是一切正常。" },
+      ],
+    },
+    "postgresql-intro": {
+      slug: "postgresql-intro",
+      sections: [
+        {
+          title: "PostgreSQL 入门——PG 跟 MySQL 啥区别",
+          content: `PG 和 MySQL 是开源数据库两大王者。MySQL 好上手、生态广、互联网公司最爱；PG 更严谨——类型系统更丰富、标准 SQL 支持更彻底、复杂查询优化更强。简单说：创业赶进度用 MySQL，企业级复杂业务用 PG。GitHub 上大部分高级项目默认支持 PG 是有原因的。`,
+        },
+        {
+          title: "基础操作",
+          content: `PG 里把数据库叫 database，一个连接同一时间只能连一个数据库——不像 MySQL 可以随时 USE 切换。psql 是 PG 的命令行客户端，反斜杠开头的是元命令（不是 SQL）：`,
+          code: `# 登录
+psql -U postgres -d mydb
+
+# psql 内常用命令
+\\l          # 列出所有数据库（= SHOW DATABASES）
+\\c mydb     # 切换到 mydb 数据库（= USE mydb）
+\\dt         # 列出当前库的所有表（= SHOW TABLES）
+\\d users    # 查看 users 表结构（= DESCRIBE users）
+\\du         # 列出所有用户
+\\q          # 退出
+
+# 命令行执行 SQL
+psql -U postgres -d mydb -c "SELECT * FROM users LIMIT 5;"`,
+          language: "bash",
+          tip: "PG 里用户等于角色（role），没有单独的 user 概念。CREATE ROLE 和 CREATE USER 本质上一样，区别是 USER 默认带 LOGIN 权限。",
+        },
+        {
+          title: "JSONB——数据库里的 NoSQL",
+          content: `PG 的 JSONB 是杀手锏——在关系型数据库里用文档存储，既可以灵活存 JSON，又可以建 GIN 索引加速查询，兼得两者的好处。JSONB 存的是二进制格式，查询比存纯文本的 JSON 快得多：`,
+          code: `-- 建表，products 列是 JSONB 类型
+CREATE TABLE orders (
+  id SERIAL PRIMARY KEY,
+  user_id INT,
+  products JSONB
+);
+
+-- 插入
+INSERT INTO orders (user_id, products)
+VALUES (1, '[{"name": "book", "qty": 2}, {"name": "pen", "qty": 5}]');
+
+-- 查询 JSON 内部字段
+SELECT * FROM orders WHERE products @> '[{"name": "book"}]';
+SELECT products->>0 AS first_product FROM orders;  -- 取第一个产品
+
+-- 更新 JSON 里的值
+UPDATE orders SET products = products || '[{"name": "eraser", "qty": 1}]';
+
+-- 建 GIN 索引加速 JSONB 查询
+CREATE INDEX idx_orders_products ON orders USING GIN (products);`,
+          language: "sql",
+          tip: "存 API 返回的 JSON 原样保留时用 JSONB——既能按 JSON 内部字段查询，又能保持原始结构，比拆成十几张关联表省事多了。",
+        },
+        {
+          title: "数组和 SERIAL",
+          content: `PG 还支持数组字段——一列能存多个值。这在 MySQL 里得建关联表才能实现。SERIAL 是 PG 的自增 ID 语法，本质上是个帮你自动创建 SEQUENCE 的快捷方式：`,
+          code: `-- 数组类型
+CREATE TABLE teams (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100),
+  members TEXT[]    -- 数组：["alice","bob","charlie"]
+);
+
+INSERT INTO teams (name, members) VALUES ('Team A', '{alice,bob,charlie}');
+
+-- 数组查询
+SELECT * FROM teams WHERE 'alice' = ANY(members);
+SELECT * FROM teams WHERE array_length(members, 1) > 2;
+
+-- SERIAL 本质
+-- CREATE TABLE users (id SERIAL PRIMARY KEY);
+-- 等价于：
+-- CREATE SEQUENCE users_id_seq;
+-- CREATE TABLE users (id INT DEFAULT nextval('users_id_seq') PRIMARY KEY);
+
+-- SEQUENCE 操作
+SELECT currval('users_id_seq');  -- 上次生成的 ID
+SELECT nextval('users_id_seq');  -- 拿下个 ID 并递增`,
+          language: "sql",
+          tip: "数组不是用于无限关联的替代品——适合存少量固定字段（标签、技能列表），别把全公司的员工 ID 塞数组里，那玩意就没救了。",
+        },
+      ],
+      quiz: [
+        { question: "PG 跟 MySQL 本质区别是什么？", options: ["PG 更便宜", "PG 更严谨、类型更丰富、标准 SQL 支持更好", "PG 不是关系型数据库", "MySQL 不支持 SQL"], answer: 1, explanation: "PG 对标准 SQL 的支持更完整，类型系统更丰富（JSONB、数组等），复杂查询优化器更智能。" },
+        { question: "PG 里 JSONB 跟普通 JSON 类型的区别？", options: ["JSONB 存二进制更方便查询和索引", "JSONB 是纯文本", "都一样", "JSONB 不能建索引"], answer: 0, explanation: "JSONB 是二进制格式存储，支持 GIN 索引，查询更快；JSON 是存原样文本，每次查都要重新解析。" },
+        { question: "PG 里怎么切换数据库？", options: ["USE dbname;", "\\c dbname", "SWITCH dbname;", "SELECT dbname;"], answer: 1, explanation: "PG 的 psql 里用 \\c + 数据库名来切换，不像 MySQL 用 USE——PG 每个连接线程只能对一个数据库。" },
+        { question: "SERIAL 背后的实现是什么？", options: ["数据库自动加 1 的逻辑", "SEQUENCE 序列对象", "触发器", "存储过程"], answer: 1, explanation: "SERIAL 实际是通过 SEQUENCE 实现的——创建一个序列对象，再用 nextval 函数自动取下一个值。" },
+        { question: "PG 的 TEXT[] 表示什么？", options: ["文本字段", "文本数组——一列可以存多个文本值", "多行文本", "文本索引"], answer: 1, explanation: "TEXT[] 是数组字段，一列可以存多个文本值，像标签列表这种场景正合适。" },
+      ],
+    },
+    "views-and-sp": {
+      slug: "views-and-sp",
+      sections: [
+        {
+          title: "视图——虚拟出来的表",
+          content: `视图说白了就是「给一条 SELECT 语句起个名字」。你有一长串复杂的查询、跨好几张表 JOIN 来 JOIN 去，每次都要敲一遍？太蠢了。把这条查询保存成一个视图，以后直接 SELECT FROM 视图就行，跟查普通表一模一样。
+
+视图里不存数据——它就是一层「壳」，每次查视图，数据库都在后台帮你跑那条 SELECT 语句。所以视图也叫「虚拟表」：
+- 底层数据变了，视图查出来的结果自动跟着变
+- 简化复杂查询——把一长串 SQL 封装成一个简单名字
+- 权限控制——只让某些人看视图，不让他们碰底层表`,
+          code: `-- 创建视图：把员工信息和部门名称拼在一起
+CREATE VIEW employee_view AS
+SELECT e.id, e.name, e.salary, d.dept_name
+FROM employees e
+JOIN departments d ON e.dept_id = d.id;
+
+-- 查视图，跟查表一模一样
+SELECT * FROM employee_view WHERE salary > 10000;
+
+-- 查视图带排序
+SELECT dept_name, COUNT(*) AS emp_count
+FROM employee_view
+GROUP BY dept_name
+ORDER BY emp_count DESC;
+
+-- 修改视图定义
+CREATE OR REPLACE VIEW employee_view AS
+SELECT e.id, e.name, e.salary, e.hire_date, d.dept_name
+FROM employees e
+JOIN departments d ON e.dept_id = d.id;
+
+-- 删视图
+DROP VIEW IF EXISTS employee_view;
+
+-- 可更新视图：简单视图也能往里面 INSERT/UPDATE（单表、无聚合函数）
+CREATE VIEW active_employees AS
+SELECT id, name, department FROM employees WHERE status = 'active';
+
+-- 通过视图插数据——实际插入了原表
+INSERT INTO active_employees (name, department) VALUES ('小王', '研发部');
+-- 注意插完这行在视图里能看到，但 status 是 NULL 可能在视图查不出来`,
+          language: "sql",
+          tip: "视图本身不占存储空间（物化视图除外），它就是个「快捷方式」。但别层层嵌套视图——套了三四层查询效率会很难看，MySQL 优化器对这玩意不太聪明的样子。",
+        },
+        {
+          title: "存储过程——数据库里写程序",
+          content: `存储过程就是把一组 SQL 语句打包成一个「程序」，存在数据库里，想用的时候直接调用。跟编程语言里的函数差不多——可以接收参数、可以有变量、可以有条件判断和循环。
+
+为什么要把逻辑写在数据库里而不是应用代码里？
+- 减少网络往返——应用发一条 CALL 命令，数据库内部跑一堆操作，只把最终结果传回来
+- 封装业务逻辑——比如「下单」涉及扣库存、写订单、扣积分三步，一个存储过程全包了
+- 权限控制——只给用户 CALL 过程的权限，不让他们直接碰表`,
+          code: `-- 最简单的存储过程：查所有员工
+DELIMITER $$
+CREATE PROCEDURE get_all_employees()
+BEGIN
+  SELECT * FROM employees;
+END $$
+DELIMITER ;
+
+CALL get_all_employees();
+
+-- 带输入参数：查某部门的员工
+DELIMITER $$
+CREATE PROCEDURE get_employees_by_dept(IN dept_name VARCHAR(50))
+BEGIN
+  SELECT e.name, e.salary
+  FROM employees e
+  JOIN departments d ON e.dept_id = d.id
+  WHERE d.dept_name = dept_name;
+END $$
+DELIMITER ;
+
+CALL get_employees_by_dept('研发部');
+
+-- 带输出参数：统计部门人数
+DELIMITER $$
+CREATE PROCEDURE count_dept_employees(IN dept_name VARCHAR(50), OUT total INT)
+BEGIN
+  SELECT COUNT(*) INTO total
+  FROM employees e
+  JOIN departments d ON e.dept_id = d.id
+  WHERE d.dept_name = dept_name;
+END $$
+DELIMITER ;
+
+-- 调用输出参数的过程
+CALL count_dept_employees('研发部', @count);
+SELECT @count;   -- 输出结果
+
+-- 带 INOUT 参数：传入传出同一个变量
+DELIMITER $$
+CREATE PROCEDURE double_value(INOUT num INT)
+BEGIN
+  SET num = num * 2;
+END $$
+DELIMITER ;
+
+SET @val = 10;
+CALL double_value(@val);
+SELECT @val;  -- 20`,
+          language: "sql",
+          warning: "存储过程写多了会给数据库增加「逻辑债」——业务逻辑散落在应用代码和数据库里，团队交接、版本控制、调试都会变麻烦。能用应用代码搞定的就别往存储过程里塞。",
+        },
+        {
+          title: "自定义函数——存进数据库的算盘",
+          content: `函数跟你写的存储过程挺像的，但有几个关键区别：
+- 函数必须有返回值（RETURNS 声明），过程可以没有
+- 函数可以在 SELECT 里直接调用（SELECT my_func(x)），过程要用 CALL
+- 函数里不能改数据（MySQL 默认禁止函数里执行 INSERT/UPDATE/DELETE）
+- 函数适合做计算、格式转换、判断逻辑
+
+说白了一句话：需要返回一个值参与查询选函数，需要做一堆操作选过程：`,
+          code: `-- 最简单的函数：返回固定值
+DELIMITER $$
+CREATE FUNCTION say_hello() RETURNS VARCHAR(50)
+DETERMINISTIC
+BEGIN
+  RETURN 'Hello, World!';
+END $$
+DELIMITER ;
+
+SELECT say_hello();   -- Hello, World!
+
+-- 有参数的函数：计算税后工资
+DELIMITER $$
+CREATE FUNCTION calc_after_tax(salary DECIMAL(10,2), tax_rate DECIMAL(3,2))
+RETURNS DECIMAL(10,2)
+DETERMINISTIC
+BEGIN
+  DECLARE result DECIMAL(10,2);
+  SET result = salary * (1 - tax_rate);
+  RETURN result;
+END $$
+DELIMITER ;
+
+SELECT name, salary, calc_after_tax(salary, 0.2) AS after_tax
+FROM employees;
+
+-- 用 IF 条件判断的函数：评级
+DELIMITER $$
+CREATE FUNCTION get_level(salary DECIMAL(10,2))
+RETURNS VARCHAR(10)
+DETERMINISTIC
+BEGIN
+  DECLARE level VARCHAR(10);
+  IF salary >= 20000 THEN
+    SET level = '高级';
+  ELSEIF salary >= 10000 THEN
+    SET level = '中级';
+  ELSE
+    SET level = '初级';
+  END IF;
+  RETURN level;
+END $$
+DELIMITER ;
+
+SELECT name, salary, get_level(salary) AS level FROM employees;
+
+-- 查看和删除
+SHOW FUNCTION STATUS WHERE Db = 'mydb';
+DROP FUNCTION IF EXISTS calc_after_tax;`,
+          language: "sql",
+          tip: "DETERMINISTIC 告诉 MySQL 这个函数「同样输入永远同样输出」，MySQL 在优化时可能缓存结果——像取当前时间这种就得用 NOT DETERMINISTIC。",
+        },
+        {
+          title: "逻辑流控制——分支和循环",
+          content: `存储过程和函数里光靠 SQL 不够——有时需要「如果这样就这么办，否则那么办」或者「把这几条记录一条条处理」。这就得靠流程控制语句了。MySQL 里提供了 IF、CASE、LOOP、WHILE、REPEAT 这些经典结构。
+
+游标这个玩意要认真说——它就是让你在过程里「逐行遍历」查询结果。但用之前先想想能不能用一条 SQL 搞定：游标效率低、代码长的要死，SQL 里能批量处理的就别逐行搞。只有极度复杂的逐行业务逻辑才值得用游标：`,
+          code: `-- IF / ELSE
+DELIMITER $$
+CREATE PROCEDURE adjust_salary(IN emp_id INT, IN rating CHAR(1))
+BEGIN
+  IF rating = 'A' THEN
+    UPDATE employees SET salary = salary * 1.2 WHERE id = emp_id;
+  ELSEIF rating = 'B' THEN
+    UPDATE employees SET salary = salary * 1.1 WHERE id = emp_id;
+  ELSE
+    UPDATE employees SET salary = salary * 1.05 WHERE id = emp_id;
+  END IF;
+END $$
+DELIMITER ;
+
+-- CASE 语句（比 IF 更适合多分支）
+DELIMITER $$
+CREATE PROCEDURE set_bonus(IN emp_id INT, IN years INT)
+BEGIN
+  CASE
+    WHEN years >= 10 THEN
+      UPDATE employees SET bonus = salary * 0.5 WHERE id = emp_id;
+    WHEN years >= 5 THEN
+      UPDATE employees SET bonus = salary * 0.3 WHERE id = emp_id;
+    WHEN years >= 3 THEN
+      UPDATE employees SET bonus = salary * 0.15 WHERE id = emp_id;
+    ELSE
+      UPDATE employees SET bonus = salary * 0.05 WHERE id = emp_id;
+  END CASE;
+END $$
+DELIMITER ;
+
+-- WHILE 循环
+DELIMITER $$
+CREATE PROCEDURE insert_numbers(IN max_num INT)
+BEGIN
+  DECLARE i INT DEFAULT 1;
+  WHILE i <= max_num DO
+    INSERT INTO test_numbers(num) VALUES (i);
+    SET i = i + 1;
+  END WHILE;
+END $$
+DELIMITER ;
+
+-- 游标：逐行处理
+DELIMITER $$
+CREATE PROCEDURE process_high_salary()
+BEGIN
+  DECLARE done INT DEFAULT 0;
+  DECLARE emp_id INT;
+  DECLARE emp_salary DECIMAL(10,2);
+  -- 游标定义
+  DECLARE cur CURSOR FOR SELECT id, salary FROM employees WHERE salary > 15000;
+  -- 游标到头了怎么办
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+  OPEN cur;
+  read_loop: LOOP
+    FETCH cur INTO emp_id, emp_salary;
+    IF done = 1 THEN
+      LEAVE read_loop;
+    END IF;
+    -- 对每行做点什么
+    INSERT INTO salary_log(emp_id, old_salary, log_time) VALUES (emp_id, emp_salary, NOW());
+  END LOOP;
+  CLOSE cur;
+END $$
+DELIMITER ;`,
+          language: "sql",
+          warning: "游标循环会很慢——100 万行逐行循环和一条 UPDATE 语句之间差了好几个数量级。能用集合操作干的事就别用游标。",
+        },
+        {
+          title: "什么时候用视图、过程、函数",
+          content: `三样东西各有各的适用场景，用对了事半功倍，用错了团队骂你：
+
+视图适合这些情况：
+- 你有一个超复杂的查询，到处要用，每次重敲受不了
+- 想对某些用户隐藏表的真实结构——让他们查视图但不能碰表
+- 报表展示——把多表 JOIN 的结果封装成简单接口
+
+存储过程适合这些情况：
+- 一个操作涉及多步数据修改，用过程保证原子性（一条命令全做完或全不做）
+- 定时任务——配合 MySQL EVENT 定时执行
+- 批量数据迁移或修复
+
+函数适合这些情况：
+- 需要把计算结果嵌在 SELECT 里用——比如 SELECT calc_age(birth_date)
+- 格式化输出——姓名脱敏、手机号加星号
+- 简单的业务规则判断
+
+一句话总结：
+- 查询包装 → 视图
+- 多步操作 → 存储过程
+- 计算返回值 → 函数
+- 能不写这三个就别写——简单的 SQL 在应用层搞定，数据库只管存和查，逻辑交给应用代码才是正道。`,
+        },
+      ],
+      quiz: [
+        { question: "视图和普通表最本质的区别是？", options: ["视图更快", "视图不存数据，只是查询的快捷方式", "视图不能查", "视图不能 JOIN"], answer: 1, explanation: "视图就是一条被保存起来的 SELECT 语句，查视图时数据库帮你执行那条 SELECT——视图本身不存数据。" },
+        { question: "存储过程和函数最大的区别是？", options: ["没区别", "函数必须有返回值，过程不一定", "过程更快", "函数不能在 SQL 里调用"], answer: 1, explanation: "函数用 RETURNS 声明返回类型，必须 RETURN 一个值；过程可以没有返回值，用 OUT 参数往外传数据。" },
+        { question: "DECLARE CONTINUE HANDLER FOR NOT FOUND 在游标里干什么用的？", options: ["声明变量", "当游标走到末尾时捕获异常设置退出标志", "打开游标", "关闭游标"], answer: 1, explanation: "游标 FETCH 到最后一行后会触发 NOT FOUND 条件，这个 handler 就是在这时候把 done 变量置为 1，告诉循环可以退出了。" },
+        { question: "为什么说存储过程不要滥用？", options: ["性能太差", "业务逻辑散落在数据库里，维护和调试困难", "数据库不支持", "语法太难"], answer: 1, explanation: "存储过程没法用 Git 版本管理、没法做代码审查、团队交接成本高——逻辑放应用层更透明。" },
+        { question: "CREATE OR REPLACE VIEW 干了什么？", options: ["先删再建同名视图", "只创建新视图", "重命名视图", "复制视图"], answer: 0, explanation: "如果视图不存在就创建，如果已经存在就替换掉旧的——相当于一次性「检查+覆盖」，改视图定义时的必用命令。" },
       ],
     },
   },
@@ -2710,6 +3618,618 @@ spec:
         { question: "ConfigMap 更新后 Pod 会自动感知吗？", options: ["会，实时生效", "不会，需要重启 Pod 或用外部工具触发", "自动滚动更新", "分批更新"], answer: 1, explanation: "ConfigMap 改了不会自动推送给 Pod，要么手动重启 Pod，要么用 Reloader 等工具触发滚动更新。" },
       ],
     },
+    "docker-network": {
+      slug: "docker-network",
+      sections: [
+        {
+          title: "Docker 网络基础",
+          content: `Docker 网络管的就是容器之间怎么通信、容器怎么跟外面通信。默认有 3 种网络模式：
+bridge——默认模式，容器在一个虚拟局域网里，通过 docker0 网桥连宿主机
+host——容器直接用宿主机的网络栈，性能最好但没隔离
+none——断网模式，完全不配网络，高安全场景用`,
+          code: `# 查看所有网络
+docker network ls
+
+# 查看网络详情（哪些容器连上了）
+docker network inspect bridge
+
+# 创建自定义网络（重要！用容器名就能通信）
+docker network create my-network
+
+# 运行容器并指定网络
+docker run -d --name web --network my-network nginx
+docker run -d --name db --network my-network mysql:8
+
+# 在 web 容器里直接 ping db 容器名就能通
+docker exec web ping db`,
+          language: "bash",
+          tip: "自定义 bridge 网络比默认 bridge 强得多：可以用容器名互访、自带 DNS 解析、创建时能指定子网。生产环境一定要建自己的网络。",
+        },
+        {
+          title: "网络模式详解",
+          content: `host 模式相当于容器裸奔在宿主机的网络栈上——nginx 监听 80 等于宿主机 80，不看 -p 映射。性能极高但端口容易冲突。
+
+--link 是老式容器互访方式，现在基本被自定义网络淘汰了。overlay 模式用于 Swarm 跨主机容器通信，生产多机部署才用：`,
+          code: `# host 模式——直接绑定宿主机端口
+docker run -d --network host nginx
+# nginx 监听 80 等于宿主机 80，不需要 -p
+
+# none 模式——彻底断网
+docker run -d --network none nginx
+
+# --link（已过时，不推荐）
+docker run -d --name db mysql
+docker run -d --name web --link db:my-db nginx
+
+# overlay 网络（需要 Swarm 模式）
+docker swarm init
+docker network create --driver overlay my-overlay
+docker service create --name web --network my-overlay nginx`,
+          language: "bash",
+          warning: "host 模式小心端口冲突——两个容器都监听 80 端口不可能同时用 host 模式。只有性能敏感场景（如 Node.js 服务）才考虑它。",
+        },
+        {
+          title: "容器之间怎么通信",
+          content: `在同一个自定义网络下，Docker 自带 DNS——直接用容器名当域名就能访问，比如 web 容器里 curl db:3306 就能连上 MySQL。不同网络下的容器是不能直连的，除非把一个容器挂到多个网络下：`,
+          code: `# 给运行中的容器接一个新网络
+docker network connect my-network existing-container
+
+# 让容器退出某个网络
+docker network disconnect my-network existing-container
+
+# 查看容器到底接了哪些网络
+docker inspect web | grep -A 20 "Networks"
+
+# 发布端口到宿主机
+docker run -d -p 8080:80 nginx   # 宿主机 8080 映射到容器 80
+docker run -d -P nginx            # 随机映射所有 EXPOSE 端口`,
+          language: "bash",
+          tip: "如果容器没能用名字互访，先确认它们在同一个自定义网络上——默认 bridge 网络不支持自动 DNS 解析。",
+        },
+      ],
+      quiz: [
+        { question: "自定义 bridge 网络比默认 bridge 强在哪？", options: ["快很多", "能用容器名互访、自带 DNS、配置更灵活", "只能连两台容器", "启动更快"], answer: 1, explanation: "自定义网络自动 DNS 解析容器名，默认 bridge 得用 IP 还得 --link，差别很大。" },
+        { question: "host 网络模式下 -p 端口映射有用吗？", options: ["有用", "没用——容器直接绑宿主机端口", "只对 80 有效", "需要额外配置"], answer: 1, explanation: "host 模式容器和宿主机共用网络栈，容器监听什么端口，宿主机就绑定什么端口——-p 根本不生效。" },
+        { question: "--link 现在还用吗？", options: ["仍然是主流", "已过时，推荐用自定义网络 + DNS", "只有 Windows 能用", "必须用"], answer: 1, explanation: "--link 是早期的接入方式，现在用自定义网络，容器名自带 DNS 解析，更简单可靠。" },
+        { question: "不同网络上的两个容器能直连吗？", options: ["能直接连", "不能，除非一个容器同时接两个网络", "通过宿主机中转", "不能连接"], answer: 1, explanation: "docker network connect 可以让一个容器接入多个网络，从而跨网络访问不同网络中的其他容器。" },
+      ],
+    },
+    "docker-volume": {
+      slug: "docker-volume",
+      sections: [
+        {
+          title: "数据卷是啥——容器删了数据在",
+          content: `容器是无状态的——删了就没了，所有写的文件跟着消失。数据卷就是解决这个问题的——把容器的某个目录映射到宿主机，容器删了数据还在。
+
+Docker 有三种挂载方式：
+1. volume——Docker 管理的，存在 /var/lib/docker/volumes/，推荐
+2. bind mount——直接挂宿主机目录，开发调试常用
+3. tmpfs——挂内存，容器停了数据也没了，适合临时文件`,
+        },
+        {
+          title: "Volume 和 Bind Mount 实战",
+          content: `volume 最推荐——Docker 帮你管目录，不用担心权限问题，也方便在不同容器间复用。bind mount 简单粗暴——直接指定宿主机路径，开发环境改代码马上生效：`,
+          code: `# Volume——Docker 管理，自动创建
+docker run -d -v mydata:/app/data nginx
+# 不用先创建 mydata，Docker 会自动在 /var/lib/docker/volumes/ 下建
+
+# Bind mount——直接挂主机路径
+docker run -d -v /home/user/config:/etc/nginx/conf.d nginx
+# 宿主机改了配置，重启容器生效（或 nginx -s reload）
+
+# 挂当前目录到容器的 /app
+docker run -d -v $(pwd):/app nginx
+
+# 只读挂载——容器不能改
+docker run -d -v /host/config:/etc/nginx/conf.d:ro nginx
+
+# 查看所有卷
+docker volume ls
+
+# 卷详情（看存在哪儿）
+docker volume inspect mydata
+
+# 清理不用的卷
+docker volume prune`,
+          language: "bash",
+          warning: "bind mount 路径用绝对路径——你写了 -v ./data:/data 在当前目录可能正常，但到了有些环境就不行。用 $(pwd)/data 最保险。",
+        },
+        {
+          title: "数据共享和 tmpfs",
+          content: `volume 可以随便在多个容器间共享——比如前端和后端挂同一个卷做日志采集。tmpfs 是纯内存映射，读写极快，适合不外发、不怕丢的临时文件：`,
+          code: `# 多个容器共享同一个 volume
+docker run -d --name web1 -v shared_logs:/var/log myapp
+docker run -d --name web2 -v shared_logs:/var/log myapp
+# 俩容器写同一个日志卷
+
+# tmpfs——内存映射
+docker run -d --tmpfs /tmp nginx
+docker run -d --mount type=tmpfs,destination=/tmp,tmpfs-size=64m nginx
+
+# docker-compose 里的卷配置
+# volumes:
+#   logs:
+#     driver: local
+#   db-data:
+#     external: true   # 用已经存在的卷`,
+          language: "bash",
+          tip: "Volume 之间拷数据超简单——启动一个临时的 alpine 容器挂两个卷，cp 一下就行：docker run --rm -v src:/src -v dest:/dest alpine cp -r /src/data /dest/。",
+        },
+      ],
+      quiz: [
+        { question: "Volume 和 Bind Mount 最大区别是什么？", options: ["没区别", "Volume 由 Docker 管路径，Bind Mount 你指定宿主机路径", "Volume 更快", "Bind Mount 只能读"], answer: 1, explanation: "Volume 的物理路径在 Docker 管理目录下，你不需要关心；Bind Mount 你自己指定路径，开发场景灵活。" },
+        { question: "tmpfs 挂载的数据存在哪儿？", options: ["硬盘", "内存里", "对象存储", "远程服务器"], answer: 1, explanation: "tmpfs 直接挂到内存文件系统，读写飞快，但容器停了或重启了数据就没了。适合存缓存和临时文件。" },
+        { question: "docker volume prune 干什么的？", options: ["清理所有数据", "删除不被任何容器引用的卷", "删除容器", "清理日志"], answer: 1, explanation: "prune 清理孤儿卷——没容器在用的卷会慢慢累积占空间，定期 prune 清掉。" },
+        { question: ":ro 在挂载里表示什么意思？", options: ["根目录", "只读——容器只能读不能改", "读写", "重启"], answer: 1, explanation: "加 :ro 后缀让挂载变成只读，容器不能往里写数据，相当于给容器加一层安全保护。" },
+      ],
+    },
+    "docker-security": {
+      slug: "docker-security",
+      sections: [
+        {
+          title: "不用 root 跑容器",
+          content: `Docker 默认容器里的进程是 root 身份——但这是容器里的 root，跟宿主机 root 不完全一样，有 namespace 隔离。不过万一突破了容器隔离，root 权限就是灾难。
+
+最简单安全的做法：建一个非 root 用户在 Dockerfile 里切过去，或者 docker run 时指定 user：`,
+          code: `# Dockerfile 里建普通用户
+FROM node:20-alpine
+RUN addgroup -g 1001 appuser && adduser -D -u 1001 -G appuser appuser
+WORKDIR /app
+COPY --chown=appuser:appuser . .
+USER appuser
+CMD ["node", "server.js"]
+
+# 运行时指定用户
+docker run -d --user 1000:1000 nginx
+
+# 验证容器里跑的是谁
+docker exec my-container whoami`,
+          language: "dockerfile",
+          tip: "生产环境的 Dockerfile 最后一行一定写 USER——别让容器里的进程以 root 身份跑，这是安全底线。",
+        },
+        {
+          title: "只读文件系统和 Capabilities",
+          content: `容器里大部分文件不需要改——把根文件系统挂成只读能防攻击注入。再加上 --cap-drop 把容器不需要的内核能力全删了，攻击面大大缩小：`,
+          code: `# 只读文件系统（用 tmpfs 给必须写的地方留口）
+docker run -d --read-only \\
+  --tmpfs /tmp --tmpfs /run --tmpfs /var/log \\
+  nginx
+
+# 去掉所有 capabilities，只加必要的
+docker run -d --cap-drop ALL --cap-add NET_BIND_SERVICE nginx
+# NET_BIND_SERVICE 允许绑定 1024 以下的特权端口
+
+# 不加 --privileged！别让容器拥有宿主机的全部特权
+# --privileged 等于把 namespace 隔离全拆了，非常危险`,
+          language: "bash",
+          warning: "任何人让你用 --privileged 跑容器多问一句为什么。99% 的场景用 --device 或者 --cap-add 都能解决，没必要给全权。",
+        },
+        {
+          title: "资源限制——cgroups",
+          content: `没限制的容器可能吃掉整台机器的 CPU 和内存。cgroups 就是管这个的——给每个容器设上限，谁也饿不着谁：`,
+          code: `# 内存限制
+docker run -d --memory="512m" --memory-swap="1g" nginx
+# 物理内存最多 512MB，超出可能被 OOM Killer 杀掉
+
+# CPU 限制
+docker run -d --cpus="1.5" nginx        # 最多用 1.5 个核
+docker run -d --cpuset-cpus="0,1" nginx  # 只能用第 0 和第 1 个核
+
+# 磁盘 IO 限制
+docker run -d --device-read-bps /dev/sda:1mb nginx     # 每秒最多读 1MB
+docker run -d --device-write-iops /dev/sda:100 nginx   # 每秒最多 100 次写操作
+
+# 查看容器的资源使用
+docker stats
+docker stats --no-stream    # 一次性快照`,
+          language: "bash",
+          tip: "生产环境一定要设 --memory 和 --cpus，不然一个死循环或内存泄漏能把整台机器拖垮。K8s 的 requests/limits 也是同一个原理。",
+        },
+      ],
+      quiz: [
+        { question: "Dockerfile 里 USER 指令干什么的？", options: ["设置容器名", "切换容器里进程的运行用户", "设置环境变量", "设置工作目录"], answer: 1, explanation: "USER 让后续的 RUN/CMD/ENTRYPOINT 都用指定用户跑，避免容器进程以 root 身份执行。" },
+        { question: "docker run --read-only 的效果？", options: ["只读端口", "容器根文件系统只读，必须配合 tmpfs 给需要写的位置", "只能读日志", "只读数据卷"], answer: 1, explanation: "只读根文件系统防止攻击者修改文件，需要写的地方（/tmp, /run）用 tmpfs 挂载解决。" },
+        { question: "为什么不该用 --privileged？", options: ["太慢", "等于给容器宿主机 root 特权，隔离全没了", "占内存", "不能联网"], answer: 1, explanation: "--privileged 把内核 namespace 隔离全拆了，容器拥有宿主机的全部能力，出事了相当于宿主机被入侵。" },
+        { question: "--memory=512m 限制的是什么？", options: ["磁盘", "容器的内存使用上限", "日志大小", "镜像大小"], answer: 1, explanation: "cgroups 中的内存限制——容器能不能用超过 512MB 内存，超了会被 OOM 杀掉。" },
+        { question: "docker stats 能看什么？", options: ["日志", "资源使用：CPU、内存、网络 IO、磁盘 IO", "文件列表", "端口"], answer: 1, explanation: "docker stats 实时显示每个容器占了多少 CPU、内存、网络流量和磁盘 IO，排查哪个容器吃资源一目了然。" },
+      ],
+    },
+    "docker-optimization": {
+      slug: "docker-optimization",
+      sections: [
+        {
+          title: "镜像瘦身——为什么重要",
+          content: `镜像越小拉得越快、占磁盘越少、攻击面也越小。很多人上来就 FROM ubuntu 然后 apt install 一堆东西——开发当然快，但最后镜像 1GB+。优化空间巨大。记住一句：生产镜像的目标是能跑就行，不是能开发就行。`,
+        },
+        {
+          title: "多阶段构建——终极瘦身",
+          content: `多阶段构建的思路很简单：构建一个大而全的镜像用来编译，再从里面只把编译好的结果拷到最终的小镜像里放行。最终镜像里没有编译器、没有源码、没有 npm 依赖里的 devDependencies——干干净净只留下必要的运行时文件：`,
+          code: `# Go 项目——最终镜像可以小到几 MB
+FROM golang:1.21 AS builder
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 go build -o server .
+
+FROM alpine:3.18    # 最终镜像
+RUN apk add --no-cache ca-certificates
+COPY --from=builder /app/server /usr/local/bin/
+ENTRYPOINT ["server"]
+
+# 前端项目——静态 HTML 放 nginx
+FROM node:20 AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+# 不需要 node、不需要 node_modules、不需要源码`,
+          language: "dockerfile",
+          tip: "多阶段构建能减的体积超乎你想象——Go 最终镜像可以从 900MB 减到 15MB，前端项目从 1GB 减到几十 MB。",
+        },
+        {
+          title: ".dockerignore 和层缓存",
+          content: `.dockerignore 跟 .gitignore 一样——告诉 Docker 哪些文件不要。不加的话一个 COPY . . 把 node_modules、.git、IDE 配置全拷进去了，又大又慢。
+
+层缓存是 Docker 的加速秘密——每条 Dockerfile 指令生成一层，没变就不重建。利用好能省不少时间：`,
+          code: `# .dockerignore
+node_modules
+.git
+.gitignore
+*.md
+.env
+.env.*
+dist
+coverage
+.DS_Store
+
+# Dockerfile 里利用层缓存
+FROM node:20-alpine
+WORKDIR /app
+# 先拷贝 package 文件——代码改了但依赖没变就不用重新装
+COPY package*.json ./
+RUN npm ci --only=production
+# 再拷贝源代码——这层才会因为代码修改而重建
+COPY . .
+
+# 别这样写——COPY . . 在前，代码一改，RUN npm ci 也跟着重建
+# COPY . .
+# RUN npm ci`,
+          language: "dockerfile",
+          tip: "Dockerfile 里变更不频繁的步放前面（装依赖），频繁变更的步放后面（拷贝源码）——充分利用缓存加速构建。",
+        },
+        {
+          title: "小技巧汇总",
+          content: `选 Alpine 当基础镜像——node:20-alpine 比 node:20 小 10 倍。包管理器装完就清理缓存——apt-get install 完加一行 rm -rf /var/lib/apt/lists/*。能合并的 RUN 合并一行——减少层数也减少体积。别装调试工具到生产镜像——vim、htop、telnet 这些调试工具用 docker exec 临时装就行。减少副本——同一镜像不同 tag 共享底层 layer，尽量用一致的基础镜像。`,
+        },
+      ],
+      quiz: [
+        { question: "多阶段构建核心思想是什么？", options: ["镜像分多次推送", "编译和运行分离，编译用的工具不留到最终镜像", "多个人同时构建", "构建多个不同镜像"], answer: 1, explanation: "第一阶段装编译工具构建产物，第二阶段拿编译结果放小镜像运行——最终镜像不包含构建依赖。" },
+        { question: ".dockerignore 的主要作用？", options: ["忽略镜像大小", "排除不需要的文件送入构建上下文", "忽略容器日志", "忽略网络请求"], answer: 1, explanation: "构建前 Docker 会把上下文目录发到 Docker daemon，.dockerignore 里的文件不参与，减少传输量也防泄露。" },
+        { question: "为什么 Dockerfile 里 COPY package.json 放 COPY . 前面？", options: ["顺序无所谓", "依赖层没变就用缓存，不用重新装，加速构建", "package.json 更轻", "安全要求"], answer: 1, explanation: "依赖文件不常变，先 COPY 依赖装完可以用缓存，后面 COPY 源码那层才因为代码改动重建——这叫层缓存策略。" },
+        { question: "RUN apt-get install 后为什么加 rm -rf /var/lib/apt/lists/*？", options: ["释放空间，减少层大小", "加快启动", "提高安全性", "是格式要求"], answer: 0, explanation: "apt 安装完留下的包列表缓存占空间还没用，删掉能省几十 MB。" },
+      ],
+    },
+    "k8s-basics": {
+      slug: "k8s-basics",
+      sections: [
+        {
+          title: "K8s 是啥——容器的超级管家",
+          content: `Kubernetes（K8s）就是容器的调度平台——你告诉它「我要 3 个 nginx，CPU 各 0.5 核」它就自动找合适的机器跑起来。挂了自动重启，流量太大自动扩缩容，滚动更新不停机。
+
+架构分两部分：
+Control Plane（控制面）——大脑：API Server（入口）、etcd（数据库）、Scheduler（调度器）、Controller Manager（控制器）
+Node（工作节点）——干活的：kubelet（节点管家）、kube-proxy（网络代理）、上面跑着若干 Pod
+
+这一切都是声明式的——你告诉 K8s「我想要什么状态」，它自己想办法达到，你不需要操心怎么做。`,
+        },
+        {
+          title: "Pod——最小单位",
+          content: `Pod 是 K8s 里最小的调度单元——一个 Pod 里可以有一到多个容器，共享网络和存储。但大多数时候一个 Pod 只有一个主容器。Pod 是临时的，死了会在别处重生，IP 也会变——所以别记 IP，用 Service：`,
+          code: `# pod.yaml ——最简单的 Pod 定义
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-nginx
+  labels:
+    app: web
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.24
+      ports:
+        - containerPort: 80`,
+          language: "yaml",
+        },
+        {
+          title: "kubectl 基本操作",
+          content: `kubectl 是你操作 K8s 的遥控器。几个高频命令背下来就够日常用了：`,
+          code: `# 查看资源
+kubectl get pods                    # 所有 Pod
+kubectl get pods -o wide            # 更多 IP、节点信息
+kubectl get pods -w                 # watch 模式，实时监测
+kubectl get nodes                   # 所有节点
+kubectl get services                # 所有 Service
+kubectl get all                     # 全部资源
+
+# 操作 Pod
+kubectl describe pod my-pod         # 详情（看 Events 能知道为啥还起不来）
+kubectl logs pod/my-pod             # 看日志
+kubectl logs -f pod/my-pod          # 实时日志
+kubectl exec -it pod/my-pod -- bash # 进 Pod 里操作
+
+# 创建和删除
+kubectl apply -f pod.yaml           # 声明式创建/更新
+kubectl delete pod my-pod           # 删除 Pod（Deployment 管的会自动重建）
+kubectl delete -f pod.yaml          # 按文件删`,
+          language: "bash",
+          tip: "kubectl get 加 -o wide 多显示一行关键信息，排查问题时先用它看看 Pod 在哪个节点、IP 是多少。",
+        },
+      ],
+      quiz: [
+        { question: "K8s 中声明式 API 是什么意思？", options: ["你写脚本一步步操作", "你声明想要的状态，K8s 自动调节达到目标", "必须用 YAML", "只能用 kubectl"], answer: 1, explanation: "你只需要 YAML 里写期望状态——3 个副本、2 核 CPU——K8s 调度器自己分配节点，挂了自己重启，无需人工干预。" },
+        { question: "Pod 是 K8s 里最小的什么？", options: ["存储单元", "调度单元", "网络单元", "安全单元"], answer: 1, explanation: "Pod 是最小可调度单位——K8s 不调度单个容器，而是调度 Pod。Pod 里的容器共享网络和存储。" },
+        { question: "etcd 在 K8s 里干什么的？", options: ["跑容器", "控制网络", "存储集群所有配置和状态数据——集群的数据库", "日志系统"], answer: 2, explanation: "etcd 是分布式键值存储，K8s 把节点信息、Pod 配置、Service 定义等等全存在 etcd 里——集群失忆了就是从 etcd 出了问题。" },
+        { question: "kubectl describe 主要看什么？", options: ["只看 IP", "Event 区——能看到 Pod 为什么起不来", "只看端口", "只看镜像名"], answer: 1, explanation: "describe 里 Events 段最有价值：镜像拉不下来、资源不够、健康检查失败——全在这里记录着。" },
+        { question: "kubectl logs -f 里的 -f 干嘛的？", options: ["过滤", "跟随——持续输出新日志", "格式化", "删除"], answer: 1, explanation: "和 tail -f 一样，持续跟踪输出新日志，排查实时问题必备。" },
+      ],
+    },
+    "k8s-deployment": {
+      slug: "k8s-deployment",
+      sections: [
+        {
+          title: "Deployment——Pod 的控制器",
+          content: `Deployment 是上层抽象，替你管理 Pod。你声明要几个 Pod、用什么镜像、怎么更新，Deployment 控制器自动搞定。Pod 挂了或节点宕机了它负责重建，更新镜像时按策略滚动更新——全程不需要你手动操作 Pod：`,
+          code: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: web
+          image: nginx:1.24
+          ports:
+            - containerPort: 80`,
+          language: "yaml",
+        },
+        {
+          title: "滚动更新和回滚",
+          content: `K8s 默认滚动更新——一个一个替换旧 Pod，不停机更新版本。出问题了一条命令回滚到上一个版本：`,
+          code: `# 更新镜像
+kubectl set image deployment/web-app web=nginx:1.25
+kubectl edit deployment web-app      # 手改 YAML
+
+# 看更新进度
+kubectl rollout status deployment/web-app
+kubectl rollout history deployment/web-app
+
+# 回滚
+kubectl rollout undo deployment/web-app          # 回滚到上一个版本
+kubectl rollout undo deployment/web-app --to-revision=2  # 回滚到指定版本
+
+# 暂停/恢复更新
+kubectl rollout pause deployment/web-app
+kubectl rollout resume deployment/web-app`,
+          language: "bash",
+        },
+        {
+          title: "更新策略——绿蓝和金丝雀",
+          content: `滚动更新（默认）：maxSurge（多跑几个新 Pod）、maxUnavailable（允许几个 Pod 暂时不可用）
+
+蓝绿部署：两套环境（蓝=旧，绿=新），准备好绿环境后切 Service 指向，瞬间切换。优点是秒切回蓝环境，缺点要双倍资源
+
+金丝雀部署：先放行一小部分流量到新版本，观察没问题再全量放开。常用 Istio 或 nginx-ingress 做流量切片`,
+          code: `# 滚动更新策略定死
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1          # 更新时可以多跑的新 Pod 数
+      maxUnavailable: 0    # 更新时允许几个不可用
+
+# 蓝绿示意——两个 Deployment + Service selector 切换
+# 蓝：Deployment web-v1 (labels: version: v1)
+# 绿：Deployment web-v2 (labels: version: v2)
+# Service selector 从 version: v1 改成 version: v2 即完成切换`,
+          language: "yaml",
+          tip: "滚动更新的 maxUnavailable=0 保证服务不断——但需要资源余量。公司 VPS 资源紧的话可以设 maxUnavailable=1, maxSurge=0，先杀旧再跑新（有一瞬间少 Pod 但不会全停）。",
+        },
+      ],
+      quiz: [
+        { question: "Deployment 的主要职责是什么？", options: ["管理网络", "管理 Pod 的生命周期和更新", "存储数据", "管理节点"], answer: 1, explanation: "Deployment 是 Pod 的管控器——副本数维持、滚动更新、回滚都归它管。" },
+        { question: "kubectl rollout undo 是什么操作？", options: ["删除 Deployment", "回滚到上一个版本", "重新部署", "更新配置"], answer: 1, explanation: "undo 回滚到上一个 Revision，类似 git revert——上线出问题一键退回。" },
+        { question: "蓝绿部署的主要代价是什么？", options: ["需要写很多代码", "需要双倍服务器资源运行两套环境", "更新慢", "不能回滚"], answer: 1, explanation: "蓝绿部署同一时间两套完整环境同时运行，资源占用翻倍——但换来极致快速的切换和回退。" },
+        { question: "maxSurge 在滚动更新里控制什么？", options: ["最大不可用数量", "更新时额外允许创建的新 Pod 数量上限", "最大副本数", "最大内存"], answer: 1, explanation: "maxSurge=2 意味着更新时可以先跑到 original+2 个 Pod，多出来的是新版本——保证更新过程中服务能力不减。" },
+      ],
+    },
+    "k8s-storage": {
+      slug: "k8s-storage",
+      sections: [
+        {
+          title: "PV 和 PVC——存储的申请制",
+          content: `PersistentVolume（PV）是管理员备好的存储——一块硬盘、NFS 目录、云磁盘。PersistentVolumeClaim（PVC）是用户的申请单——我要 5GB 容量，找个匹配的 PV 给我用。解耦了存储提供者和使用者，Pod 只管挂 PVC 就行，不用关心底层是什么盘：`,
+          code: `# PV——管理员创建
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: my-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce    # 只能一个节点读写
+  hostPath:
+    path: /mnt/data
+
+# PVC——用户申请
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+spec:
+  resources:
+    requests:
+      storage: 5Gi
+  accessModes:
+    - ReadWriteOnce`,
+          language: "yaml",
+        },
+        {
+          title: "StorageClass——动态按需分配",
+          content: `每个 Pod 都让管理员手动建 PV 不合适。StorageClass 允许按需自动建 PV——你申请 PVC，存储插件自动为你配一个云磁盘或 NFS 目录。这就是动态供给：`,
+          code: `# StorageClass——自动提供者
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: fast-ssd
+provisioner: kubernetes.io/aws-ebs    # AWS 云盘
+parameters:
+  type: gp3
+
+# PVC 引用 StorageClass——自动创建 PV
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: auto-pvc
+spec:
+  storageClassName: fast-ssd
+  resources:
+    requests:
+      storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+
+# Pod 挂载 PVC
+spec:
+  containers:
+    - name: db
+      image: mysql
+      volumeMounts:
+        - name: data
+          mountPath: /var/lib/mysql
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: auto-pvc`,
+          language: "yaml",
+          tip: "PV 的 reclaimPolicy 决定 PVC 删除后底层存储怎么处理——Retain（保留，默认）要手动清理，Delete（自动删除）最常用，StorageClass 的动态供给通常自动 Delete。",
+        },
+        {
+          title: "常用存储类型",
+          content: `hostPath——直接用节点本地路径，开发测试用。Pod 换节点了数据就没——本地数据不跨节点
+NFS——网络文件存储，多节点共享，适合读多写少或共享配置
+云磁盘（EBS/PD）——高性能，但只能单节点读写（RWO）
+云文件（EFS/Filestore）——多节点共享类 NFS
+CSI 插件——各厂商自己实现的标准接口，比如 AWS EFS CSI Driver、Ceph RBD`,
+        },
+      ],
+      quiz: [
+        { question: "PV 和 PVC 是什么关系？", options: ["一样", "PV 管理员准备存储，PVC 用户提交需求，K8s 自动匹配", "PV 是容器 PVC 是网络", "PVC 是旧版的 PV"], answer: 1, explanation: "PV 是已有的存储资源仓库，PVC 是用户的申请单——匹配逻辑自动绑定大小和访问模式最合适的那个。" },
+        { question: "StorageClass 解决了什么痛点？", options: ["网络问题", "自动按需动态创建 PV——不用管理员手动操作", "容器启动问题", "日志问题"], answer: 1, explanation: "有了 StorageClass，你申请 PVC 它自动建一个云厂商的磁盘绑上来，不用等管理员手工创建 PV。" },
+        { question: "hostPath 最大的问题是什么？", options: ["太慢", "Pod 漂移到其他节点数据就没了——跟节点绑定", "没权限", "不能挂两个容器"], answer: 1, explanation: "hostPath 把存储绑在节点本地，Pod 调度到别的节点就找不着数据了——只适合测试，生产不敢用。" },
+        { question: "accessModes ReadWriteOnce 是什么意思？", options: ["所有节点都能读写", "只能单节点读写", "只能读不能写", "只能一个 Pod 读"], answer: 1, explanation: "RWO 限制这一个存储被且仅被一个节点的 Pod 读写，适合关系型数据库这种不能多节点同时写盘的情况。" },
+      ],
+    },
+    "k8s-monitoring": {
+      slug: "k8s-monitoring",
+      sections: [
+        {
+          title: "Prometheus 和 Grafana",
+          content: `生产监控的标配组合：Prometheus（采集并存储指标）+ Grafana（图表展示）。Prometheus 定期拉取各 Pod 曝光的 /metrics 端点，然后 Grafana 做可视化大盘。
+
+Operator 方式安装最省心——kube-prometheus-stack 一个 Helm 全搞定，自带 Node Exporter（主机指标）和 Kube State Metrics（K8s 资源指标）。`,
+          code: `# 使用 helm 装完整监控栈
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm install monitoring prometheus-community/kube-prometheus-stack
+
+# 访问 Grafana（默认 admin/admin）
+kubectl port-forward svc/monitoring-grafana 3000:80
+
+# 应用暴露 metrics 给 Prometheus 采集
+# 在 Deployment 上加 annotation：
+metadata:
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9090"
+    prometheus.io/path: "/metrics"`,
+          language: "bash",
+          tip: "PromQL 是 Prometheus 的查询语言。初学记这几个：rate(http_requests_total[5m])——最近5分钟每秒请求速率；sum by(status)(rate(...))——按状态码分类汇总；histogram_quantile(0.99, rate(...))——P99 延迟。",
+        },
+        {
+          title: "日志——EFK/ELK 方案",
+          content: `EFK（Elasticsearch + Fluentd + Kibana）或 ELK（Logstash 替代 Fluentd）是 K8s 日志采集的标配。每个 Node 上跑一个 Fluentd DaemonSet 当日志收割机——收集所有容器标准输出，统一发给 Elasticsearch，Kibana 做查询和可视化：`,
+          code: `# Fluentd DaemonSet——每个节点自动跑一个
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluentd
+spec:
+  selector:
+    matchLabels:
+      name: fluentd
+  template:
+    spec:
+      containers:
+        - name: fluentd
+          image: fluent/fluentd-kubernetes-daemonset:v1
+          volumeMounts:
+            - name: varlog
+              mountPath: /var/log
+            - name: dockercontainers
+              mountPath: /var/lib/docker/containers
+              readOnly: true
+      volumes:
+        - name: varlog
+          hostPath:
+            path: /var/log
+        - name: dockercontainers
+          hostPath:
+            path: /var/lib/docker/containers`,
+          language: "yaml",
+          tip: "Loki + Grafana 是比 EFK 更轻量的选择——不依赖 ES 的庞大资源开销，直接用对象存储存日志，Grafana 一个平台看指标+日志一体。小团队首选。",
+        },
+        {
+          title: "简单告警设置",
+          content: `Prometheus 的告警规则定义在 PrometheusRule 资源里，AlertManager 收到告警后发邮件、钉钉、微信或 Slack。最简单的 CPU 过高告警：`,
+          code: `apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cpu-alert
+spec:
+  groups:
+    - name: node-alerts
+      rules:
+        - alert: HighCpuUsage
+          expr: 100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "节点 CPU 超过 80%"`,
+          language: "yaml",
+          tip: "告警要有人看才有效——别设一堆没人理的告警报警疲劳。核心指标（CPU>80%、内存>90%、Pod 重启频繁、磁盘>85%）盯好就够了。",
+        },
+      ],
+      quiz: [
+        { question: "Prometheus 默认怎么获取数据？", options: ["推模式接入", "拉模式——定时拉 Pod 的 /metrics 端点", "接收 UDP", "WebSocket"], answer: 1, explanation: "Prometheus 用 pull 模式——定期访问被监控目标的 /metrics 端点采集指标，而不是等对方往里推。" },
+        { question: "EFK 里的 F 通常指什么？", options: ["Fluentd——日志采集器", "Fluentbit", "Fast", "Filter"], answer: 0, explanation: "EFK 的标准组合是 Elasticsearch（存储搜索）+ Fluentd（采集转发）+ Kibana（可视化查询界面）。" },
+        { question: "DaemonSet 在日志采集里怎么用？", options: ["集中跑一个", "每个节点运行一个 Fluentd 实例收集本节点日志", "随机找一个节点", "手动挑选节点"], answer: 1, explanation: "DaemonSet 保证每个 Node 上跑一个副本，刚好满足日志采集的需求——每台机器各自收割自己的日志。" },
+        { question: "Grafana 能做什么？", options: ["存储数据", "可视化——把 Prometheus 的指标数据做成图表和仪表盘", "杀 Pod", "扩容节点"], answer: 1, explanation: "Grafana 是可视化面板，连接 Prometheus 数据源后定制各种仪表盘，CPU、内存、QPS 一眼看清。" },
+      ],
+    },
   },
   git: {
     "git-basics": {
@@ -2819,6 +4339,491 @@ git rebase main
         { question: "git checkout -b feature-x 做了什么？", options: ["删除分支", "创建并切换到新分支", "合并分支", "查看分支"], answer: 1, explanation: "-b 是创建新分支，checkout 是切换，合起来就是新建分支同时切过去。" },
         { question: "什么时候不该用 rebase？", options: ["本地分支", "已经推送到远程共享的分支", "小分支", "主分支"], answer: 1, explanation: "rebase 会改写提交历史，如果分支已经推给别人用了，改写历史会搞乱别人的仓库。" },
         { question: "git branch -D 和 -d 的区别？", options: ["没区别", "-D 强制删除，-d 安全删除（没合并不删）", "-d 更快", "-D 只删远程分支"], answer: 1, explanation: "-d 是安全检查——分支没合并到上游就不让删，-D 不管三七二十一直接干。" },
+      ],
+    },
+    "git-commands": {
+      slug: "git-commands",
+      sections: [
+        {
+          title: "日常高频命令",
+          content: `Git 命令有两百多个，但真正天天用的就十几个。这章把核心命令串一遍——先记这些，剩下的遇到再查就行：`,
+          code: `# 初始化——把一个普通文件夹变成 git 仓库
+git init
+
+# 克隆——把远程仓库搬到本地
+git clone https://github.com/user/repo.git
+git clone -b dev https://github.com/user/repo.git   # 克隆指定分支
+
+# 查看状态——不管做什么，先看状态
+git status
+git status -s     # 简短模式，一行一个文件
+
+# 增删改——三步走：编完 -> add -> commit -> push
+git add file.txt             # 添加到暂存区
+git add .                    # 全部添加
+git add -p                   # 交互式挑着加，精细控制
+git commit -m "fix: bug fixed"
+git commit -am "fix: bug fixed"  # add + commit 一步（只对已跟踪文件）
+git push                     # 推送到远程
+git push -u origin main      # 首次推送 + 设上游分支
+
+# 拉取
+git pull                     # = git fetch + git merge
+git fetch                    # 只拉不看（先看看有啥再决定）
+git fetch --prune            # 顺带清理远程已删的分支`,
+          language: "bash",
+          tip: "养成 git status 当习惯——任何操作前都看一眼，避免手抖提交不该交的东西。另外 git pull --rebase 比默认 pull 好，历史清爽没多余 merge commit。",
+        },
+        {
+          title: "日志和历史",
+          content: `git log 是时光机，但不加参数很啰嗦。学会这几个参数组合，看历史效率翻倍：`,
+          code: `# 基础日志
+git log                          # 完整历史
+git log --oneline                # 每条一行，最常用
+git log --oneline --graph        # 图形式分支路径
+git log --oneline --graph --all  # 所有分支一起看——全貌
+git log -5                       # 只看最近 5 条
+
+# 搜日志内容
+git log --grep="bug"             # 提交信息含 bug 的提交
+git log -S"functionName"         # 改了这个函数的提交
+
+# 按条件过滤
+git log --author="Alice"         # Alice 的提交
+git log --since="2026-01-01"     # 新年后的提交
+git log --before="2026-06-01"    # 六月前的提交`,
+          language: "bash",
+        },
+        {
+          title: "diff——看改了啥",
+          content: `diff 是排 bug 利器——一眼看到底哪些代码变了：`,
+          code: `# 工作区 vs 暂存区
+git diff
+
+# 暂存区 vs 最新提交
+git diff --staged
+git diff --cached
+
+# 工作区 vs 最新提交
+git diff HEAD
+
+# 查看两个分支的差别
+git diff main..feature-branch
+git diff --name-only main..feature-branch   # 只看改了哪些文件名
+
+# 查看单次提交的内容
+git show HEAD
+git show abc1234
+
+# 查看某行代码是谁啥时候改的
+git blame file.txt
+git blame -L 10,30 file.txt    # 只看 10-30 行`,
+          language: "bash",
+          tip: "git blame 其实不是「归罪」的意思，是查谁写了哪段——但代码审查时叫 blame 确实很形象。",
+        },
+      ],
+      quiz: [
+        { question: "git fetch 和 git pull 有什么区别？", options: ["一样", "fetch 只下载不合并，pull=fetch+merge", "fetch 更快", "pull 只下载"], answer: 1, explanation: "fetch 把远程更新下载到本地但不合并，给你机会先看；pull 是 fetch + merge 一条龙。" },
+        { question: "git status 报告 'nothing to commit, working tree clean' 是什么意思？", options: ["代码删光了", "工作区干净——没有待提交的改动", "Git 坏了", "远程没更新"], answer: 1, explanation: "工作区所有改动都提交了，跟最后一次 commit 完全一致——干净状态。" },
+        { question: "git log --oneline 的输出格式？", options: ["完整提交详情", "每条提交一行——hash + 标题", "图形化显示", "只显示 hash"], answer: 1, explanation: "--oneline 把每条提交压成一行，紧凑排列前 7 位 hash 和标题，快速浏览历史必备。" },
+        { question: "git diff --staged 看的是什么？", options: ["工作区改动", "暂存区和最后 commit 的差异", "两次 commit 的差异", "没跟踪的文件"], answer: 1, explanation: "已经 git add 进暂存区但还没 git commit 的改动——提交前最后一次确认。" },
+        { question: "git push -u origin main 中 -u 做了什么？", options: ["强制推送", "设上游分支——以后 git push 不带参数就行", "更新远程", "删除远程分支"], answer: 1, explanation: "-u（set-upstream）把本地 main 和远程 origin/main 绑定，以后直接 git push/pull 就行不用每次都写全参数。" },
+      ],
+    },
+    "git-stashing": {
+      slug: "git-stashing",
+      sections: [
+        {
+          title: "stash——临时存一下",
+          content: `正写到一半，同事说有个紧急 bug 要切分支修——现在 commit 半截代码又不好看。stash 就是救星——把当前改动暂存起来，工作区恢复干净，然后放心切分支。等你回来再 stash pop 恢复：`,
+          code: `# 暂存当前所有改动
+git stash
+git stash save "写到一半的登录功能"
+
+# 看存了多少东西
+git stash list
+# stash@{0}: WIP on feature: abc1234 写到一半的登录功能
+
+# 恢复——两种方式
+git stash pop       # 恢复最近一次 stash + 删除它
+git stash apply     # 恢复但不删除，保留 stash
+
+# 恢复指定的 stash
+git stash pop stash@{1}
+
+# 删掉没用的
+git stash drop stash@{0}
+git stash clear     # 全清
+
+# 部分暂存——精细控制
+git stash push -m "only frontend changes" src/frontend/`,
+          language: "bash",
+          tip: "记得别在好几个 stash 堆了又不清理——时间长了跟回收站一样乱。pop 完删掉，用完即走。",
+        },
+        {
+          title: "reset——后悔药",
+          content: `reset 把仓库状态往回退。三种力度：
+--soft：只挪 HEAD，暂存区和工作区都不动——相当于只撤销 commit 命令本身
+--mixed（默认）：挪 HEAD + 清暂存区，工作区保留改动——最安全
+--hard：清光一切——HEAD、暂存区、工作区全回滚到目标——最暴力、没回头路`,
+          code: `# 撤销最近一次 commit——改动回到暂存区
+git reset --soft HEAD~1
+
+# 撤销 commit + 暂存区——改动回到工作区
+git reset HEAD~1
+git reset --mixed HEAD~1
+
+# 完全撤销——改动的代码全没
+git reset --hard HEAD~1
+
+# 回退到某个特定提交
+git reset --hard abc1234
+
+# 把文件从暂存区拉回到工作区
+git reset HEAD file.txt
+git restore --staged file.txt   # Git 2.23+ 新写法`,
+          language: "bash",
+          warning: "git reset --hard 很危险——没提交的改动会被干掉。执行前先用 git stash 或确认干净。已经 push 过的 commit 别 reset 后 force push，会搞乱别人的仓库。",
+        },
+        {
+          title: "revert——文明回退",
+          content: `revert 不会改历史——它在现有基础上再提交一个「反操作」，把目标 commit 的改动反向置回来。对已经 push 到公共分支的代码，revert 比 reset 文明——不改历史、不害队友：`,
+          code: `# 回退最近一次提交——创建一条新的 revert commit
+git revert HEAD
+
+# 回退到指定提交
+git revert abc1234
+
+# 多个连续 revert
+git revert HEAD~3..HEAD
+
+# revert 出现冲突时——解决后继续
+git revert --continue
+git revert --abort    # 放弃 revert`,
+          language: "bash",
+          tip: "已经 push 的 commit 需要回退用 revert 不要 reset + force push。revert 是添加新 commit 撤销，历史在线性延展，不会有同事的 git pull 报冲突。",
+        },
+      ],
+      quiz: [
+        { question: "git stash pop 和 git stash apply 的区别？", options: ["一样", "pop 恢复并删除 stash，apply 恢复但保留 stash", "pop 更快", "apply 只能读"], answer: 1, explanation: "pop 是取了不还，apply 是复制一份——stash 列表里还有。" },
+        { question: "git reset --soft HEAD~1 做了什么？", options: ["删代码", "只撤销最近一次 commit 保留改动在暂存区", "清空仓库", "恢复文件"], answer: 1, explanation: "HEAD 回退一步，但改动保留在暂存区——等于撤销 commit 命令本身。" },
+        { question: "为啥已经 push 的 commit 不建议 reset + force push？", options: ["慢", "改历史让其他人 pull 的时候冲突、分支发散", "不安全", "GitHub 不允许"], answer: 1, explanation: "别人已经基于旧 commit 工作，你改公共历史会导致他们的仓库跟远端对不上。公共分支用 revert 别用 reset + force push。" },
+        { question: "git reset --hard 会丢什么？", options: ["远程代码", "没提交的工作区改动全部丢失", "分支", "标签"], answer: 1, explanation: "--hard 彻底清空暂存区和工作区——没提交的改动全部消失，找不回来除非翻了 reflog。" },
+        { question: "git revert 的原理是？", options: ["删除历史", "产生新 commit 恰好是原 commit 的反操作", "重置分支", "丢弃改动"], answer: 1, explanation: "revert 不篡改历史——它新建一个 commit，内容就是把要撤销的提交的改动反着做一遍。" },
+      ],
+    },
+    "git-remotes": {
+      slug: "git-remotes",
+      sections: [
+        {
+          title: "远程仓库管理",
+          content: `远程仓库就是大家共享的那个代码仓库（GitHub/GitLab/Gitee）。git remote 是管理本地仓库和远程仓库之间映射的命令：`,
+          code: `# 查看远程仓库
+git remote              # 叫什么名
+git remote -v            # 带 fetch/push 地址
+
+# 添加远程仓库
+git remote add origin https://github.com/user/repo.git
+git remote add upstream https://github.com/original/repo.git
+
+# 改地址 / 删仓库
+git remote set-url origin git@github.com:user/new-repo.git
+git remote remove upstream
+
+# 查看远程分支
+git branch -r            # 只列远程分支
+git branch -a            # 本地 + 远程全列`,
+          language: "bash",
+          tip: "fork 工作流常见配置：origin 指向你 fork 的仓库，upstream 指向原始仓库。同步上游更新：git fetch upstream && git merge upstream/main。",
+        },
+        {
+          title: "Fork 和 PR 流程",
+          content: `开源项目协作的标准流程——你不会直接往主仓库推代码，而是：
+1. Fork 一份主仓库到自己账号下（GitHub 点个按钮）
+2. clone 你的 fork 到本地
+3. 加原始仓库做 upstream 随时同步更新
+4. 开分支写功能 -> push 到自己 fork
+5. 在 GitHub 上发起 Pull Request
+6. 代码 review 后合并进主仓库`,
+          code: `# 典型 Fork 工作流
+git clone https://github.com/yourname/repo.git
+cd repo
+git remote add upstream https://github.com/original/repo.git
+
+# 同步上游更新（开新功能前先同步）
+git fetch upstream
+git checkout main
+git merge upstream/main
+git push origin main
+
+# 开发功能
+git checkout -b feature-awesome
+# ... 写代码 ...
+git push origin feature-awesome
+# 在 GitHub 上 Create Pull Request from feature-awesome`,
+          language: "bash",
+        },
+        {
+          title: "解决合并冲突",
+          content: `冲突不是世界末日——只是 Git 不知道怎么同时合并两个改动。别慌，三步走：
+1. 打开冲突文件——Git 把两边冲突都标出来了
+2. 决定要保留哪段或怎么写——删掉 Git 加的标记
+3. git add 告诉 Git 解决好了，然后 commit`,
+          code: `# pull 或 merge 之后看到冲突
+git status
+# Unmerged paths: both modified: file.txt
+
+# 冲突文件长这样：
+<<<<<<< HEAD           # 你当前分支的内容
+const port = 3000;
+=======                # 对方分支的内容
+const PORT = 8080;
+>>>>>>> feature-branch
+
+# 手动选留哪一个（比如留 3000），删掉标记行，变成：
+const port = 3000;
+
+# 标记为已解决
+git add file.txt
+git commit -m "merge: resolve conflict"
+
+# 放弃解决——回到 merge 前
+git merge --abort`,
+          language: "bash",
+          tip: "经常 pull 上游更新就不容易产生大冲突——积压越久冲突越大。小步快跑，频繁同步。",
+        },
+      ],
+      quiz: [
+        { question: "Fork 工作流中 origin 和 upstream 通常指向哪？", options: ["都指向自己", "origin 指向自己 fork，upstream 指向原始仓库", "origin 指向原始仓库", "upstream 没意义"], answer: 1, explanation: "origin 是你 fork 的仓库（你有写权限），upstream 是原始仓库（你只能读，通过 PR 贡献）。" },
+        { question: "Pull Request 的本质是？", options: ["合并代码", "请求原始仓库审查和合并你的改动", "拉取代码", "删除分支"], answer: 1, explanation: "PR 不是你把代码推到别人仓库——是你请求仓库维护者审查你的改动并以合法形式合并进去。" },
+        { question: "git merge --abort 干什么的？", options: ["合并 git", "放弃合并——回到 merge 之前状态", "合并分支", "强制合并"], answer: 1, explanation: "merge 到一半发现冲突太乱不想继续了——--abort 撤回到 merge 前的干净状态。" },
+        { question: "合并冲突时 Git 用什么符号标记冲突？", options: ["// 和 //", "<<<<<<< 和 ======= 和 >>>>>>>", "/* 和 */", "## 和 ##"], answer: 1, explanation: "<<<<<<< 是你这边的改动，>>>>>>> 是对方那边的改动，中间 ======= 隔开——删标记保留想要的内容就解决了。" },
+      ],
+    },
+    "git-hooks": {
+      slug: "git-hooks",
+      sections: [
+        {
+          title: "Git Hooks 是啥",
+          content: `Git Hooks 是在特定 Git 事件触发时自动跑的脚本——提交前检查代码格式、提交信息格式校验、push 前跑测试。hook 脚本放在 .git/hooks/ 目录，去掉 .sample 后缀就激活了。最常用的 pre-commit 在提交前跑检查——直接把问题消灭在本地，等不到 CI 环节才发现。`,
+          code: `# .git/hooks/pre-commit ——提交前自动跑
+#!/bin/sh
+# 检查代码格式
+npm run lint
+if [ $? -ne 0 ]; then
+  echo "Lint 不通过，提交被拦截了"
+  exit 1
+fi
+
+# commit-msg ——检查提交信息格式
+#!/bin/sh
+# 要求提交信息格式：type: description
+COMMIT_MSG=$(cat $1)
+if ! echo "$COMMIT_MSG" | grep -qE "^(feat|fix|docs|chore|refactor|test): "; then
+  echo "提交信息格式不对：type: description"
+  exit 1
+fi`,
+          language: "bash",
+          tip: "原生 hooks 没法直接分享给团队——.git/hooks 不在版本控制里。所以诞生了 husky 这样的工具——把 hooks 写在项目目录中，团队 clone 后自动装上。",
+        },
+        {
+          title: "husky + lint-staged",
+          content: `husky 把 hooks 声明在 .husky/ 目录里，可以提交到 git——全团队共享。lint-staged 只检查暂存区里的文件，不改动不检查的——又省时间又精准。安装：npm i -D husky lint-staged，初始化：npx husky init（创建 .husky/pre-commit）：`,
+          code: `# package.json 里配 lint-staged
+{
+  "lint-staged": {
+    "*.{js,ts,tsx}": ["eslint --fix", "prettier --write"],
+    "*.css": ["stylelint --fix"],
+    "*.py": ["ruff format", "ruff check"]
+  }
+}
+
+# .husky/pre-commit ——husky 自动生成的 hook
+npx lint-staged
+
+# .husky/commit-msg ——检查提交信息
+npx --no-install commitlint --edit $1`,
+          language: "json",
+          tip: "lint-staged 小技巧：自动格式化完了要 git add 加回去——lint-staged 自动处理，不用手写。",
+        },
+        {
+          title: "常用 hooks 场景",
+          content: `pre-commit：检查代码格式、跑 eslint、禁止提交密码和密钥到仓库——最常用的 hook
+commit-msg：检查提交信息格式——强制团队遵守 Conventional Commits（feat:, fix:, docs: 等）
+pre-push：push 前跑测试，防止推送烂代码
+post-commit：提交成功后通知或更新
+pre-receive/update（服务端）：中心仓库的守卫——拒绝不合规的推送`,
+        },
+      ],
+      quiz: [
+        { question: "pre-commit hook 什么时候触发？", options: ["push 后", "git commit 执行时、提交前", "pull 时", "checkout 时"], answer: 1, explanation: "在你 git commit 按下回车后、真正提交之前，pre-commit 脚本跑完不出错才会继续提交。" },
+        { question: "husky 解决了什么问题？", options: ["加速 Git", "让 hooks 可以提交到版本库、团队共享", "替代 Git", "图形化 Git"], answer: 1, explanation: "项目内配置 hooks，clone 后自动生效——不需要每个人自己去 .git/hooks 里手动复制脚本。" },
+        { question: "lint-staged 和直接跑 lint 区别？", options: ["一样", "lint-staged 只检查暂存区文件，更快更精准", "lint-staged 更慢", "lint-staged 会失败"], answer: 1, explanation: "全量 lint 可能检查几百个文件要等几秒，lint-staged 只对即将提交的那几个文件跑检查——轻量高效。" },
+        { question: "commit-msg hook 能做什么？", options: ["修改代码", "校验提交信息格式——不符合规则就拦下", "加速提交", "自动 push"], answer: 1, explanation: "commit-msg 拿到你写的提交信息文本，可以用正则匹配检查格式——强制团队写好提交备注。" },
+      ],
+    },
+    "git-workflows": {
+      slug: "git-workflows",
+      sections: [
+        {
+          title: "Git Flow——经典流",
+          content: `Git Flow 把分支分很多种角色——开发流程高度结构化，适合有固定发布周期的团队：
+main：永远稳定、可发布的生产版本
+develop：最新的开发状态，从 main 分出
+feature/*：从 develop 分出来开发新功能，完成合回 develop
+release/*：准备发布的版本，从 develop 分出修 bug
+hotfix/*：紧急修线上问题，从 main 分出修完合到 main 和 develop`,
+          code: `# Git Flow 命令行工具（不必装，自己建分支更灵活）
+# 功能开发
+git checkout -b feature/user-login develop
+# ... 开发 ...
+git checkout develop
+git merge --no-ff feature/user-login
+
+# 发布准备
+git checkout -b release/1.0 develop
+# ... 修小 bug ...
+git checkout main
+git merge --no-ff release/1.0
+git tag -a v1.0 -m "Release 1.0"
+git checkout develop
+git merge --no-ff release/1.0
+
+# 热修复
+git checkout -b hotfix/bug-123 main
+# ... 修 bug ...
+git checkout main
+git merge --no-ff hotfix/bug-123
+git tag -a v1.0.1 -m "Hotfix 1.0.1"
+git checkout develop
+git merge --no-ff hotfix/bug-123`,
+          language: "bash",
+          tip: "Git Flow 有小公司用得越来越少——太繁琐了。但如果你们在做按版本发布的桌面软件或硬件产品，Git Flow 的结构感很舒服。",
+        },
+        {
+          title: "GitHub Flow——简单流",
+          content: `比 Git Flow 简化——只有一个 main 分支永远可部署（技术上），feature 分支拉完、PR 审核、合并、立刻部署。适合持续交付的 Web 应用：
+
+1. main 分支必须始终可以部署
+2. 开发从 main 拉出描述性的分支名（feature-xxx, fix-xxx）
+3. 开发完发起 Pull Request——代码审查
+4. 审查通过合并入 main
+5. 合并后立即部署（自动化 CI/CD）
+
+没有 develop、release、hotfix——只有 main 和无数功能分支来回——极简高效。`,
+        },
+        {
+          title: "Trunk-Based Development 和分支命名",
+          content: `Trunk-Based（干道开发）更激进——所有人往一个主干（main）直接提交或短分支，分支存活不超过一两天。全靠 feature flag 和强大的 CI/CD 搞定。Google 和大部分互联网大厂都演进成这种模式。
+
+不管用哪种流程——分支名写清楚。推荐格式：
+feature/user-login——新功能
+fix/header-crash——修 bug
+chore/update-deps——日常维护
+release/v2.1——发版分支
+docs/api-guide——文档`,
+          tip: "小型团队（1-5 人）直接用 GitHub Flow——一个 main + feature/fix 分支的方法最简单，不用记复杂的分支策略。",
+        },
+      ],
+      quiz: [
+        { question: "Git Flow 里 hotfix 分支从哪分出来？", options: ["develop", "feature", "main——直接修生产问题", "release"], answer: 2, explanation: "hotfix 是紧急线上修复——从稳定的 main 分出来，修完合并回 main 和 develop，保证两边都包含这次修复。" },
+        { question: "GitHub Flow 跟 Git Flow 最大区别？", options: ["GitHub Flow 更复杂", "GitHub Flow 只有一个 main 分支 + 功能分支，没有 develop/release/hotfix", "GitHub Flow 不能 merged", "没有区别"], answer: 1, explanation: "GitHub Flow 极简化——只有 main 和有描述名的功能分支，提交到 main 即部署，不需要额外分支角色。" },
+        { question: "--no-ff merge 是什么意思？", options: ["快速合并", "永远产生一个合并提交保留分支印记", "不合并差异", "压缩提交"], answer: 1, explanation: "no fast-forward——即使能快进合并也额外生成一个 merge commit，保留分支存在过的证明材料。" },
+        { question: "Trunk-Based Development 核心特点？", options: ["多分支并行", "所有人直接往主干提交或极短分支——持续集成极频繁", "只用 Git Flow", "不写代码"], answer: 1, explanation: "分支最晚一两天必须合回主干，通过 feature flag 隐藏进行中的功能——等于高频小步提交到主干。" },
+        { question: "分支命名 fix/header-crash 里 fix 前缀的作用？", options: ["Git 强制要求", "一眼看出是修 bug 的分支", "没意义", "只能用于 hotfix"], answer: 1, explanation: "前缀给分支类型打标签——feature 是新功能，fix 是修 bug，release 是发版——团队沟通和过滤方便。" },
+      ],
+    },
+    "git-advanced": {
+      slug: "git-advanced",
+      sections: [
+        {
+          title: "cherry-pick——挑樱桃",
+          content: `cherry-pick 允许你从别的分支挑出来某个 commit 单独应用到当前分支——不需要合整个分支，只拿想要的干净提交：`,
+          code: `# 从 feature 分支拿一个 commit 到 main
+git checkout main
+git cherry-pick abc1234
+
+# 拿多个 commit
+git cherry-pick abc1234 def5678
+
+# 拿一个范围的 commit
+git cherry-pick abc1234..def5678
+
+# 冲突了就手动解决后继续
+git cherry-pick --continue
+git cherry-pick --abort    # 放弃`,
+          language: "bash",
+          tip: "cherry-pick 可能会产生重复提交——两个分支以后合流可能会有冲突。常用场景：修补 hotfix 时从 bugfix 分支挑补丁、重新整理历史时把后续提交挑到干净的基础提交上。",
+        },
+        {
+          title: "rebase -i——重写历史",
+          content: `rebase -i 是交互式变基——你可以把几个 commit 压缩成一个（squash）、修改提交信息（reword）、调整顺序、删除不要的 commit。上线前把分支收拾干净——把一堆"tmp"、"fix"合成有意义的提交再合主分支：`,
+          code: `# 交互式变基最近 3 个 commit
+git rebase -i HEAD~3
+
+# 进入编辑器，每行是一个 commit：
+pick abc1234 加登录页面
+pick def5678 fix typo
+pick ghi7890 又改样式
+
+# squash——把后面的 commit 压进前面一个
+pick abc1234 加登录页面
+squash def5678 fix typo       # 这条压进上一个
+squash ghi7890 又改样式      # 这条也压进第一个
+
+# 保存后 Git 把三个 commit 合成一个——提交信息编辑成一个就完事`,
+          language: "bash",
+          warning: "不要对已经 push 到共享分支的 commit 用 rebase -i——改历史会让同事抓狂。只在本地分支独享的提交上 rebase。",
+        },
+        {
+          title: "bisect——二分法找 bug",
+          content: `程序某天突然出 bug 了，但你不知道是哪个 commit 引入的？bisect 用二分查找帮你从几十上百个 commit 中快速锁定肇事提交：`,
+          code: `# 开始二分搜索
+git bisect start
+
+# 标记当前版本是坏的
+git bisect bad HEAD
+
+# 标记某个已知的好的版本
+git bisect good v1.0
+
+# Git 自动切到中间 commit——测试后标记 good 或 bad
+git bisect good    # 如果是好的——bug 在更近期
+git bisect bad     # 如果是坏的——bug 在更早
+
+# 重复几轮后 Git 找到第一个引入 bad 的 commit
+# 查看结果
+git bisect log
+
+# 结束二分搜索
+git bisect reset`,
+          language: "bash",
+          tip: "bisect 可以自动化——写个脚本来判断 good/bad：git bisect run npm test。Git 自动跑完帮你找到 break 的提交，效率爆表。",
+        },
+        {
+          title: "reflog——兜底保护",
+          content: `reflog 是本地历史记录——记录你在仓库里的一切操作（commit、checkout、rebase、reset）。就算你 git reset --hard 掉了没 push 的 commit——reflog 还能找回来：`,
+          code: `# 看所有操作记录
+git reflog
+# abc1234 HEAD@{0}: reset: moving to HEAD~1
+# def5678 HEAD@{1}: commit: new feature
+
+# 恢复到之前的 commit（不会丢失）
+git checkout HEAD@{1}
+# 或者建个分支指向它
+git branch recover-branch HEAD@{1}
+
+# reflog 默认保留 90 天（gc.reflogExpire 可调）`,
+          language: "bash",
+          tip: "reflog 是本地不可同步的操作日志——只记录你本地仓库的操作，不用 push 不会被共享，纯粹是给自己操作的防护。",
+        },
+      ],
+      quiz: [
+        { question: "cherry-pick 做了什么？", options: ["挑水果", "从其他分支单独拿某个 commit 到当前分支", "合并整个分支", "删除分支"], answer: 1, explanation: "cherry-pick 能把特定一个或几个 commit 单独应用到当前分支，不合并其他不想带的提交。" },
+        { question: "rebase -i 里 squash 操作的含义？", options: ["删除 commit", "把当前 commit 压进上一个——多个 commit 合为一个", "跳过 commit", "交换顺序"], answer: 1, explanation: "squash 把后面提交的内容合并到前一个 commit 里——常用于把多个零散 commit 整理成一个干净的提交。" },
+        { question: "git bisect 用的是什么算法？", options: ["遍历", "二分查找——快速定位引入 bug 的 commit", "随机尝试", "冒泡"], answer: 1, explanation: "二分查找：在好坏两个点中间换版本，每轮排除一半嫌疑——O(log n) 找到肇事提交，比从头翻快得多。" },
+        { question: "reflog 和 git log 有什么区别？", options: ["一样", "reflog 记录本地仓库的一切操作；log 只记录提交历史", "log 有分支信息", "reflog 显示远程操作"], answer: 1, explanation: "reflog 是本地操作日记——reset、rebase、checkout 全在里面，即使误删了 commit 也能从 reflog 找回。" },
+        { question: "rebase -i 不应该对哪种分支使用？", options: ["本地新分支", "已经 push 给共享分支的 commit——不能改历史", "短分支", "长分支"], answer: 1, explanation: "rebase -i 改提交历史——已推到远程共享的分支，别人拉过去再 reset 会乱掉双方仓库。本地独用是安全区域。" },
       ],
     },
   },
@@ -2990,7 +4995,553 @@ location / {
         { question: "Nginx 负载均衡中 ip_hash 的作用是？", options: ["随机分配", "根据客户端IP分配到固定服务器", "按顺序分配", "按权重分配"], answer: 1, explanation: "ip_hash 根据客户端 IP 的哈希值将请求分配到固定的后端服务器，实现会话保持。" },
         { question: "proxy_pass 指令干什么的？", options: ["认证用户", "把请求转发给后端服务器", "设置缓存", "压缩响应"], answer: 1, explanation: "proxy_pass 是反向代理的核心——告诉 Nginx 把匹配到的请求转发到哪个后端地址。" },
         { question: "proxy_set_header X-Real-IP $remote_addr 有什么用？", options: ["设置缓存头", "把真实客户端 IP 传给后端", "伪装 IP", "隐藏 IP"], answer: 1, explanation: "Nginx 代理后，后端看到的是 Nginx 的 IP。这个头把用户的真实 IP 透传过去，方便后端记录和分析。" },
-        { question: "upstream 块里的 weight=3 是什么意思？", options: ["服务器编号", "权重，权重越大概率越大", "最大连接数", "超时时间"], answer: 1, explanation: "weight 是加权轮询的权重，3:2:1 意味着给那台服务器分配的请求是另外两台的三倍和两倍。" },
+         { question: "upstream 块里的 weight=3 是什么意思？", options: ["服务器编号", "权重，权重越大概率越大", "最大连接数", "超时时间"], answer: 1, explanation: "weight 是加权轮询的权重，3:2:1 意味着给那台服务器分配的请求是另外两台的三倍和两倍。" },
+      ],
+    },
+    "nginx-static": {
+      slug: "nginx-static",
+      sections: [
+        {
+          title: "静态文件服务",
+          content: `Nginx 最初的成名绝技就是静态文件服务——比其他服务器快得多。一个 root 指令指定文件根目录，location 块做路由匹配，图片、CSS、JS、HTML 文件不经过后端直接返回：`,
+          code: `# 基本静态文件服务
+server {
+    listen 80;
+    server_name static.example.com;
+
+    root /var/www/html;
+    index index.html index.htm;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    # alias——路径别名（路径不一样时用）
+    location /images/ {
+        alias /var/data/photos/;
+    }
+}`,
+          language: "nginx",
+        },
+        {
+          title: "root vs alias",
+          content: `这两个指令容易被搞混：
+root——拼接路径。location /img/ + root /var/www => 找 /var/www/img/xxx.jpg
+alias——替换直指。location /img/ + alias /var/data/ => 找 /var/data/xxx.jpg
+
+alias 一定要以 / 结尾，否则不工作。另外 try_files 是在 root/alias 找文件，而不是在 URL 路径找——这是静态文件服务的核心逻辑：`,
+          code: `# root：路径是 $root + $uri
+location /assets/ {
+    root /var/www;
+    # 用户访问 /assets/logo.png => Nginx 找 /var/www/assets/logo.png
+}
+
+# alias：路径是 $alias + $uri去掉匹配部分
+location /assets/ {
+    alias /var/data/static/;
+    # 用户访问 /assets/logo.png => Nginx 找 /var/data/static/logo.png
+    # 注意 alias 后的 / 不能少——少了就拼接错误
+}
+
+# try_files 用法
+location / {
+    try_files $uri $uri/ /index.html;  # 把 SPA 应用路径都回传给 index.html
+}`,
+          language: "nginx",
+          tip: "单页应用（SPA：Vue/React）最常用 try_files $uri /index.html——URL 路由交给前端处理，Nginx 只管把找不到的文件全返回 index.html。",
+        },
+        {
+          title: "静态文件缓存",
+          content: `给静态资源设缓存过期时间，用户下次访问直接从浏览器缓存拿——节省带宽、减轻服务器压力、加载超快：`,
+          code: `# 图片、字体、CSS、JS 缓存 30 天
+location ~* \\.(jpg|jpeg|png|gif|svg|webp|ico)$ {
+    expires 30d;
+    add_header Cache-Control "public, immutable";
+}
+
+location ~* \\.(css|js)$ {
+    expires 7d;
+    add_header Cache-Control "public, max-age=604800";
+}
+
+location ~* \\.(woff|woff2|ttf|eot)$ {
+    expires 1y;
+    add_header Cache-Control "public, immutable";
+}
+
+# expires 也可以用具体时间
+expires modified +7d;    # 修改时间 +7 天
+expires @23h30m;         # 当天 23:30`,
+          language: "nginx",
+          tip: "immutable 告诉浏览器这个文件永远不会变——文件名带 hash（main.a3d5f.js），内容变了文件名跟着变，旧缓存也不会错。所以放心设 1 年缓存。",
+        },
+      ],
+      quiz: [
+        { question: "root 和 alias 的核心区别？", options: ["没区别", "root 拼接路径，alias 直接替换前缀", "root 只能用于静态文件", "alias 更快"], answer: 1, explanation: "root 把 location 路径拼上去，alias 直接忽略匹配的部分用你用 alias 指定的路径——最重要的区别。" },
+        { question: "try_files $uri $uri/ /index.html 常用于什么场景？", options: ["代理转发", "单页应用（SPA）——找不到文件返回 index.html 让前端搞定路由", "负载均衡", "API 转发"], answer: 1, explanation: "Vue/React 等 SPA 应用，页面 URL 路由由前端处理——Nginx 只返回 index.html，所有 URL 都由前端客户端渲染。" },
+        { question: "Cache-Control: immutable 是什么意思？", options: ["不用缓存", "告诉浏览器这个文件永不变——不需要做二次协商", "总是向服务器确认", "每次请求新文件"], answer: 1, explanation: "immutable 表示资源不会变（因为文件名带 hash），浏览器不必发条件请求问服务器有没有更新——省掉多余的验证请求。" },
+        { question: "expires 30d 做了什么？", options: ["30 天不访问", "让浏览器缓存 30 天——31 天的请求才重新下载", "限制 30 天过期", "30 天删除文件"], answer: 1, explanation: "expires 设 Cache-Control 的 max-age=30 天，浏览器 30 天内用本地缓存，到期不再请求服务器——减少请求和带宽。" },
+      ],
+    },
+    "nginx-ssl": {
+      slug: "nginx-ssl",
+      sections: [
+        {
+          title: "HTTPS 和证书配置",
+          content: `HTTPS 已是所有网站的标配——不加密的 HTTP 浏览器都打"不安全"标签。Nginx 配 SSL 基本三步：拿到证书、改配置、配置自动续期：`,
+          code: `server {
+    listen 443 ssl http2;
+    server_name example.com www.example.com;
+
+    ssl_certificate     /etc/nginx/ssl/example.com.crt;
+    ssl_certificate_key /etc/nginx/ssl/example.com.key;
+
+    # 推荐安全参数
+    ssl_protocols TLSv1.2 TLSv1.3;          # 只认 TLS 1.2 和 1.3
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256;
+    ssl_prefer_server_ciphers on;
+
+    root /var/www/html;
+}
+
+# HTTP 自动跳转到 HTTPS
+server {
+    listen 80;
+    server_name example.com;
+    return 301 https://$host$request_uri;
+}`,
+          language: "nginx",
+        },
+        {
+          title: "Let's Encrypt 免费证书",
+          content: `Let's Encrypt 提供免费 SSL 证书，用 certbot 工具全自动申请和续期。90 天有效期但能设置自动续期——一劳永逸：`,
+          code: `# Ubuntu 安装 certbot
+sudo apt install certbot python3-certbot-nginx
+
+# 自动获取并配好 Nginx（自动修改配置文件）
+sudo certbot --nginx -d example.com -d www.example.com
+
+# 只获取证书，手动配
+sudo certbot certonly --webroot -w /var/www/html \\
+  -d example.com -d www.example.com
+
+# 模拟续期测试
+sudo certbot renew --dry-run
+
+# certbot 自动添加 cron/systemd timer 做续期
+# 查看自动续期状态
+sudo systemctl status certbot.timer`,
+          language: "bash",
+          tip: "certbot nginx 插件自动修改 Nginx 配置加 SSL——配合 Ubuntu 的 software-properties-common 包，一键搞定证书申请和 Nginx 配置。",
+        },
+        {
+          title: "HSTS 和 HTTP/2",
+          content: `HSTS 就是告诉浏览器"以后访问此网站只能用 HTTPS，别再试 HTTP"——防止中间人攻击里降级 HTTP。浏览器记住这个指令一段时间内再也不走 HTTP。
+
+HTTP/2 是 HTTP 协议的进化——请求复用同一连接，减少握手次数，加速页面加载：`,
+          code: `server {
+    listen 443 ssl http2;
+
+    # 开启 HSTS——6 个月有效
+    add_header Strict-Transport-Security "max-age=15768000; includeSubDomains; preload" always;
+
+    # 其它安全头
+    add_header X-Content-Type-Options nosniff;
+    add_header X-Frame-Options DENY;
+    add_header X-XSS-Protection "1; mode=block";
+
+    # OCSP Stapling——证书吊销状态缓存到本地
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    resolver 8.8.8.8 8.8.4.4 valid=300s;
+}`,
+          language: "nginx",
+          warning: "HSTS includeSubDomains 会波及所有子域名——确认所有子域名都部署了 SSL 再开。开了 preload 之后浏览器直接内置你的 HTTPS 标记，回不去 HTTP 可能得不偿失。",
+        },
+        {
+          title: "自签证书（开发用）",
+          content: `开发环境用 openssl 自签一张证书——浏览器会提示不安全，但功能测试足够：`,
+          code: `# 生成自签证书
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \\
+  -keyout /etc/nginx/ssl/server.key \\
+  -out /etc/nginx/ssl/server.crt \\
+  -subj "/C=CN/ST=Beijing/L=Beijing/O=Dev/CN=localhost"
+
+# Nginx 里一样方式引用 ssl_certificate 和 ssl_certificate_key`,
+          language: "bash",
+          tip: "RSA 还是 ECC？ECC（ecdsa）密钥更短更安全——现代浏览器和服务都支持。openssl ecparam -genkey -name prime256v1 -out key.pem 生成的是 ECC 密钥——文件大小只有 RSA 的几分之一。",
+        },
+      ],
+      quiz: [
+        { question: "Let's Encrypt 证书有效期多久？", options: ["1 年", "90 天——需要自动续期", "30 天", "永不过期"], answer: 1, explanation: "90 天短有效期是为安全考量——certbot 自带续期定时器，90 天其实可以自动续，约等于永久免费。" },
+        { question: "HSTS 头干什么的？", options: ["加密传输", "强制浏览器以后只能通过 HTTPS 访问", "速度优化", "隐藏站点"], answer: 1, explanation: "Strict Transport Security 告诉浏览器记住这个站一定走 HTTPS——防止降级 HTTPS 成 HTTP 来调包数据。" },
+        { question: "certbot --nginx 参数做了什么？", options: ["安装 Nginx", "自动获取 SSL 证书并修改 Nginx 配置", "删除证书", "测试 Nginx"], answer: 1, explanation: "certbot nginx 插件自动申请证书、加载到 Nginx、配上 SSL/TLS 参数——几条命令外完全自动化。" },
+        { question: "listen 443 ssl http2 里 http2 做什么？", options: ["只支持 HTTP/1", "启用 HTTP/2 协议——同连接多路复用提升性能", "HTTP/3", "自动重定向"], answer: 1, explanation: "+ http2 后 Nginx 开启 HTTP/2 支持——一个 TCP 连接里并行传多个请求/响应，省掉的连接握手时间对首屏性能改善很显著。" },
+      ],
+    },
+    "nginx-location": {
+      slug: "nginx-location",
+      sections: [
+        {
+          title: "Location 匹配优先级",
+          content: `location 指令决定哪个 URL 走哪个处理规则。几类匹配方式和优先级（从高到低）：
+= 精确匹配——路径完全相同才匹配
+^~ 前缀优先——匹配后不再往下查正则
+~ 区分大小的正则匹配
+~* 不区分大小的正则匹配
+无修饰前缀匹配——普通前缀，最宽松`,
+          code: `# 精确匹配——访问 / 只有跟 / 完全相同时才匹配
+location = / {
+    return 200 "精确命中！";
+}
+
+# ^~ 前缀优先——匹配后不检查正则
+location ^~ /api/static/ {
+    return 200 "API 静态路径优先！";
+}
+
+# 正则匹配——区分大小写
+location ~ \\.php$ {
+    fastcgi_pass php-fpm;
+}
+
+# 正则匹配——不区分大小写
+location ~* \\.(jpg|png|gif)$ {
+    expires 30d;
+}
+
+# 普通前缀匹配——最后兜底
+location / {
+    try_files $uri /index.html;
+}`,
+          language: "nginx",
+          tip: "优先级口诀：= > ^~ > ~/~* > 普通前缀。正则按配置文件顺序匹配——第一个匹配到的就用，所以经常被访问的正则放前面。",
+        },
+        {
+          title: "rewrite——改 URL",
+          content: `rewrite 把一条 URL 改成另一条 URL 再处理。比如旧的 URL 模式换了新域名、把 http 重定向到 https、负载均衡时修改请求路径：`,
+          code: `# 强制跳转 HTTPS
+server {
+    listen 80;
+    server_name example.com;
+    rewrite ^ https://$host$request_uri permanent;
+    # 或者：return 301 https://$host$request_uri;
+}
+
+# 路径重写
+location /old-api/ {
+    rewrite ^/old-api/(.*)$ /new-api/$1 break;
+    proxy_pass http://backend;
+}
+
+# 旧链接 301 永久重定向
+location /blog {
+    rewrite ^/blog/(.*)$ /news/$1 permanent;
+}
+
+# 根据条件重写
+if ($http_user_agent ~* "bot|spider") {
+    rewrite ^/(.*)$ /blocked;   # 挡住爬虫
+}`,
+          language: "nginx",
+          tip: "能用 return 就别用 rewrite——return 性能更好、逻辑更清晰。return 用于纯重定向，rewrite 用于需要改 URI 再继续匹配的场景。",
+        },
+        {
+          title: "常用变量",
+          content: `Nginx 自带很多内置变量快速获取请求信息——不用额外模块，拿来就用：
+$host——请求的域名
+$server_name——匹配到的 server name
+$uri——请求的 URI 路径（不含参数）
+$args——查询参数（? 后面那串）
+$scheme——http 还是 https
+$request_method——GET/POST/PUT...
+$remote_addr——客户端 IP
+$http_user_agent——浏览器标识
+$http_referer——从哪个页面跳来的
+
+这些变量常用于配置日志、写条件判断、透传 header 到后端。`,
+        },
+      ],
+      quiz: [
+        { question: "location = / 和 location / 的区别？", options: ["一样", "= 精确匹配——只对根路径响应，/ 匹配所有路径", "/ 优先级更高", "= 更慢"], answer: 1, explanation: "= / 是最高优先级的精确匹配——只有访问 example.com 时匹配，/ 被访问任意未匹配到的路径都会走。" },
+        { question: "location ~ 和 location ~* 的区别？", options: ["~ 区分大小写，~* 不区分", "~ 不区分，~* 区分", "~ 更快", "没区别"], answer: 0, explanation: "~ 对正则表达式区分大小写，~* 忽略大小写——形如 ~ (?!^)[a-z] 和 ~* [a-zA-Z] 的区别。" },
+        { question: "rewrite 里的 permanent 参数做什么？", options: ["永久重定向——302", "永久重定向——301 浏览器缓存此跳转", "临时重定向", "不重定向"], answer: 1, explanation: "permanent=301 永久重定向，浏览器会记住这个映射，以后直接跳转到新 URL 不用再请求源站。" },
+        { question: "Nginx 的 $args 变量包含什么？", options: ["URL 路径", "? 后面的查询参数串", "请求方法", "客户端 IP"], answer: 1, explanation: "$args 取的是 ? 后面的所有查询参数——比如 ?page=2&sort=name 就是 page=2&sort=name。" },
+      ],
+    },
+    "nginx-security": {
+      slug: "nginx-security",
+      sections: [
+        {
+          title: "限流——limit_req",
+          content: `限流能防止暴力刷接口或者 DDoS 攻击打垮服务器。limit_req_zone 定义一个"计数器桶"，limit_req 在 location 里对匹配的请求计数消耗，超出最大值后返回 503 或者排队等待：`,
+          code: `# http 段定义限流区和速率
+http {
+    # 以客户端 IP 为键，内存占用 10MB，每秒限 10 个请求
+    limit_req_zone $binary_remote_addr zone=mylimit:10m rate=10r/s;
+
+    server {
+        location /api/ {
+            limit_req zone=mylimit burst=20 nodelay;
+            # burst=20：突发时允许短时排 20 个
+            # nodelay：有 burst 空位时立刻过来，不要等延迟排队
+            proxy_pass http://backend;
+        }
+    }
+}
+
+# 对下载等消耗资源大的也设限
+location /download/ {
+    limit_req zone=mylimit burst=5;
+    limit_rate 200k;   # 每个连接限速 200KB/s
+}`,
+          language: "nginx",
+          tip: "用 limit_req_status 可以自定义返回码——设成 429 Too Many Requests 是目前 REST API 标准的限速响应码。",
+        },
+        {
+          title: "访问控制——allow/deny",
+          content: `最简单的访问控制——基于 IP 的白名单/黑名单。管理后台、内部 API、开发环境都可以设：`,
+          code: `# 只允许特定 IP 段访问
+location /admin/ {
+    allow 10.0.0.0/8;      # 内网段
+    allow 192.168.1.100;    # 允许特定 IP
+    deny all;               # 其他人拒绝
+}
+
+# 拒绝指定 IP 访问
+location / {
+    deny 192.168.1.200;    # 黑名单
+    allow all;
+}
+
+# auth_basic——密码认证（开发阶段）
+location /staging/ {
+    auth_basic "管理员区域";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+}
+# 生成密码文件：htpasswd -c /etc/nginx/.htpasswd admin`,
+          language: "nginx",
+        },
+        {
+          title: "隐藏版本号和防信息泄露",
+          content: `Nginx 默认错误页会显示 Nginx 版本号——攻击者据此可以利用已知 Nginx 漏洞。关掉版本信息、屏蔽代理错误细节、不透露后端信息——让错误页面干净安全：`,
+          code: `http {
+    # 隐藏 Nginx 版本号
+    server_tokens off;
+
+    # 关闭在 40x/50x 错误时显示 Nginx 信息
+    # 自定义错误页
+    error_page 404 /404.html;
+    error_page 500 502 503 504 /50x.html;
+}
+
+# 代理层单独的错误页——不让后端错误透传
+location = /50x.html {
+    root /usr/share/nginx/html;
+    internal;    # 只有内部重定向能访问，外部直接 URL 看不到
+}`,
+          language: "nginx",
+          tip: "proxy_intercept_errors on + error_page 可拦截后端的错误响应，返回自定义页——用户看不到后端的服务异常信息，保护内部细节。",
+        },
+      ],
+      quiz: [
+        { question: "limit_req 限流的原理是？", options: ["限制连接数", "基于 IP 令牌桶计数——达到速率后排队或拒绝", "限制带宽", "限制文件大小"], answer: 1, explanation: "limit_req_zone 给每个 IP 一个桶按指定速率漏水——请求进来消耗令牌，桶空了就排队或直接拒绝。" },
+        { question: "server_tokens off 做了什么？", options: ["加速 Nginx", "隐藏 Nginx 版本号——减少信息泄露", "关闭日志", "关闭缓存"], answer: 1, explanation: "错误页面和响应头 Server 字段不再显示 Nginx 具体版本——减少攻击者利用已知漏洞的可能。" },
+        { question: "allow 10.0.0.0/8; deny all; 的效果？", options: ["允许所有 IP", "只允许 10.x.x.x 内网段访问", "拒绝所有", "只允许局域网"], answer: 1, explanation: "先允许 10.x 段的所有 IP，再拒绝其他——白名单模式，管理后台典型配置。" },
+        { question: "limit_req burst=20 nodelay 里 nodelay 起什么作用？", options: ["无缓冲", "burst 桶位有空直接放行不排队等待", "延迟处理", "不计速"], answer: 1, explanation: "nodelay 使请求在未达到限制前直接走 bursts 的槽位、不从排队中等待——用户不感到延迟，但突发超过 burst 时仍拒绝。" },
+      ],
+    },
+    "nginx-performance": {
+      slug: "nginx-performance",
+      sections: [
+        {
+          title: "worker 进程调优",
+          content: `Nginx 性能的关键是 worker 进程数和连接数。worker 就是干活的进程——简单原则是一个 CPU 核心用一个 worker，auto 自动辨认。worker_connections 决定每个 worker 能同时处理的多大连接数——Websocket 服务需要设大：`,
+          code: `# /etc/nginx/nginx.conf 性能参数
+user nginx;
+worker_processes auto;          # 自动匹配 CPU 核心数
+worker_rlimit_nofile 65535;     # 每个 worker 能打开的文件数
+
+events {
+    worker_connections 4096;    # 每个 worker 的并发连接数
+    use epoll;                  # Linux 高性能事件模型
+    multi_accept on;            # 一次接受多个新连接
+}
+
+# 最大并发数 = worker_processes * worker_connections
+# 4 核 * 4096 = 16384 并发`,
+          language: "nginx",
+        },
+        {
+          title: "gzip 和发送文件优化",
+          content: `gzip 压缩文本资源能省 70% 带宽——HTML/CSS/JS/JSON 都该压缩。sendfile 是 Linux 内核级别的零拷贝文件发送——静态文件直接在内核态从磁盘到网卡，不经过用户态拷贝：`,
+          code: `http {
+    sendfile on;          # 零拷贝——静态文件直发
+    tcp_nopush on;        # 打包多个包一起发——减少 TCP 包数
+    tcp_nodelay on;       # 小数据不等待立即发——keepalive 内的小请求
+    keepalive_timeout 65;
+
+    gzip on;
+    gzip_vary on;                      # 让 CDN 根据 Accept-Encoding 做缓存
+    gzip_comp_level 6;                 # 压缩级别（1-9, 建议 5-6）
+    gzip_min_length 1000;              # 小于 1KB 不压——不值得
+    gzip_proxied any;                  # 代理时也压缩
+    gzip_types
+      text/plain
+      text/css
+      text/javascript
+      application/javascript
+      application/json
+      application/xml
+      image/svg+xml;
+
+    # 客户端缓存
+    open_file_cache max=10000 inactive=30s;
+    open_file_cache_valid 60s;         # 60 秒验证一次缓存是否过期
+    open_file_cache_min_uses 2;
+}`,
+          language: "nginx",
+          tip: "gzip 对已压缩的图片和视频没用还浪费 CPU——只对 text/ 和 application/ 开头 compressible MIME 类型压缩。图片、视频、PDF 本身已经压缩过不用再压。",
+        },
+        {
+          title: "缓冲区和缓存",
+          content: `Nginx 代理时可以设 buffer 吸完后端慢请求——而不是逐字节转发慢如蜗牛。也适合对大文件设大缓冲区快速交付：`,
+          code: `# 代理的缓冲区配置
+location /api/ {
+    proxy_buffering on;
+    proxy_buffer_size 4k;           # 响应头缓冲
+    proxy_buffers 32 16k;           # 响应体缓冲（32 个 16KB）
+    proxy_busy_buffers_size 32k;    # 缓冲忙时的缓冲大小
+    proxy_max_temp_file_size 256m;  # 溢出写的临时文件大小
+
+    proxy_pass http://backend;
+}
+
+# 开启缓存
+proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=my_cache:10m max_size=1g inactive=60m;
+location /api/ {
+    proxy_cache my_cache;
+    proxy_cache_valid 200 10m;      # 成功响应缓存 10 分钟
+    proxy_cache_valid 404 1m;       # 404 缓存 1 分钟
+    proxy_pass http://backend;
+}`,
+          language: "nginx",
+        },
+      ],
+      quiz: [
+        { question: "worker_processes auto 是什么含义？", options: ["1 个进程", "自动按 CPU 核心数设 worker 进程", "随机设", "不设进程"], answer: 1, explanation: "auto 让 Nginx 自己探测机器的 CPU 逻辑核心数——一个核心跑一个 worker 最多利用性能。" },
+        { question: "sendfile on 有什么性能优势？", options: ["压缩文件", "零拷贝——内核态直接发文件到网卡不占用户态", "加密传输", "日志加速"], answer: 1, explanation: "Linux 内核原生操作——文件数据不经过用户态拷贝，直接从磁盘到网卡，CPU 不参与搬运。" },
+        { question: "gzip_comp_level 设成 9 为什么不好？", options: ["压缩更快", "最高压缩比但 CPU 吃起来飞起，延迟增加——不划算", "不工作了", "会报错"], answer: 1, explanation: "9 级压缩 CPU 比对 6 级多十几倍却压缩比没太大提升——投入产出极低，5-6 是性价比最高的点。" },
+        { question: "worker_connections * worker_processes 等于什么？", options: ["CPU 核心数", "Nginx 能处理的理论最大并发连接数", "内存大小", "端口号"], answer: 1, explanation: "每个 worker 都能同时打开 worker_connections 个连接——总数乘以 worker 数量得出最大并发数。" },
+        { question: "proxy_cache 的好处？", options: ["加速代理", "缓存后端响应——下次直接拿缓存不用再返回后端", "防火墙", "日志过滤"], answer: 1, explanation: "反向代理缓存——第一次后端给结果存起来，后续同样请求直接从缓存拿，减少后端压力和响应延迟。" },
+      ],
+    },
+    "nginx-logging": {
+      slug: "nginx-logging",
+      sections: [
+        {
+          title: "access_log 和 error_log",
+          content: `Nginx 两种日志：
+access_log——记录每一次请求——谁访问了什么、状态码是什么、花了多久。位置通常 /var/log/nginx/access.log
+error_log——Nginx 自己的诊断日志——配置错误、SSL 握手失败、上游连接超时。默认位置 /var/log/nginx/error.log`,
+          code: `# 主配置文件设置日志
+http {
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log warn;
+}
+
+# 关了某站的 access_log（减少 IO）
+server {
+    listen 80;
+    access_log off;
+    # 或者写到另一个文件
+    access_log /var/log/nginx/special.log;
+}
+
+# error_log 等级：debug, info, notice, warn, error, crit
+error_log /var/log/nginx/error.log error;   # 只记录 error 级别以上`,
+          language: "nginx",
+          tip: "高流量网站可以设 access_log off 或 access_log /dev/null 减少磁盘 IO。或者用 Buffer 日志写入：buffer=64k flush=1m。",
+        },
+        {
+          title: "自定义日志格式",
+          content: `log_format 定义日志每一行怎么排列——想要啥字段取啥字段。JSON 格式是纯结构化、便于收集到 ELK 或 Grafana 分析：`,
+          code: `# 自定义日志格式
+http {
+    # 详细的普通格式
+    log_format detailed '$remote_addr - $remote_user [$time_local] '
+                        '"$request" $status $body_bytes_sent '
+                        '"$http_referer" "$http_user_agent" '
+                        '$request_time $upstream_response_time';
+
+    # JSON 格式——适合发送给日志平台
+    log_format json_log escape=json '{'
+        '"timestamp":"$time_local",'
+        '"remote_addr":"$remote_addr",'
+        '"request":"$request",'
+        '"status":"$status",'
+        '"body_bytes_sent":"$body_bytes_sent",'
+        '"request_time":$request_time,'
+        '"upstream_response_time":$upstream_response_time,'
+        '"http_referer":"$http_referer",'
+        '"http_user_agent":"$http_user_agent"'
+    '}';
+
+    access_log /var/log/nginx/access.json json_log;
+}`,
+          language: "nginx",
+        },
+        {
+          title: "日志分割和轮转",
+          content: `Nginx 不会自动分割日志——每隔一段时间需要切分否则一个文件几十 GB。用 logrotate 配合 Nginx 定时分割：`,
+          code: `# /etc/logrotate.d/nginx
+/var/log/nginx/*.log {
+    daily                    # 每天轮转
+    missingok                # 日志文件不存在也不报错
+    rotate 14               # 最多保留 14 份轮转
+    compress                 # gzip 压缩轮转
+    delaycompress            # 最新一份不压缩（便于还在读取）
+    notifempty               # 空的就不转
+    create 0640 nginx adm
+    sharedscripts
+    postrotate
+        [ -f /var/run/nginx.pid ] && kill -USR1 $(cat /var/run/nginx.pid)
+    endscript
+}
+
+# 手动测试
+sudo logrotate -d /etc/logrotate.d/nginx  # dry-run
+sudo logrotate -f /etc/logrotate.d/nginx  # 强制执行`,
+          language: "bash",
+          tip: "postrotate 段里的 kill -USR1 很重要——通知 Nginx 关闭旧日志文件、打开新文件继续写。没有这步 Nginx 继续写旧文件，轮转白干了。",
+        },
+        {
+          title: "日志分析和查询",
+          content: `普通 access.log 可以用 awk 做快速分析。JSON 日志送进 ELK/Loki 用 Kibana/Grafana 做仪表盘分析：`,
+          code: `# 统计访问最多的 10 个 IP
+awk '{print $1}' /var/log/nginx/access.log | sort | uniq -c | sort -rn | head -10
+
+# 统计 HTTP 状态码分布
+awk '{print $9}' /var/log/nginx/access.log | sort | uniq -c | sort -rn
+
+# 找出响应时间最慢的 10 个请求
+awk '{print $NF, $0}' /var/log/nginx/access.log | sort -rn | head -10
+
+# 统计每分钟请求数
+awk '{print $4}' /var/log/nginx/access.log | cut -d: -f1-3 | uniq -c
+
+# 查看 5xx 错误
+grep ' 5[0-9][0-9] ' /var/log/nginx/access.log | tail -20`,
+          language: "bash",
+          tip: "$request_time 记录了 Nginx 处理请求的总时间，$upstream_response_time 记录了后端处理时间。两者之差就是 Nginx 自身和处理传输开销——排查慢请求第一手数据。",
+        },
+      ],
+      quiz: [
+        { question: "access_log 和 error_log 区别？", options: ["一样", "access_log 记录每次请求详情，error_log 记录 Nginx 自己的异常", "access_log 存错误", "error_log 存所有请求"], answer: 1, explanation: "access 记录谁访问了什么、状态码等请求详情；error 记录 Nginx 自己的问题——配置错误、上游超时、磁盘 IO 错等。" },
+        { question: "JSON 格式日志的好处？", options: ["更短", "结构化数据——直接导入日志平台分析查询", "更快", "只能用于 Nginx"], answer: 1, explanation: "JSON 是机器全可解析的格式，直接扔到 Elasticsearch/Loki 配合 Kibana/Grafana 做字段提取和数据可视化。" },
+        { question: "logrotate 里 postrotate 段为什么重要？", options: ["不重要", "分割日志后通知 Nginx 关旧文件开新文件", "压缩日志", "删除旧日志"], answer: 1, explanation: "Nginx 一直往当前日志文件的文件描述符写——轮转改文件名后 Nginx 不知道，仍往老文件描述符写。postrotate 发 USR1 信号它才切换。" },
+        { question: "access_log off 什么时候用？", options: ["生产永远关", "极高流量对日志无需求时降低磁盘 IO", "安全要求", "必开关"], answer: 1, explanation: "几十万 QPS 写 access_log 对磁盘 IO 影响大——如果不分析日志且合规允许就关了，否则用缓存写和延迟刷。" },
+        { question: "$request_time 和 $upstream_response_time 区别？", options: ["同一个东西", "$request_time 从收到请求到发完响应的总时间，$upstream_response_time 只算后端处理时间", "一个用于 GET 一个用于 POST", "一个毫秒一个秒"], answer: 1, explanation: "request_time 是 Nginx 处理的总耗时（含读请求+后端调用+发送响应），upstream_response_time 只看后端花了多久——定位慢在 Nginx 本身还是后端。" },
       ],
     },
   },
@@ -9513,6 +12064,1223 @@ input:focus, button:focus {
         { question: "FormData 的作用？", options: ["创建表单", "一次性收集表单所有字段的键值对", "校验表单", "样式表单"], answer: 1, explanation: "new FormData(form) 自动读取表单里所有带 name 的元素，省去挨个取值的麻烦。" },
         { question: "前端校验够用吗？", options: ["够了", "不够——前端校验提升体验，后端必须重验，前端可被绕过", "看情况", "不用校验"], answer: 1, explanation: "前端校验任何人都能绕过去，后端校验是最后防线。两次校验不是重复而是各司其职。" },
         { question: "label 标签为什么要关联 input？", options: ["好看", "点击 label 自动聚焦关联的 input + 屏幕阅读器能读出对应关系", "性能优化", "SEO"], answer: 1, explanation: "label for 关联 input 不仅让点击范围更大，视障用户的屏幕阅读器也能正确配对字段和说明。" },
+      ],
+    },
+    "ts-basics": {
+      slug: "ts-basics",
+      sections: [
+        {
+          title: "TypeScript 是啥——JavaScript 加个类型安全带",
+          content: `TypeScript 说白了就是加了「类型标注」的 JavaScript。你写的还是 JS 那套东西，只是在变量、函数参数、返回值后面多写个冒号 + 类型名，让编译器帮你检查有没有搞错类型。
+
+举个例子：你函数要收一个数字参数，但调用时不小心传了个字符串，JS 会默默忍着然后出 bug，TS 直接在编辑器里给你画红波浪线告诉你「喂，类型不对」。
+
+几个关键认知：
+- TS 代码 .ts 文件最后要编译成 .js 才能在浏览器或 Node 里跑，浏览器不认识 TS
+- TS 的类型检查只在编译时生效，运行时就没了——不会拖慢程序
+- 所有合法的 JS 都是合法的 TS（反过来不行），可以渐进式迁移`,
+        },
+        {
+          title: "搭建环境——跑起来",
+          content: `装 TS 就一行命令，然后弄个配置文件。tsconfig.json 是 TS 的大脑，控制怎么编译、检查多严格：`,
+          code: `# 全局安装 TypeScript 编译器
+npm install -g typescript
+
+# 项目中安装（推荐，锁定版本）
+npm install typescript --save-dev
+
+# 初始化 tsconfig.json
+tsc --init
+
+# 编译文件
+tsc index.ts          # 单文件编译
+tsc                   # 按 tsconfig.json 编译整个项目
+
+# 监听模式——改了自动编译
+tsc --watch`,
+          language: "bash",
+          tip: "推荐把 TS 装在项目 devDependencies 里而不是全局装——不同项目可能用不同 TS 版本，全局装容易打架。",
+        },
+        {
+          title: "基础类型——给数据贴上标签",
+          content: `变量后面加冒号标类型，这就是类型注解。函数参数、返回值也一样。TS 能自动推断的就不用写，写在需要明确的地方：`,
+          code: `// 基本类型注解——冒号 + 类型名
+let name: string = "小明";
+let age: number = 25;
+let isStudent: boolean = true;
+
+// 没有初始值时最好标注类型
+let score: number;
+score = 90;
+
+// 函数——参数和返回值都标上
+function add(a: number, b: number): number {
+  return a + b;            // TS 知道你返回的是数字，放心用
+}
+
+function greet(name: string): void {
+  console.log("你好，" + name);   // void 表示没返回值
+}
+
+// 数组——两种写法
+let nums: number[] = [1, 2, 3];
+let strs: Array<string> = ["a", "b"];  // 泛型写法，后面会讲
+
+// 对象——直接写结构
+let user: { name: string; age: number } = {
+  name: "小红",
+  age: 18,
+};
+
+// TS 能自动推断类型，能推断的就不用写
+let x = 10;        // TS 推断 x 是 number
+let y = "hello";   // TS 推断 y 是 string
+// x = "world";    // 报错！类型推断也管用`,
+          language: "typescript",
+        },
+        {
+          title: "接口——给对象定个形状",
+          content: `interface 用来描述对象的「形状」——规定它必须有哪几个属性、每个属性什么类型。就像签合同，不按规矩来就报错：`,
+          code: `// 定义接口——描述一个对象长什么样
+interface Person {
+  name: string;
+  age: number;
+}
+
+// 用接口来约束变量
+const p1: Person = { name: "张三", age: 30 };  // 正确
+// const p2: Person = { name: "李四" };        // 报错，少 age
+// const p3: Person = { name: "王五", age: 20, gender: "男" };  // 报错，多 gender
+
+// 函数用接口——只要符合形状的对象都能传
+function printPerson(person: Person): void {
+  console.log(person.name + "今年" + person.age + "岁");
+}
+
+printPerson({ name: "赵六", age: 25 });   // 正常
+// printPerson({ name: "钱七" });          // 报错，缺 age`,
+          language: "typescript",
+          tip: "interface 在 TS 编译后就没了（JS 里不存在），纯编译时检查。运行时你没法判断一个对象是不是某个 interface。",
+        },
+        {
+          title: "编译到 JS——.ts 怎么变 .js",
+          content: `tsc 把 .ts 编译成 .js 时，会把类型注解全擦掉。箭头函数、async/await 这些新语法也可以按目标 JS 版本自动转换：`,
+          code: `// tsconfig.json 核心配置
+{
+  "compilerOptions": {
+    "target": "ES2020",           // 编译成哪个版本的 JS
+    "module": "commonjs",         // 模块方案（Node 用 commonjs）
+    "outDir": "./dist",           // 编译产物放哪
+    "rootDir": "./src",           // 源码在哪
+    "strict": true,               // 严格模式——强烈推荐打开
+    "esModuleInterop": true       // 让 import 语法更宽松
+  },
+  "include": ["src/**/*"],        // 编译哪些文件
+  "exclude": ["node_modules"]     // 忽略哪些
+}
+
+// 编译前 (index.ts)
+const greet = (name: string): string => "Hello " + name;
+
+// 编译后 (dist/index.js) —— 类型没了，箭头变普通函数
+var greet = function (name) { return "Hello " + name; };`,
+          language: "typescript",
+          tip: "strict: true 是 TS 里最重要的配置——开启后所有严格检查全启用，虽然刚开始报错多，但长期来看帮你少写无数 bug。",
+        },
+      ],
+      quiz: [
+        { question: "TypeScript 代码能在浏览器直接跑吗？", options: ["能", "不能——得先编译成 JS", "部分能", "用特殊标签就行"], answer: 1, explanation: "TS 是 JS 的超集，浏览器不认识 .ts 文件，必须用 tsc 编译成 .js 才能跑。" },
+        { question: "TS 的类型检查什么时候生效？", options: ["运行时", "编译时（写代码时）", "部署时", "从来不检查"], answer: 1, explanation: "TS 的类型系统只在开发/编译阶段起作用，编译后类型全擦掉，运行时跟 JS 一模一样。" },
+        { question: "interface 编译成 JS 后还存在吗？", options: ["存在", "不存在——interface 是纯 TS 概念，编译后擦除", "变成 class", "变成注释"], answer: 1, explanation: "interface、type、泛型等 TS 专属语法编译后全部消失，产物就是纯净的 JS。" },
+        { question: "tsconfig.json 里 strict: true 的作用？", options: ["没作用", "开启所有严格类型检查——强烈推荐", "提高运行速度", "生成更小的文件"], answer: 1, explanation: "strict 是一个总开关，打开后相当于把 noImplicitAny、strictNullChecks 等全开了。" },
+        { question: "let x = 10; TS 知道 x 是什么类型吗？", options: ["不知道", "知道——TS 自动推断为 number", "只能手动指定", "推断为 any"], answer: 1, explanation: "TS 有强大的类型推断，有初始值时能自己猜出类型，不用处处手动写。" },
+      ],
+    },
+    "ts-types": {
+      slug: "ts-types",
+      sections: [
+        {
+          title: "基础类型再走一遍",
+          content: `TS 的类型分两大类：原始类型（string、number、boolean 这些最基础的）和对象类型（数组、对象、函数这些由基础类型拼起来的）。
+
+把类型想成给数据贴标签——有了标签，编辑器就知道这个变量能干什么、不能干什么：`,
+          code: `// 原始类型——最简单直接
+let str: string = "hello";          // 字符串
+let num: number = 42;               // 数字（不分 int/float）
+let bool: boolean = true;           // 布尔
+let big: bigint = 100n;            // 大整数
+let sym: symbol = Symbol("key");    // 唯一标识
+
+// 数组——两种写法效果一样
+let arr1: number[] = [1, 2, 3];
+let arr2: Array<number> = [1, 2, 3];   // 泛型写法
+
+// 元组——定长定类型的数组
+let tuple: [string, number] = ["小明", 25];
+// tuple = [25, "小明"];     // 报错，位置类型不对
+// tuple = ["小明", 25, 30]; // 报错，多了一个
+
+// 枚举——给一组常量起名字
+enum Direction {
+  Up,        // 默认 0
+  Down,      // 默认 1
+  Left,      // 默认 2
+  Right,     // 默认 3
+}
+let dir: Direction = Direction.Up;
+
+enum Status {
+  Success = 200,
+  NotFound = 404,
+  Error = 500,
+}`,
+          language: "typescript",
+        },
+        {
+          title: "any / unknown / never / void——四大特殊类型",
+          content: `这几兄弟性格各不同。any 最宽容啥都让干但等于放弃类型检查；unknown 也啥都能装但要先检查类型才让用（更安全）；never 永远到不了；void 表示没返回值。`,
+          code: `// any——关闭类型检查，等于回到 JS
+let a: any = 10;
+a = "hello";         // 不报错
+a.foo();             // 也不报错（运行时可能崩）
+// 尽量别用 any，除非你确实不知道类型（比如引入没类型的第三方库）
+
+// unknown——安全的 any，用之前必须检查类型
+let u: unknown = 10;
+// u.toFixed(2);      // 报错，TS 不知道 u 是不是数字
+if (typeof u === "number") {
+  console.log(u.toFixed(2));  // 这里安全了，TS 知道 u 是 number
+}
+
+// 类型收窄后 unknown 变具体类型
+function process(value: unknown): string {
+  if (typeof value === "string") return value.toUpperCase();
+  if (typeof value === "number") return value.toFixed(2);
+  return String(value);
+}
+
+// never——永不发生，比如抛异常或死循环的函数
+function throwError(msg: string): never {
+  throw new Error(msg);   // 函数永远不会正常返回
+}
+
+function infiniteLoop(): never {
+  while (true) {}          // 永远不会结束
+}
+
+// void——没有返回值（但函数实际返回 undefined）
+function log(msg: string): void {
+  console.log(msg);
+  // 没有 return
+}`,
+          language: "typescript",
+          tip: "遇到不认识的类型优先用 unknown 而不是 any——unknown 能接任何值但必须检查后才能用，等于加了层安全带。",
+        },
+        {
+          title: "类型断言——你比 TS 更懂",
+          content: `有时候你心里清楚一个变量是啥类型但 TS 推断不出来，就可以用类型断言「告诉」TS：「相信我，它就是这类型」。断言分两种写法——as 语法跟尖括号语法，推荐 as：`,
+          code: `// as 语法——推荐，JSX/TSX 里也能用
+let el = document.getElementById("app") as HTMLDivElement;
+el.innerHTML = "你好";    // TS 现在知道它是 div 了
+
+// 尖括号语法——跟 JSX 语法冲突，React 项目里别用
+let el2 = <HTMLDivElement>document.getElementById("app");
+
+// 双断言——从 any 或 unknown 桥接到目标类型
+let raw: unknown = "hello";
+let len = (raw as string).length;  // 告诉 TS：它就是字符串
+
+// 常用场景：你不知道完整类型，先断言
+fetch("/api/data")
+  .then(res => res.json())
+  .then(data => {
+    const result = data as { name: string; age: number };
+    console.log(result.name);
+  });
+
+// 断言 vs 类型注解：断言是「我知道」，注解是「我要求」
+let s1 = "hello" as string;    // 断言：它就是字符串
+let s2: string = "hello";       // 注解：它必须是字符串`,
+          language: "typescript",
+          warning: "类型断言不检查——你说它是啥 TS 就信你。运行时类型不对照样崩。断言 = 强行绕过检查，谨慎用。",
+        },
+        {
+          title: "字面量类型——精确到值",
+          content: `除了 string、number 这些大类，TS 还能精确到具体的值。比如变量不仅要是字符串，还必须正好是 "male" 或 "female"。这叫字面量类型，跟联合类型搭配特别好用：`,
+          code: `// 字符串字面量类型
+let gender: "male" | "female";
+gender = "male";   // OK
+// gender = "other";  // 报错，只能是那两个值之一
+
+// 用在函数参数里——约束可选值
+function setAlign(align: "left" | "center" | "right") {
+  // TS 帮你保证 align 只可能是这三个之一
+}
+setAlign("center");  // OK
+// setAlign("top");   // 报错
+
+// 数字字面量
+let dice: 1 | 2 | 3 | 4 | 5 | 6;
+dice = 3;  // OK
+// dice = 7;  // 报错
+
+// 联合类型 + 字面量 = 枚举替代方案（更轻量）
+type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
+function request(url: string, method: HttpMethod) {
+  // 编译时保证 method 对，还能自动补全
+}
+
+// const 断言——把值冻结成字面量类型
+const colors = ["red", "green", "blue"] as const;
+// colors 的类型是 readonly ["red", "green", "blue"]，不是 string[]
+
+const config = {
+  port: 3000,
+  host: "localhost",
+} as const;
+// config.port 的类型是 3000（字面量），不是 number`,
+          language: "typescript",
+          tip: "as const 是 TS 里一个小而精的语法——让数组变成只读元组、对象属性变成只读字面量类型，少了它就全是泛泛的 string/number。",
+        },
+      ],
+      quiz: [
+        { question: "unknown 和 any 的区别？", options: ["完全一样", "unknown 安全——用之前必须先检查类型；any 直接放行", "unknown 能直接调用方法", "any 更安全"], answer: 1, explanation: "unknown 让你接收任意值但不能直接操作，必须 typeof/instanceof 检查后才能用，比 any 安全得多。" },
+        { question: "never 类型的函数意味着什么？", options: ["返回 undefined", "永远不会正常返回——比如抛异常或死循环", "返回 null", "返回任意值"], answer: 1, explanation: "never 表示永不到达——函数要么抛异常退出要么死循环，绝不会有 return 语句。" },
+        { question: "类型断言 'hello' as string 做了什么？", options: ["类型转换", "告诉 TS 编译器这就是 string——但运行时啥也没发生", "把数字转成字符串", "编译成类型检查代码"], answer: 1, explanation: "as 断言纯编译时的声明，编译后代码跟没有 as 一样，TS 只是相信你的判断不报错。" },
+        { question: "as const 对数组的影响？", options: ["没影响", "数组变只读元组——每个元素获得字面量类型", "数组扩容", "数组排序"], answer: 1, explanation: "as const 把 ['a','b'] 的类型从 string[] 变成 readonly ['a','b']，每个元素确定到值。" },
+        { question: "字面量类型 'GET' | 'POST' 的好处？", options: ["好看", "编译时检查 + 编辑器自动补全——比用 string 安全一百倍", "运行更快", "没有好处"], answer: 1, explanation: "限制参数到具体几个值让 TS 在编译时就能检查出拼写错误和非法值，编辑器还能在输入时自动提示候选。" },
+      ],
+    },
+    "ts-interfaces": {
+      slug: "ts-interfaces",
+      sections: [
+        {
+          title: "interface——给对象定合同",
+          content: `interface 就是对象的「合同」——规定了对象长什么样：必须有哪几个属性、每个属性啥类型。你拿来约束参数、返回值、变量都行。不符合合同的对象 TS 直接给你报错，门都不让进：`,
+          code: `// 定义接口——描述对象形状
+interface User {
+  name: string;
+  age: number;
+  email: string;
+}
+
+// 变量必须符合接口
+const u1: User = {
+  name: "张三",
+  age: 28,
+  email: "zhangsan@example.com",
+};
+
+// 函数用接口约束参数
+function sendEmail(user: User): void {
+  console.log("发送邮件给 " + user.name + " (" + user.email + ")");
+}
+
+// 接口做返回值——函数返回的对象也必须符合接口
+function createAdmin(name: string): User {
+  return { name, age: 0, email: name + "@admin.com" };
+}`,
+          language: "typescript",
+        },
+        {
+          title: "可选属性与只读属性",
+          content: `接口里的属性不是每个都必填。加个问号就变可选（可以有也可以没有），前面加 readonly 就只能读不能改（设一次就锁死）：`,
+          code: `interface Product {
+  readonly id: number;       // 只读——一旦赋值不能改
+  name: string;
+  price: number;
+  description?: string;      // 可选——可以有也可以没有
+  category?: string;         // 可选
+}
+
+const p: Product = { id: 1, name: "手机", price: 2999 };
+// p.id = 2;     // 报错！readonly 属性不能改
+
+// 可选属性——访问前得判空
+function printProduct(p: Product) {
+  console.log(p.name + " ¥" + p.price);
+  // 可选属性用可选链访问
+  console.log(p.description?.substring(0, 20) ?? "暂无描述");
+}
+
+// 函数参数也支持可选——问号放在参数名后面
+function greet(name: string, title?: string): string {
+  return title ? title + " " + name : name;
+}
+greet("小明");                // OK
+greet("小明", "博士");        // OK`,
+          language: "typescript",
+        },
+        {
+          title: "索引签名——未知属性名也能约束",
+          content: `有些场景你不知道属性具体叫什么名字（比如从后端拿回来的配置对象），但你知道属性名和值的类型。索引签名就是干这个的：`,
+          code: `// 字符串索引签名——属性名是 string，值是 number
+interface Dictionary {
+  [key: string]: number;      // 任意个属性，只要值是数字就行
+}
+
+const scores: Dictionary = {
+  math: 95,
+  english: 88,
+  chinese: 92,
+};
+
+// 更实用的例子——任何字符串键，值是任意类型
+interface Config {
+  [key: string]: string | number | boolean;
+}
+
+const config: Config = {
+  apiUrl: "https://api.example.com",
+  timeout: 3000,
+  debug: true,
+};
+
+// 混合写法——已知属性 + 索引签名
+interface NamedDict {
+  name: string;             // 必须有的属性
+  [key: string]: string;     // 其他任意属性也得是 string
+}
+
+const d: NamedDict = {
+  name: "小明",
+  city: "北京",
+  job: "工程师",
+};`,
+          language: "typescript",
+          tip: "索引签名让你在不牺牲类型安全的前提下接受动态键的对象，告别 any。",
+        },
+        {
+          title: "extends——接口继承, 别重复",
+          content: `interface 可以继承另一个 interface，把父接口的属性全拿过来再叠加新的。这样就不用 Ctrl+C Ctrl+V：`,
+          code: `interface Animal {
+  name: string;
+  age: number;
+}
+
+interface Dog extends Animal {
+  breed: string;          // 新增属性
+  bark(): void;           // 新增方法
+}
+
+const wangwang: Dog = {
+  name: "旺财",
+  age: 3,
+  breed: "金毛",
+  bark() { console.log("汪汪！"); },
+};
+
+// 还可以多继承——从好几个接口各拿一部分
+interface Swimmer { swim(): void; }
+interface Flyer { fly(): void; }
+
+interface Duck extends Swimmer, Flyer {
+  name: string;
+}
+
+const donald: Duck = {
+  name: "唐老鸭",
+  swim() { console.log("游..."); },
+  fly() { console.log("飞..."); },
+};`,
+          language: "typescript",
+        },
+        {
+          title: "interface vs type——选哪个",
+          content: `interface 和 type（类型别名）都能描述对象形状，大部分情况都能互换。但有几个关键区别：`,
+          code: `// 两者都能做这些事
+interface User1 {
+  name: string;
+  age: number;
+}
+
+type User2 = {
+  name: string;
+  age: number;
+};
+
+// 区别1：interface 能「声明合并」——同名 interface 自动合并
+interface Person {
+  name: string;
+}
+interface Person {
+  age: number;
+}
+// Person 现在是 { name: string; age: number }
+// type 同名会直接报错
+
+// 区别2：type 能写联合类型、交叉类型
+type ID = string | number;
+type Admin = User2 & { role: string };
+
+// 区别3：interface 能被 extends 扩展
+interface AdminUser extends User1 {
+  role: string;
+}
+
+// 习惯：
+// - 描述对象形状用 interface
+// - 联合/交叉/映射类型用 type
+// - 第三方库对外 API 用 interface（方便用户扩展）`,
+          language: "typescript",
+          tip: "日常开发：优先用 interface 描述对象，type 处理联合/交叉/工具类型。如果你的接口可能被别人扩展，用 interface 没错。",
+        },
+      ],
+      quiz: [
+        { question: "interface 里的 readonly 属性意味着？", options: ["只读——赋值后不能修改", "不能定义", "运行时加密", "只有类能用"], answer: 0, explanation: "readonly 让属性在初始化后就不能再改动，编译时检查，适合 id、创建时间等字段。" },
+        { question: "interface 里属性后面加 ? 表示什么？", options: ["必填", "可选——可以有也可以没有", "只读", "私有"], answer: 1, explanation: "问号表示可选属性，使用时不填也不会报错。访问时 TS 会自动推断为 类型 | undefined。" },
+        { question: "interface 和 type 的核心区别？", options: ["完全一样", "interface 能声明合并（同名合并），type 能写联合/交叉类型", "type 更好用", "interface 更快"], answer: 1, explanation: "interface 的同名自动合并是独门绝技；type 能表示 string | number 这种联合类型，interface 做不到。" },
+        { question: "索引签名 [key: string]: number 表示什么？", options: ["固定属性名", "属性名是字符串，值是数字——数量不限", "只有一个 key 属性", "key 是数字"], answer: 1, explanation: "索引签名说这个对象可以有任意多个属性，只要属性名是字符串、值是数字就行。" },
+        { question: "extends 能继承多个 interface 吗？", options: ["不能", "能——用逗号分隔", "只能用一次", "只能继承一个"], answer: 1, explanation: "interface 支持多继承，extends A, B, C 把多个父接口的属性全合并到子接口。" },
+      ],
+    },
+    "ts-generics": {
+      slug: "ts-generics",
+      sections: [
+        {
+          title: "泛型是啥——写了再定类型的函数",
+          content: `泛型就是「类型参数」——写函数或类的时候先不固定类型，用的时候再传入具体类型。就像函数有参数一样，泛型让「类型」也能当参数传来传去。
+
+举个最简单的例子：一个返回数组第一项的函数。不用泛型你得为每种类型写一遍，用泛型一行搞定：`,
+          code: `// 不用泛型——每种类型写一遍，烦死了
+function firstNumber(arr: number[]): number | undefined {
+  return arr[0];
+}
+function firstString(arr: string[]): string | undefined {
+  return arr[0];
+}
+
+// 用泛型——一招搞定所有类型
+function first<T>(arr: T[]): T | undefined {
+  return arr[0];
+}
+
+first([1, 2, 3]);         // T 自动推断为 number，返回 number
+first(["a", "b", "c"]);   // T 自动推断为 string，返回 string
+first<boolean>([true]);   // 手动指定 T 为 boolean`,
+          language: "typescript",
+        },
+        {
+          title: "泛型约束——别让 T 太自由",
+          content: `光写 <T> 的话 T 可以是任何类型，有时候你得限制它。比如你要调用 .length 属性，就得约束 T 必须包含 length 属性。用 extends 给 T 加限制：`,
+          code: `// 不加约束——T 可以是任何类型，没法用 length
+// function getLength<T>(arg: T): number {
+//   return arg.length;  // 报错！不是所有类型都有 length
+// }
+
+// 加了约束——T 必须有 length 属性
+function getLength<T extends { length: number }>(arg: T): number {
+  return arg.length;    // OK，TS 知道有 length
+}
+
+getLength("hello");      // string 有 length → 5
+getLength([1, 2, 3]);    // array 有 length → 3
+// getLength(123);        // 报错，number 没有 length
+
+// 约束对象必须有特定属性
+interface HasName {
+  name: string;
+}
+
+function printName<T extends HasName>(obj: T): void {
+  console.log(obj.name);
+}
+
+printName({ name: "小明", age: 20 });  // OK，有 name 就行
+// printName({ age: 20 });               // 报错，没有 name
+
+// keyof 约束——T 的键
+function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
+  return obj[key];
+}
+
+const user = { name: "张三", age: 30 };
+getProperty(user, "name");  // OK
+// getProperty(user, "email");  // 报错，user 没有 email 键`,
+          language: "typescript",
+        },
+        {
+          title: "泛型类与泛型接口",
+          content: `泛型不光是函数能用，类和接口也能用。后端接口返回的列表、本地缓存、数据仓库这些场景，泛型让你一个类伺候所有数据类型：`,
+          code: `// 泛型接口
+interface Result<T> {
+  data: T;
+  success: boolean;
+  message: string;
+}
+
+// T 可以是任何类型
+const userResult: Result<{ name: string }> = {
+  data: { name: "张三" },
+  success: true,
+  message: "ok",
+};
+
+const listResult: Result<string[]> = {
+  data: ["a", "b", "c"],
+  success: true,
+  message: "ok",
+};
+
+// 泛型类
+class Stack<T> {
+  private items: T[] = [];
+
+  push(item: T): void {
+    this.items.push(item);
+  }
+
+  pop(): T | undefined {
+    return this.items.pop();
+  }
+
+  peek(): T | undefined {
+    return this.items[this.items.length - 1];
+  }
+}
+
+const numStack = new Stack<number>();
+numStack.push(1);
+numStack.push(2);
+const val = numStack.pop();  // val 的类型是 number | undefined`,
+          language: "typescript",
+        },
+        {
+          title: "实用工具类型——TS 自带的泛型法宝",
+          content: `TS 自带了一堆用泛型写好的工具类型，帮你少写样板代码。做的最重要的这几个：Partial 全变可选、Required 全变必填、Pick 挑几样、Omit 踢掉几样、Record 造字典。`,
+          code: `interface Todo {
+  id: number;
+  title: string;
+  description: string;
+  completed: boolean;
+}
+
+// Partial——所有属性变可选，更新数据时常用
+type TodoUpdate = Partial<Todo>;
+// 等价于 { id?: number; title?: string; description?: string; completed?: boolean; }
+
+function updateTodo(id: number, fields: Partial<Todo>) {
+  // 只传要改的字段
+}
+updateTodo(1, { completed: true });  // 只改 completed，其他不动
+
+// Required——所有属性变必填
+type RequiredTodo = Required<Todo>;  // 去掉所有 ?
+
+// Pick——从接口里挑几个属性
+type TodoBrief = Pick<Todo, "id" | "title">;
+// { id: number; title: string }
+
+// Omit——从接口里踢掉几个属性
+type TodoWithoutId = Omit<Todo, "id">;
+// { title: string; description: string; completed: boolean }
+
+// Record——快速造一个字典类型
+type PageRoutes = Record<string, string>;
+// { [key: string]: string }
+const routes: PageRoutes = { home: "/", about: "/about" };
+
+type StatusMap = Record<"active" | "inactive" | "banned", string>;
+// { active: string; inactive: string; banned: string }`,
+          language: "typescript",
+          tip: "Partial 是做更新接口的神器——不用为每个更新接口重新定义一遍字段全可选的类型，一行 Partial<T> 搞定。",
+        },
+      ],
+      quiz: [
+        { question: "泛型 <T> 的作用？", options: ["占位符", "类型参数——用的时候才确定具体类型", "只能是 number", "只能是 string"], answer: 1, explanation: "泛型让你写代码时不指定类型，调用时才传入或推断具体类型，一个函数伺候所有类型。" },
+        { question: "<T extends { length: number }> 的 extends 啥意思？", options: ["继承类", "约束——T 必须包含 length 属性", "等于 any", "等于 string"], answer: 1, explanation: "extends 在泛型约束里表示 T 必须满足某个条件——这里是要求 T 有 length 属性才能用。" },
+        { question: "Partial<T> 的作用？", options: ["复制类型", "把 T 所有属性变成可选——更新场景神器", "删除所有属性", "新增属性"], answer: 1, explanation: "Partial 借助映射类型把接口每个属性后都加个 ?，全部变可选，更新数据时只传要改的字段。" },
+        { question: "Pick<T, K> 和 Omit<T, K> 的区别？", options: ["一样", "Pick 选择保留哪些；Omit 选择排除哪些——方向相反", "Pick 更快", "Omit 更安全"], answer: 1, explanation: "Pick 是「我要这几个」，Omit 是「我不要这几个」，功能互补。" },
+        { question: "Record<'a'|'b', string> 出来的类型？", options: ["数组", "{ a: string; b: string }——给定键和值造对象类型", "只读数组", "undefined"], answer: 1, explanation: "Record<K, V> 创建一个以 K 为键、V 为值的对象类型，拿来定义字典/映射最方便。" },
+      ],
+    },
+    "ts-advanced": {
+      slug: "ts-advanced",
+      sections: [
+        {
+          title: "联合类型与交叉类型——或与和",
+          content: `联合类型 | 表示「要么这个要么那个」（或），交叉类型 & 表示「既要这个又要那个」（和）。这俩是组合类型的基本操作：`,
+          code: `// 联合类型 |——满足其一即可
+type ID = string | number;
+let userId: ID = 123;     // 可以
+userId = "abc-456";       // 也可以
+
+function formatId(id: ID): string {
+  // 收窄——先判断具体是哪个类型再处理
+  if (typeof id === "string") {
+    return id.toUpperCase();
+  }
+  return id.toString();
+}
+
+// 交叉类型 &——两个都满足
+interface Nameable { name: string; }
+interface Ageable { age: number; }
+
+type Person = Nameable & Ageable;  // 必须同时有 name 和 age
+
+const p: Person = { name: "张三", age: 30 };  // 两个都得有
+
+// 联合 vs 交叉的更多例子
+type Admin = Person & { role: "admin" };        // Person + role
+type Visitor = Person & { role: "visitor" };
+type AppUser = Admin | Visitor;                  // 要么 Admin 要么 Visitor
+
+function handleUser(u: AppUser) {
+  console.log(u.name);      // 都能访问 name
+  // console.log(u.role);   // 报错！不能确定 role 是 "admin" 还是 "visitor"
+  if (u.role === "admin") {
+    console.log("管理员");
+  } /* else {
+    console.log("访客");
+  }*/
+}`,
+          language: "typescript",
+        },
+        {
+          title: "条件类型——根据条件选类型",
+          content: `条件类型就像三元表达式但作用于类型层面：根据某个条件判断结果，返回不同的类型。extends 在这里的意思是「是否可赋值给」：`,
+          code: `// 条件类型基础——T 能赋值给 U 吗？
+type IsString<T> = T extends string ? "yes" : "no";
+
+type A = IsString<"hello">;   // "yes"
+type B = IsString<number>;    // "no"
+
+// 常用的 Exclude / Extract / NonNullable 都用条件类型实现
+type T1 = Exclude<"a" | "b" | 1 | 2, string>;   // 1 | 2（排除字符串）
+type T2 = Extract<"a" | "b" | 1 | 2, string>;   // "a" | "b"（提取字符串）
+type T3 = NonNullable<string | null | undefined>; // string（踢掉 null/undefined）
+
+// ReturnType——获取函数返回值类型
+function fetchUser() {
+  return { name: "张三", age: 30 };
+}
+type UserType = ReturnType<typeof fetchUser>;  // { name: string; age: number }
+
+// Parameters——获取函数参数类型
+type FetchParams = Parameters<typeof fetchUser>;  // []（没有参数）
+
+// 分布式条件类型——联合类型自动拆开
+type ToArray<T> = T extends any ? T[] : never;
+type Result = ToArray<string | number>;  // string[] | number[]（拆开各自处理）`,
+          language: "typescript",
+          tip: "Exclude 和 Extract 是联合类型的筛子——一个去掉不要的、一个只留想要的，日常过滤联合类型就靠这俩。",
+        },
+        {
+          title: "infer——在条件类型里抓取类型",
+          content: `infer 让你在条件类型里「取出」某个类型，然后用在结果里。就像在类型体操里伸手抓住一个路过的东西：`,
+          code: `// 获取数组元素类型
+type ArrayItem<T> = T extends (infer U)[] ? U : never;
+// 如果 T 是数组，抓住 U（元素类型）；否则 never
+
+type Item1 = ArrayItem<string[]>;     // string
+type Item2 = ArrayItem<number[]>;     // number
+type Item3 = ArrayItem<string>;       // never（不是数组）
+
+// 获取 Promise 包裹的类型——极其常用
+type Unwrap<T> = T extends Promise<infer U> ? U : T;
+
+type R1 = Unwrap<Promise<string>>;  // string
+type R2 = Unwrap<number>;           // number（不是 Promise，直接返回）
+
+// 获取函数返回值——不用 ReturnType 也能实现
+type MyReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+
+type Fn = (a: number, b: string) => boolean;
+type FnReturn = MyReturnType<Fn>;  // boolean`,
+          language: "typescript",
+        },
+        {
+          title: "映射类型——遍历属性挨个改",
+          content: `映射类型是一种「批量生产」类型的方式——遍历已有类型的所有属性，对每个属性做同样的操作。TS 的 Partial、Readonly、Record 背后全是映射类型：`,
+          code: `// 只读映射——所有属性加 readonly
+type MyReadonly<T> = {
+  readonly [K in keyof T]: T[K];
+};
+
+interface User {
+  name: string;
+  age: number;
+}
+type ReadonlyUser = MyReadonly<User>;
+// { readonly name: string; readonly age: number }
+
+// 可选映射——所有属性加 ?
+type MyPartial<T> = {
+  [K in keyof T]?: T[K];
+};
+
+// 属性名重映射（TS 4.1+）——给属性名加前缀
+type WithPrefix<T, Prefix extends string> = {
+  [K in keyof T as \`\${Prefix}\${string & K}\`]: T[K];
+};
+
+interface Api {
+  getList(): void;
+  getDetail(): void;
+}
+type ApiWithLog = WithPrefix<Api, "log">;
+// { logGetList: () => void; logGetDetail: () => void }
+
+// 实践——给所有属性加 null
+type Nullable<T> = {
+  [K in keyof T]: T[K] | null;
+};
+
+type NullableUser = Nullable<User>;
+// { name: string | null; age: number | null }`,
+          language: "typescript",
+        },
+        {
+          title: "模板字面量类型——字符串也能玩类型",
+          content: `TS 4.1 开始支持用模板字符串（反引号那套）来构造类型。字符串不再是糊涂的 string，变成精确的模式：`,
+          code: `// 模板字面量类型基础
+type Greeting = "Hello, " + string;  // 错！
+type Greeting = \`Hello, \${string}\`;  // 对
+
+let g: Greeting = "Hello, World";    // OK
+// let g2: Greeting = "Hi, World";   // 报错，必须以 "Hello, " 开头
+
+// 实用场景——事件名类型
+type EventName = \`on\${Capitalize<string>}\`;
+let e: EventName = "onClick";    // OK
+let e2: EventName = "onChange";  // OK
+// let e3: EventName = "click";   // 报错，必须以 on 开头
+
+// CSS 单位类型
+type CSSValue = \`\${number}\${"px" | "em" | "rem" | "%"}\`;
+let width: CSSValue = "100px";   // OK
+let size: CSSValue = "1.5rem";   // OK
+// let bad: CSSValue = "auto";    // 报错
+
+// 结合映射类型——「给接口所有方法名加 on」模式
+type EventHandlers<T> = {
+  [K in keyof T as T[K] extends Function ? \`on\${Capitalize<string & K>}\` : never]: T[K];
+};
+
+interface Component {
+  click(): void;
+  change(): void;
+  value: string;
+}
+type CompHandlers = EventHandlers<Component>;
+// { onClick: () => void; onChange: () => void }（value 不是 Function 被过滤了）`,
+          language: "typescript",
+          tip: "Capitalize<X> 是 TS 自带工具，把字符串首字母变大写。还有 Uncapitalize、Uppercase、Lowercase——字符串也能玩出花。",
+        },
+      ],
+      quiz: [
+        { question: "联合类型 A | B 和交叉类型 A & B 的区别？", options: ["一样", "| 满足其一就行，& 两个都得满足", "| 是继承，& 是分开", "| 更快"], answer: 1, explanation: "联合是「或」——值只要是 A 或 B 之一就通过；交叉是「且」——值必须同时满足 A 和 B。" },
+        { question: "infer 关键字在条件类型里的作用？", options: ["声明变量", "从条件类型中提取某个类型——抓住路过的东西", "等于 any", "等于 never"], answer: 1, explanation: "infer 在 T extends SomePattern<infer X> 这种写法里，从模式匹配中抓出某个类型供后续使用。" },
+        { question: "映射类型 [K in keyof T]: T[K] 做了什么？", options: ["什么也没做", "遍历 T 的所有属性键，逐个处理——批量操作类型", "创建数组", "删除属性"], answer: 1, explanation: "映射类型相当于类型的 for...in 循环，对每个属性做同样操作，实现 Partial/Readonly 等工具类型。" },
+        { question: "模板字面量类型 \`Hello, \${string}\` 能匹配什么？", options: ["只有 Hello", "以 Hello, 开头的任何字符串", "任何字符串", "数字"], answer: 1, explanation: "模板字面量类型能精确约束字符串模式，比如 \`\${number}px\` 只匹配以数字+px 结尾的字符串。" },
+        { question: "Exclude<'a'|'b'|1|2, string> 的结果？", options: ["'a'|'b'", "1|2", "'a'|'b'|1|2", "never"], answer: 1, explanation: "Exclude 从第一个联合类型中踢掉符合第二个的类型，string 踢掉所有字符串类型，只剩数字。" },
+      ],
+    },
+    "ts-decorators": {
+      slug: "ts-decorators",
+      sections: [
+        {
+          title: "装饰器是啥——给代码贴标签",
+          content: `装饰器是一种声明式的「元编程」语法——你在类、方法、属性前面加个 @xxx，就相当于告诉编译器：「对这段代码额外做点事情」。常见场景：日志记录、权限校验、依赖注入、序列化。
+
+装饰器本质上就是一个函数，不同的装饰器在不同的时机被调用。TS 目前还是实验性特性，需要在 tsconfig 里手动打开：`,
+          code: `// tsconfig.json 中打开
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true   // 如果用了 reflect-metadata
+  }
+}`,
+          language: "json",
+        },
+        {
+          title: "类装饰器——管整个类",
+          content: `类装饰器作用在类的构造函数上，可以修改或替换一个类。它接受一个参数——目标类的构造函数：`,
+          code: `// 类装饰器——接收类的构造函数
+function sealed(constructor: Function) {
+  Object.seal(constructor);
+  Object.seal(constructor.prototype);
+}
+
+@sealed
+class Dog {
+  name: string;
+  constructor(name: string) {
+    this.name = name;
+  }
+}
+
+// 装饰器工厂——可以传参数的装饰器
+function Logger(prefix: string) {
+  return function (constructor: Function) {
+    console.log(prefix + " 创建了 " + constructor.name);
+  };
+}
+
+@Logger("动物模块")
+class Cat {
+  constructor() {
+    console.log("猫来了");
+  }
+}
+// 输出：动物模块 创建了 Cat
+
+// 传参数 + 改行为——给类加时间戳
+function AddTimestamp<T extends { new (...args: any[]): {} }>(constructor: T) {
+  return class extends constructor {
+    createdAt = new Date();
+  };
+}
+
+@AddTimestamp
+class Article {
+  title: string;
+  constructor(title: string) {
+    this.title = title;
+  }
+}
+
+const article = new Article("标题");
+// article.createdAt 可以访问`,
+          language: "typescript",
+        },
+        {
+          title: "方法装饰器——管单个方法",
+          content: `方法装饰器可以拦截方法的调用、修改参数、替换返回值。它接受三个参数：目标对象（实例或类）、方法名、属性描述符：`,
+          code: `// 方法装饰器——记录方法调用
+function Log(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  const original = descriptor.value;
+  descriptor.value = function (...args: any[]) {
+    console.log("调用方法 " + propertyKey + "，参数：" + JSON.stringify(args));
+    const result = original.apply(this, args);
+    console.log("方法 " + propertyKey + " 返回：" + result);
+    return result;
+  };
+}
+
+class Calculator {
+  @Log
+  add(a: number, b: number): number {
+    return a + b;
+  }
+
+  @Log
+  multiply(a: number, b: number): number {
+    return a * b;
+  }
+}
+
+const calc = new Calculator();
+calc.add(2, 3);   // 输出：调用方法 add，参数：[2,3]  方法 add 返回：5
+
+// 防抖装饰器——防止短时间内多次调用
+function Debounce(delay: number) {
+  return function (target: any, key: string, descriptor: PropertyDescriptor) {
+    const original = descriptor.value;
+    let timer: ReturnType<typeof setTimeout>;
+    descriptor.value = function (...args: any[]) {
+      clearTimeout(timer);
+      timer = setTimeout(() => original.apply(this, args), delay);
+    };
+  };
+}
+
+class SearchBox {
+  @Debounce(300)
+  search(keyword: string) {
+    console.log("搜索：" + keyword);
+  }
+}`,
+          language: "typescript",
+        },
+        {
+          title: "属性装饰器与参数装饰器",
+          content: `属性和参数装饰器用的少一些，但在某些框架（如 Nest.js 的 @Body() @Param()）里很关键。属性装饰器能设元数据，参数装饰器能标注入参：`,
+          code: `// 属性装饰器
+function Required(target: any, propertyKey: string) {
+  // 把必填信息存起来，后面验证时用
+  const requiredKeys = Reflect.getMetadata("required", target) || [];
+  requiredKeys.push(propertyKey);
+  Reflect.defineMetadata("required", requiredKeys, target);
+}
+
+// 参数装饰器
+function Param(name: string) {
+  return function (target: any, methodName: string, paramIndex: number) {
+    console.log("方法 " + methodName + " 的第 " + paramIndex + " 个参数名为 " + name);
+  };
+}
+
+class UserController {
+  @Required
+  name: string;
+
+  @Required
+  email: string;
+
+  greet(@Param("称呼") title: string, @Param("内容") msg: string) {
+    console.log(title + ": " + msg);
+  }
+}
+
+// 配合 reflect-metadata 实现依赖注入的简化版
+import "reflect-metadata";
+
+function Injectable() {
+  return function (constructor: Function) {};
+}
+
+function Inject() {
+  return function (target: any, key: string) {};
+}
+
+@Injectable()
+class UserService {
+  getUser() { return { name: "张三" }; }
+}
+
+@Injectable()
+class UserController2 {
+  @Inject()
+  userService!: UserService;
+
+  getProfile() {
+    return this.userService.getUser();
+  }
+}`,
+          language: "typescript",
+          tip: "reflect-metadata 让装饰器能读写类型元数据，是 Nest.js、TypeORM 等框架的基石。注意 emitDecoratorMetadata 必须开启。",
+        },
+      ],
+      quiz: [
+        { question: "TS 装饰器默认能用吗？", options: ["能", "不能——需要在 tsconfig 开启 experimentalDecorators", "部分能", "不需要 TS"], answer: 1, explanation: "装饰器在 TS 中是实验性特性，必须手动在 tsconfig.json 里设置 experimentalDecorators: true。" },
+        { question: "装饰器工厂和普通装饰器的区别？", options: ["一样", "工厂是返回装饰器的函数——可以传参数定制行为", "工厂更慢", "没有区别"], answer: 1, explanation: "装饰器工厂就是个高阶函数，外层收参数，内层返回真正的装饰器函数，实现可配。" },
+        { question: "方法装饰器的 descriptor.value 是啥？", options: ["字符串", "原始方法函数——替换它就能拦截或修改方法行为", "数组", "布尔值"], answer: 1, explanation: "descriptor.value 就是原方法本身，装饰器可以保存原方法引用、用新函数替代、在新函数里调用原方法。" },
+        { question: "reflect-metadata 的作用？", options: ["加速编译", "在运行时读写元数据——让装饰器能存储和查询类型信息", "替换类型检查", "没有作用"], answer: 1, explanation: "reflect-metadata 提供 Reflect.defineMetadata/getMetadata API，装饰器用它存类型信息供框架运行时使用。" },
+        { question: "属性装饰器能像方法装饰器一样改值吗？", options: ["能", "不能直接改——拿不到 descriptor，通常用于收集元数据", "完全一样", "更强大"], answer: 1, explanation: "属性装饰器只收到 target 和 key，没有 PropertyDescriptor，不能直接拦截读写，主要用来收集标记（如必填、验证规则）。" },
+      ],
+    },
+    "ts-project": {
+      slug: "ts-project",
+      sections: [
+        {
+          title: "tsconfig.json 配置精讲",
+          content: `tsconfig.json 是 TS 项目的总控制台。每个选项都影响编译结果和检查严谨程度。关键配置分三大块：编译输出（target/module/outDir）、严格性（strict/相关的子选项）、路径和模块解析：`,
+          code: `{
+  "compilerOptions": {
+    // 编译目标
+    "target": "ES2020",        // 编译成哪个 JS 版本
+    "module": "ESNext",        // 模块系统（Node 用 CommonJS，前端用 ESNext）
+    "lib": ["ES2020", "DOM"],  // 包含哪些类型库（DOM 类型给前端用）
+
+    // 输出
+    "outDir": "./dist",        // 编译产物放哪
+    "rootDir": "./src",        // 源码根目录（编译后保留目录结构）
+    "declaration": true,       // 生成 .d.ts 声明文件
+    "declarationDir": "./types", // d.ts 单独放
+
+    // 严格性（强烈建议全开）
+    "strict": true,            // 总开关——等价于下面六个全开
+    // "noImplicitAny": true,  // 不准隐式 any
+    // "strictNullChecks": true,// null/undefined 单独处理，不准随便赋值
+    // "strictFunctionTypes": true,
+    // "noImplicitReturns": true,
+
+    // 模块解析
+    "moduleResolution": "node", // 像 Node 那样找模块
+    "esModuleInterop": true,   // 让 import 兼容 CommonJS
+    "resolveJsonModule": true, // 能 import JSON 文件
+    "baseUrl": "./",           // 路径别名起点
+    "paths": {                 // 路径别名——告别 ../../../../
+      "@/*": ["src/*"],
+      "@utils/*": ["src/utils/*"],
+      "@components/*": ["src/components/*"]
+    },
+
+    // 其他
+    "skipLibCheck": true,      // 跳过 .d.ts 检查（加速）
+    "forceConsistentCasingInFileNames": true  // 文件名大小写敏感
+  },
+  "include": ["src/**/*"],     // 编译哪些
+  "exclude": ["node_modules", "dist"]  // 忽略哪些
+}`,
+          language: "json",
+          tip: "strict 是最该开的配置——虽然开启后报错更多，但帮你提前发现 null/undefined 等隐患，比事后修 bug 强百倍。",
+        },
+        {
+          title: "声明文件——给纯 JS 代码添加类型",
+          content: `.d.ts 文件是 TS 的「类型说明书」——只写类型不写实现。当你用纯 JS 写的库或老的 npm 包时，自己写个 .d.ts 就能让 TS 认识这些代码：`,
+          code: `// my-library.js（纯 JS 代码，没有类型）
+function calculate(a, b, operation) {
+  if (operation === "add") return a + b;
+  if (operation === "subtract") return a - b;
+  throw new Error("Unknown operation");
+}
+
+// my-library.d.ts（类型声明文件）
+declare function calculate(
+  a: number,
+  b: number,
+  operation: "add" | "subtract"
+): number;
+
+export { calculate };
+
+// 声明全局变量——比如第三方脚本挂到 window 上的
+declare global {
+  interface Window {
+    gtag: (event: string, params: Record<string, any>) => void;
+  }
+}
+
+// 声明模块——让 TS 认识 .vue .svg 等非 JS 文件
+declare module "*.vue" {
+  import { defineComponent } from "vue";
+  export default defineComponent;
+}
+
+declare module "*.svg" {
+  const content: string;
+  export default content;
+}
+
+declare module "*.scss" {
+  const content: Record<string, string>;
+  export default content;
+}
+
+// 扩展已有类型——给 Express 的 Request 加了 user 属性
+declare namespace Express {
+  interface Request {
+    user?: { id: number; name: string };
+  }
+}`,
+          language: "typescript",
+          tip: "第三方库如果自带 @types/xxx 直接装就行。如果没有（比如小众库），自己写个 xxx.d.ts 最省事。TypeScript 类型定义包全在 @types 命名空间下。",
+        },
+        {
+          title: "路径别名——别再 ../../../ 了",
+          content: `项目中跨目录引用常写成 ../../../utils/format，又丑又容易出错。TS 的路径别名让你用 @/utils/format 这种清爽写法。但要注意，TS 和打包工具的配置得同步：`,
+          code: `// tsconfig.json 配置
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@shared/*": ["src/shared/*"],
+      "@types/*": ["src/types/*"]
+    }
+  }
+}
+
+// 使用——告别丑陋的相对路径
+// 之前：import { formatDate } from "../../../utils/format"
+// 现在：import { formatDate } from "@/utils/format"
+
+// Webpack 配合（webpack.config.js）
+module.exports = {
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "src"),
+    },
+  },
+};
+
+// Vite 配合（vite.config.ts）——更简单
+import { defineConfig } from "vite";
+import path from "path";
+
+export default defineConfig({
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "src"),
+    },
+  },
+});`,
+          language: "typescript",
+          warning: "路径别名只是 TS 和打包工具层面的映射，编译后的 JS 代码里路径不会变。Node 直接运行编译产物时可能找不到，得用 tsconfig-paths 或 module-alias。",
+        },
+        {
+          title: "严格模式——宁可编译时多报错",
+          content: `strict 模式是 TS 的质量底线。不开严格模式等于买个保险但不锁门。几个关键子选项的作用：`,
+          code: `// noImplicitAny——不准隐式 any
+function fn(x) {         // strict 模式下报错：x 没有类型
+  return x + 1;
+}
+// 必须显式：
+function fn(x: number) { return x + 1; }
+
+// strictNullChecks——null 和 undefined 不是任何类型的子类型
+let name: string;
+// name = null;          // strict 模式报错！
+name = "hello";          // OK
+
+let maybeName: string | null = null;  // 明确声明可以为 null
+// maybeName.toUpperCase();           // 报错，可能为 null
+if (maybeName !== null) {
+  maybeName.toUpperCase();            // 安全
+}
+
+// 实践中的防御
+function getLength(str: string | null): number {
+  // return str.length;   // 报错，str 可能为 null
+  return str?.length ?? 0;  // 安全处理
+}
+
+// noUncheckedIndexedAccess——数组索引可能不存在
+const arr = [1, 2, 3];
+// const x: number = arr[5];  // 开启后报错，arr[5] 可能是 undefined
+const x: number | undefined = arr[5];  // 必须考虑 undefined`,
+          language: "typescript",
+          tip: "建议新项目开 strict: true，老项目可以逐步开启。strictNullChecks 是最重要的子选项——解决了十亿美元级别的空指针问题。",
+        },
+        {
+          title: "类型定义——@types 大仓库",
+          content: `npm 上有个叫 @types 的组织，专门放第三方库的类型定义。用 TS 写项目时，大部分 npm 包的类型都能在 @types 下找到。装法很简单：`,
+          code: `# 安装类型定义
+npm install --save-dev @types/node        # Node.js 类型
+npm install --save-dev @types/react       # React 类型
+npm install --save-dev @types/express     # Express 类型
+npm install --save-dev @types/lodash      # lodash 类型
+
+# 查看包是否自带类型
+# 如果包的 package.json 里有 "types" 字段，说明自带
+# 没有的话去 TypeSearch 搜：https://www.typescriptlang.org/dt/search
+
+# tsconfig.json 中指定类型——只加载需要的
+{
+  "compilerOptions": {
+    "types": ["node", "jest"]  // 只加载这两个，忽略其他的 @types
+  }
+}
+
+// 使用时有类型提示
+import express from "express";
+// TS 知道 express() 返回什么，req 有哪些方法
+const app = express();
+app.get("/", (req, res) => {
+  res.send("Hello");
+  // req.ip, req.method 都有类型提示
+});
+
+// 没有类型定义怎么办——写个简单的 ambient 声明
+declare module "some-js-lib" {
+  export function doSomething(input: string): number;
+}
+
+// 或者在 src 下新建 types 目录，放入 xxx.d.ts
+// src/types/some-js-lib.d.ts`,
+          language: "typescript",
+          tip: "安装 @types/xxx 时注意版本号跟实际包对应——@types/react@18 对应 react@18，版本不匹配可能出现奇怪的报错。",
+        },
+      ],
+      quiz: [
+        { question: "tsconfig.json 里 strict: true 等价于？", options: ["一键清空", "同时开启 noImplicitAny/strictNullChecks 等多个严格选项", "关闭所有检查", "加速编译"], answer: 1, explanation: "strict 是总开关，开启后多个严格子选项全打开，覆盖最常见的类型隐患。" },
+        { question: "strictNullChecks 开启后，string 和 string|null 的区别？", options: ["没区别", "string 不能赋 null，string|null 可以——严格区分可控和不可控", "string|null 更慢", "string 报错"], answer: 1, explanation: "strictNullChecks 让 null/undefined 成为独立类型，必须显式标注才能接收，避免空指针。" },
+        { question: ".d.ts 声明文件里写什么？", options: ["实现代码", "只写类型声明——函数签名、变量类型，不写实现", "配置文件", "测试"], answer: 1, explanation: "声明文件 .d.ts 是纯类型描述，declare 关键字的函数/变量只告诉 TS 类型信息，没有运行时代码。" },
+        { question: "路径别名 @/utils 映射到 src/utils，需要同步哪些配置？", options: ["只需要 tsconfig", "tsconfig.json + 构建工具（Webpack/Vite）——两边都得配", "不需要配置", "只需要 Webpack"], answer: 1, explanation: "TS 的 paths 只负责编译时类型检查通过，实际模块解析得靠打包工具的别名配置，两边都得一致。" },
+        { question: "没有 @types 定义的 npm 包怎么在 TS 里用？", options: ["不能", "自己写 .d.ts 声明文件或 declare module", "只能用 JS 写", "忽略就行"], answer: 1, explanation: "对没有类型声明的包，写个简单的 .d.ts 或 declare module 让 TS 认识它，哪怕只声明最简单的类型也比报错强。" },
       ],
     },
   },
@@ -18819,6 +22587,15 @@ const slugMap: Record<string, Record<string, string>> = {
     "ajax-fetch": "ajax-fetch",
     "bootstrap-basics": "bootstrap-basics",
     "tailwind-basics": "tailwind-basics",
+  },
+  typescript: {
+    "ts-basics": "ts-basics",
+    "ts-types": "ts-types",
+    "ts-interfaces": "ts-interfaces",
+    "ts-generics": "ts-generics",
+    "ts-advanced": "ts-advanced",
+    "ts-decorators": "ts-decorators",
+    "ts-project": "ts-project",
   },
 };
 
