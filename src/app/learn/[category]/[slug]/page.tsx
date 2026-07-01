@@ -32,7 +32,7 @@ export default function TutorialPage({
   const nextTutorial = currentIndex < category.tutorials.length - 1 ? category.tutorials[currentIndex + 1] : null;
 
   return (
-    <LearnLayout>
+    <LearnLayout category={category}>
       {/* Top Nav: All categories */}
       <CategoryNav activeId={categoryId} />
 

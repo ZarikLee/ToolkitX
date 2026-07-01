@@ -5,7 +5,7 @@
 
 :root {
   /* Theme transition - prevents harsh flash when switching */
-  transition: background-color 3s ease, color 3s ease;
+  transition: background-color 1s ease, color 1s ease;
   /* Dark theme colors (default) */
   --background: #131313;
   --foreground: #e4e2e1;
@@ -81,7 +81,7 @@
 }
 
 *, *::before, *::after {
-  transition: background-color 3s ease, color 3s ease, border-color 3s ease;
+  transition: background-color 1s ease, color 1s ease, border-color 1s ease;
 }
 
 /* ============ Light Theme ============ */

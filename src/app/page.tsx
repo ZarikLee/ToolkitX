@@ -93,10 +93,10 @@ function HomePageContent() {
   return (
     <div className="min-h-screen" style={{ background: "var(--background)", color: "var(--foreground)" }}>
       {/* Header */}
-      <header className="border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
-        <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <header className="border-b h-14 flex items-center" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
+        <div className="max-w-[1400px] mx-auto px-4 flex items-center justify-between gap-4 w-full">
           <Link href="/" className="shrink-0">
-            <span className="text-lg font-bold" style={{ color: "var(--on-surface)" }}>ToolkitX</span>
+            <span className="text-xl font-bold" style={{ color: "var(--on-surface)" }}>ToolkitX</span>
           </Link>
           <div className="flex-1 max-w-md">
             <div className="flex items-center gap-2 px-3 py-2 rounded border" style={{ background: "var(--surface-container-low)", borderColor: "var(--outline-variant)" }}>
@@ -281,14 +281,16 @@ function HomePageContent() {
       </div>
 
       {/* Footer */}
-      <footer className="border-t mt-8" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
-        <div className="max-w-[1400px] mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs" style={{ color: "var(--outline)" }}>
+      <footer className="sticky bottom-0 border-t z-10" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
+        <div className="max-w-[1400px] mx-auto px-4 py-1.5 flex items-center justify-between gap-4 text-xs" style={{ color: "var(--outline)" }}>
           <div className="flex items-center gap-2">
             <span className="font-semibold" style={{ color: "var(--secondary)" }}>ToolkitX</span>
             <span>·</span>
             <span>{totalTutorials} 篇教程 · {toolLinks.length}+ 工具</span>
+            <span>·</span>
+            <span>访问量：{visitCount}</span>
           </div>
-          <div>&copy; 2026 ToolkitX · 访问量：{visitCount}</div>
+          <div>&copy; 2026 ToolkitX</div>
         </div>
       </footer>
     </div>

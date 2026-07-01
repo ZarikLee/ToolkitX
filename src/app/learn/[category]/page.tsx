@@ -12,7 +12,7 @@ export default function CategoryPage({ params }: { params: Promise<{ category: s
   if (!category) return notFound();
 
   return (
-    <LearnLayout>
+    <LearnLayout category={category}>
       {/* Top Nav: All categories */}
       <CategoryNav activeId={categoryId} />
 
