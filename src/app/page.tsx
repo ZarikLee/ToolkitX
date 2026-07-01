@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useMemo, useEffect, Suspense } from "react";
+import { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   Search,
   Terminal,
@@ -66,9 +66,28 @@ function HomePageContent() {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [visitCount, setVisitCount] = useState(0);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     setVisitCount(incrementVisitCount());
+  }, []);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) setSearchOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSearchOpen(false);
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
   }, []);
 
   const filteredCategories = useMemo(() => {
@@ -88,6 +107,22 @@ function HomePageContent() {
       .filter(cat => cat.tutorials.length > 0);
   }, [search, activeCategory]);
 
+  const searchResults = useMemo(() => {
+    if (!search || search.length < 2) return [];
+    const q = search.toLowerCase();
+    const results: Array<{ cat: typeof categories[0]; slug: string; title: string }> = [];
+    for (const cat of categories) {
+      for (const t of cat.tutorials) {
+        if (t.title.toLowerCase().includes(q) || t.description.toLowerCase().includes(q) || t.tags.some(tg => tg.toLowerCase().includes(q))) {
+          results.push({ cat, slug: t.slug, title: t.title });
+          if (results.length >= 5) break;
+        }
+      }
+      if (results.length >= 5) break;
+    }
+    return results;
+  }, [search]);
+
   const totalTutorials = categories.reduce((sum, c) => sum + c.tutorials.length, 0);
 
   return (
@@ -98,18 +133,44 @@ function HomePageContent() {
           <Link href="/" className="shrink-0">
             <span className="text-xl font-bold" style={{ color: "var(--on-surface)" }}>ToolkitX</span>
           </Link>
-          <div className="flex-1 max-w-md">
+          <div ref={searchRef} className="relative flex-1 max-w-md">
             <div className="flex items-center gap-2 px-3 py-2 rounded border" style={{ background: "var(--surface-container-low)", borderColor: "var(--outline-variant)" }}>
               <Search className="w-4 h-4 shrink-0" style={{ color: "var(--outline)" }} />
               <input
                 type="text"
                 value={search}
-                onChange={e => setSearch(e.target.value)}
+                onChange={e => { setSearch(e.target.value); setSearchOpen(true); }}
+                onFocus={() => setSearchOpen(true)}
                 placeholder={mode === "knowledge" ? "搜索教程..." : "搜索工具..."}
                 className="bg-transparent border-none outline-none w-full text-sm"
                 style={{ color: "var(--on-surface)" }}
               />
             </div>
+            {searchOpen && search.length >= 2 && (
+              <div className="absolute top-full mt-1 left-0 right-0 rounded-lg border shadow-lg z-50 max-h-80 overflow-y-auto" style={{ background: "var(--surface-container-lowest)", borderColor: "var(--outline-variant)" }}>
+                {searchResults.length > 0 ? (
+                  <>
+                    <div className="px-3 py-1.5 text-xs font-semibold" style={{ color: "var(--secondary)", background: "color-mix(in srgb, var(--secondary) 8%, transparent)" }}>
+                      搜索结果
+                    </div>
+                    {searchResults.map(r => (
+                      <button
+                        key={r.cat.id + r.slug}
+                        onClick={() => { router.push(`/learn/${r.cat.id}/${r.slug}`); setSearchOpen(false); setSearch(""); }}
+                        className="w-full text-left px-3 py-2 text-sm transition-colors hover:opacity-80"
+                        style={{ color: "var(--on-surface)" }}
+                      >
+                        <span className="w-4 h-4 rounded inline-flex items-center justify-center text-[8px] font-bold mr-1.5" style={{ background: r.cat.color, color: "#fff" }}>{r.cat.icon}</span>
+                        {r.title}
+                        <span className="ml-2 text-xs" style={{ color: "var(--outline)" }}>{r.cat.name}</span>
+                      </button>
+                    ))}
+                  </>
+                ) : (
+                  <div className="px-3 py-3 text-sm text-center" style={{ color: "var(--outline)" }}>没有找到相关教程</div>
+                )}
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <div className="flex rounded border overflow-hidden" style={{ borderColor: "var(--outline-variant)" }}>

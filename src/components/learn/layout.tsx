@@ -156,7 +156,9 @@ export function HeaderSearch({ activeCategory }: { activeCategory?: TutorialCate
 
 // Category horizontal nav bar (shown on category and tutorial pages)
 export function CategoryNav({ activeId }: { activeId?: string }) {
+  const [mobileOpen, setMobileOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!activeId || !containerRef.current) return;
@@ -166,9 +168,70 @@ export function CategoryNav({ activeId }: { activeId?: string }) {
     }
   }, [activeId]);
 
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setMobileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const activeCategory = categories.find(c => c.id === activeId);
+
   return (
     <nav className="border-b" style={{ borderColor: "var(--outline-variant)", background: "var(--surface-container-lowest)" }}>
-      <div ref={containerRef} className="max-w-[1400px] mx-auto px-3 py-1.5 flex items-center gap-0.5 overflow-x-auto">
+      {/* Mobile Dropdown */}
+      <div ref={dropdownRef} className="lg:hidden px-3 py-1.5 relative">
+        <button
+          onClick={() => setMobileOpen(!mobileOpen)}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded text-sm font-medium w-full justify-between border"
+          style={{
+            background: "var(--surface-container-low)",
+            color: "var(--on-surface)",
+            borderColor: "var(--outline-variant)",
+          }}
+        >
+          <span className="flex items-center gap-1.5 truncate">
+            {activeCategory && (
+              <span className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold shrink-0" style={{ background: activeCategory.color, color: "#fff" }}>
+                {activeCategory.icon}
+              </span>
+            )}
+            {activeCategory ? activeCategory.name : "全部技术"}
+          </span>
+          <span className={`text-xs transition-transform shrink-0 ${mobileOpen ? "rotate-180" : ""}`} style={{ color: "var(--outline)" }}>▼</span>
+        </button>
+        {mobileOpen && (
+          <div
+            className="absolute top-full left-3 right-3 mt-1 rounded-lg border shadow-lg z-50 max-h-64 overflow-y-auto"
+            style={{ background: "var(--surface-container-lowest)", borderColor: "var(--outline-variant)" }}
+          >
+            {categories.map(cat => (
+              <Link
+                key={cat.id}
+                href={`/learn/${cat.id}`}
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-2 px-3 py-2 text-sm transition-colors"
+                style={{
+                  color: activeId === cat.id ? "var(--on-secondary)" : "var(--on-surface)",
+                  background: activeId === cat.id ? "var(--secondary)" : "transparent",
+                  fontWeight: activeId === cat.id ? 600 : 400,
+                }}
+              >
+                <span className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold shrink-0" style={{ background: activeId === cat.id ? "rgba(255,255,255,0.2)" : cat.color, color: activeId === cat.id ? "inherit" : "#fff" }}>
+                  {cat.icon}
+                </span>
+                {cat.name}
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Desktop Horizontal Nav */}
+      <div ref={containerRef} className="max-w-[1400px] mx-auto px-3 py-1.5 flex items-center gap-0.5 overflow-x-auto max-lg:hidden">
         {categories.map(cat => (
           <Link
             key={cat.id}
